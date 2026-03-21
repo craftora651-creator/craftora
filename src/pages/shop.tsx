@@ -1,5 +1,5 @@
 // app/page.tsx (Ana sayfa)
-import Header from '../.meteor/Header.tsx';
+import Header from '../.meteor/Header';
 import Hero from '../.meteor/Hero';
 import Categories from '../.meteor/Categories'
 import Featured from '../.meteor/Featured'; // ✅ YENİ!

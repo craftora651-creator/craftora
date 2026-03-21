@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import html2pdf from 'html2pdf.js';
+import html2pdf from 'html2pdf';
 import * as XLSX from 'xlsx';
 
 interface ReportsPageProps {
