@@ -1,6 +1,6 @@
 // components/Hero.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import './hero.css';
+import './Hero.css';
 
 const slides = [
   {
