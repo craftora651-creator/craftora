@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDeleteProduct } from '../server/FastAPI/product.hooks';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';  // 👈 GERİ GETİR!
-import { useMySuppliers } from '../server/FastAPI/supplier.hooks';
-import CJProductImport from '../pages/CJProductImport';
+
 
 interface ProductsPageProps {
   colors: {
