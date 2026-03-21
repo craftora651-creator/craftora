@@ -37,7 +37,6 @@ import EcoMartTheme from './pages/EcoMartTheme';
 import CraftoraThemes from './pages/CraftoraThemes';
 import AddPhysicalProduct from './helpers/AddPhysicalProduct';
 import CJProductImport from './pages/CJProductImport';
-import CJTest from './pages/CJTest';
 
 import "./index.css";
 
@@ -252,7 +251,6 @@ function App() {
               <Route path="/physical-products/add" element={<AddPhysicalProduct />} />
               <Route path="/admin-onboarding" element={<AdminOnboarding />} />
               <Route path="/medya" element={<Medya />} />
-              <Route path="/cj-test" element={<CJTest />} />
               <Route path="/theme/eco-mart" element={<EcoMartTheme />} />
               <Route path="/cj-import" element={<CJProductImport />} />
 
