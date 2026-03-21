@@ -1,6 +1,6 @@
 /* components/Testimonials.tsx */
 import React, { useState } from 'react';
-import './testimonials.css';
+import './Testimonials.css';
 
 // YORUM VERİLERİ
 const testimonials = [
