@@ -1,0 +1,778 @@
+/* pages/Login.css - ELEXTRA TASARIMI - ÖZEL CLASS'LAR */
+
+/* ===== VARIABLES ===== */
+:root {
+  --el-primary: #256af4;
+  --el-primary-light: #4d8af6;
+  --el-primary-dark: #1a4fb0;
+  --el-accent: #f48c25;
+  --el-accent-light: #f7a34d;
+  --el-accent-dark: #d6751e;
+  --el-bg-light: #f5f6f8;
+  --el-bg-dark: #101622;
+  --el-glass: rgba(255, 255, 255, 0.6);
+  --el-glass-border: rgba(255, 255, 255, 0.4);
+  --el-shadow: rgba(31, 38, 135, 0.07);
+  --el-success: #10b981;
+  --el-error: #ef4444;
+  --el-text-light: #1e293b;
+  --el-text-dark: #f1f5f9;
+  --el-border-light: #e2e8f0;
+  --el-border-dark: #334155;
+}
+
+/* ===== DARK MODE ===== */
+.dark-mode {
+  --el-glass: rgba(16, 22, 34, 0.7);
+  --el-glass-border: rgba(255, 255, 255, 0.1);
+  --el-border-light: #334155;
+  --el-text-light: #f1f5f9;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.el-container {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ===== BACKGROUND BLOBS ===== */
+.el-blob-primary {
+  position: absolute;
+  top: 80px;
+  left: 40px;
+  width: 256px;
+  height: 256px;
+  background: rgba(37, 106, 244, 0.1);
+  border-radius: 50%;
+  filter: blur(96px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.el-blob-accent {
+  position: absolute;
+  bottom: 80px;
+  right: 40px;
+  width: 192px;
+  height: 192px;
+  background: rgba(244, 140, 37, 0.1);
+  border-radius: 50%;
+  filter: blur(96px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== LAYOUT ===== */
+.el-layout {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .el-layout {
+    flex-direction: row;
+  }
+}
+
+/* ===== LEFT SECTION ===== */
+.el-left-section {
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .el-left-section {
+    width: 45%;
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .el-left-section {
+    width: 40%;
+    padding: 4rem;
+  }
+}
+
+.el-form-container {
+  width: 100%;
+  max-width: 28rem;
+}
+
+/* ===== LOGO ===== */
+.el-logo-wrapper {
+  margin-bottom: 2.5rem;
+}
+
+.el-logo-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.el-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--el-primary);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(37, 106, 244, 0.2);
+}
+
+.el-logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--el-primary);
+}
+
+.el-welcome-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.dark-mode .el-welcome-title {
+  color: #ffffff;
+}
+
+.el-welcome-sub {
+  color: #64748b;
+}
+
+.dark-mode .el-welcome-sub {
+  color: #94a3b8;
+}
+
+/* ===== GLASS CARD ===== */
+.el-glass-card {
+  background: var(--el-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--el-glass-border);
+  box-shadow: 0 8px 32px 0 var(--el-shadow);
+  transition: all 0.3s ease;
+  padding: 2rem;
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.el-glass-card:hover {
+  box-shadow: 0 12px 48px 0 rgba(37, 106, 244, 0.1);
+}
+
+/* ===== 3D LIGHT EFFECT ===== */
+.el-glass-card {
+  --light-x: 50%;
+  --light-y: 50%;
+}
+
+.el-glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at var(--light-x) var(--light-y),
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%
+  );
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ===== SHAKE ANIMATION ===== */
+@keyframes el-shake {
+  0%, 100% { transform: perspective(1000px) rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0)) translateX(0); }
+  25% { transform: perspective(1000px) rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0)) translateX(-8px); }
+  75% { transform: perspective(1000px) rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0)) translateX(8px); }
+}
+
+.el-glass-card.el-shake {
+  animation: el-shake 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== SUCCESS ANIMATION ===== */
+@keyframes el-success-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.el-glass-card.el-success {
+  animation: el-success-pulse 1.5s ease-out;
+  border-color: var(--el-success) !important;
+}
+
+/* ===== FORM ===== */
+.el-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.el-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.el-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  color: #334155;
+}
+
+.dark-mode .el-label {
+  color: #cbd5e1;
+}
+
+/* ===== INPUT WRAPPER ===== */
+.el-input-wrapper {
+  position: relative;
+}
+
+.el-input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 1rem;
+  z-index: 1;
+}
+
+.el-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #1e293b;
+}
+
+.el-input:focus {
+  border-color: var(--el-primary);
+  box-shadow: 0 0 0 2px rgba(37, 106, 244, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dark-mode .el-input {
+  background: rgba(16, 22, 34, 0.5);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark-mode .el-input:focus {
+  background: rgba(16, 22, 34, 0.8);
+  border-color: var(--el-primary);
+}
+
+.el-input-password {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 3rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #1e293b;
+}
+
+.el-input-password:focus {
+  border-color: var(--el-primary);
+  box-shadow: 0 0 0 2px rgba(37, 106, 244, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dark-mode .el-input-password {
+  background: rgba(16, 22, 34, 0.5);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+/* ===== PASSWORD TOGGLE ===== */
+.el-password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.el-password-toggle:hover {
+  color: var(--el-primary);
+}
+
+/* ===== FORGOT PASSWORD ===== */
+.el-forgot-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.el-label-small {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.dark-mode .el-label-small {
+  color: #cbd5e1;
+}
+
+.el-forgot-btn {
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--el-primary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.el-forgot-btn:hover {
+  color: var(--el-primary-light);
+  text-decoration: underline;
+}
+
+/* ===== REMEMBER ME ===== */
+.el-remember-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.el-checkbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  color: var(--el-primary);
+  border: 1px solid #cbd5e1;
+  accent-color: var(--el-primary);
+}
+
+.el-checkbox:focus {
+  ring-color: rgba(37, 106, 244, 0.2);
+}
+
+.el-checkbox-label {
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.dark-mode .el-checkbox-label {
+  color: #94a3b8;
+}
+
+/* ===== ERROR MESSAGE ===== */
+.el-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 9999px;
+  padding: 0.75rem 1rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ===== SUBMIT BUTTON ===== */
+.el-submit-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--el-primary);
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 4px 6px -1px rgba(37, 106, 244, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.el-submit-btn:hover:not(:disabled) {
+  background: var(--el-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 106, 244, 0.3);
+}
+
+.el-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== SPINNER ===== */
+.el-spinner-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.el-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: el-spin 0.6s linear infinite;
+}
+
+@keyframes el-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== SOCIAL DIVIDER ===== */
+.el-social-section {
+  margin-top: 2rem;
+}
+
+.el-divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.el-divider-line {
+  border-top: 1px solid #e2e8f0;
+  width: 100%;
+}
+
+.dark-mode .el-divider-line {
+  border-top-color: #334155;
+}
+
+.el-divider-text {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  position: absolute;
+  backdrop-filter: blur(4px);
+}
+
+.dark-mode .el-divider-text {
+  background: rgba(16, 22, 34, 0.5);
+  color: #94a3b8;
+}
+
+/* ===== SOCIAL BUTTONS ===== */
+.el-social-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.el-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #1e293b;
+}
+
+.el-social-btn:hover {
+  background: white;
+  border-color: var(--el-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .el-social-btn {
+  background: rgba(16, 22, 34, 0.5);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark-mode .el-social-btn:hover {
+  background: #101622;
+  border-color: var(--el-primary);
+}
+
+/* ===== SIGN UP LINK ===== */
+.el-signup-wrapper {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.dark-mode .el-signup-wrapper {
+  color: #94a3b8;
+}
+
+.el-signup-link {
+  color: var(--el-primary);
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.el-signup-link:hover {
+  color: var(--el-primary-light);
+  text-decoration: underline;
+}
+
+/* ===== RIGHT SECTION - ROBOT ===== */
+.el-right-section {
+  display: flex;
+  flex: 1;
+  background: linear-gradient(to bottom right, rgba(37, 106, 244, 0.05), rgba(37, 106, 244, 0.1), rgba(244, 140, 37, 0.05));
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+   min-height: 400px;
+}
+
+@media (min-width: 768px) {
+  .el-right-section {
+    display: flex;
+        min-height: 100vh; 
+  }
+}
+
+.el-bg-radial {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(37, 106, 244, 0.05), transparent 70%);
+}
+
+.el-robot-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== ROBOT FLOAT ANIMATION ===== */
+@keyframes el-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.el-float {
+  animation: el-float 4s ease-in-out infinite;
+}
+
+.el-shadow {
+  margin-top: 3rem;
+  width: 12rem;
+  height: 2rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 100%;
+  filter: blur(4px);
+  transform: scaleX(1.25);
+}
+
+/* ===== BOTTOM DECORATIVE CARDS ===== */
+.el-cards-wrapper {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+}
+
+.el-info-card {
+  background: var(--el-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--el-glass-border);
+  box-shadow: 0 8px 32px 0 var(--el-shadow);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 12rem;
+}
+
+.el-icon-green {
+  width: 40px;
+  height: 40px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-icon-blue {
+  width: 40px;
+  height: 40px;
+  background: rgba(37, 106, 244, 0.1);
+  color: var(--el-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-card-label {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.el-card-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.dark-mode .el-card-title {
+  color: #f1f5f9;
+}
+
+/* ===== FOOTER ===== */
+.el-footer {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  display: none;
+  z-index: 20;
+}
+
+@media (min-width: 768px) {
+  .el-footer {
+    display: block;
+  }
+}
+
+.el-footer-nav {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.el-footer-link {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.el-footer-link:hover {
+  color: var(--el-primary);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .el-left-section {
+    padding: 1.5rem;
+  }
+  
+  .el-welcome-title {
+    font-size: 1.875rem;
+  }
+  
+  .el-social-grid {
+    gap: 0.75rem;
+  }
+  
+  .el-info-card {
+    width: 10rem;
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .el-left-section {
+    padding: 1rem;
+  }
+  
+  .el-glass-card {
+    padding: 1.25rem;
+  }
+  
+  .el-logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .el-logo-text {
+    font-size: 1.25rem;
+  }
+  
+  .el-input,
+  .el-input-password {
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .el-submit-btn {
+    padding: 0.875rem;
+  }
+  
+  .el-info-card {
+    width: 8rem;
+    padding: 0.5rem;
+  }
+  
+  .el-icon-green,
+  .el-icon-blue {
+    width: 32px;
+    height: 32px;
+  }
+}

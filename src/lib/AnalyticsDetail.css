@@ -1,0 +1,26 @@
+/* DetailedAnalytics.css */
+.detailed-analytics {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-button {
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: rgba(14, 165, 233, 0.1);
+}
+
+.kpi-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}

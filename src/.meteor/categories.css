@@ -1,0 +1,687 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ========== CRAFTORA EFSANE KATEGORİLER ========== */
+/* Tasarım: Glassmorphism + 3D Kartlar + Neon Efektler */
+/* Animasyonlar: Profesyonel, Akıcı, Büyüleyici */
+/* Yapım: Kanka özel ♥ - Header ve Hero ile Uyumlu */
+
+/* -------------------- ANIMATION KEYFRAMES -------------------- */
+@keyframes craftCategoryFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(0.5deg); }
+  75% { transform: translateY(8px) rotate(-0.5deg); }
+}
+
+@keyframes craftCategoryGlow {
+  0%, 100% { box-shadow: 0 10px 30px rgba(0, 128, 128, 0.1), 0 0 0 0 rgba(0, 255, 255, 0.2); }
+  50% { box-shadow: 0 20px 40px rgba(0, 128, 128, 0.2), 0 0 20px 5px rgba(0, 255, 255, 0.3); }
+}
+
+@keyframes craftCategoryPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+@keyframes craftCategoryShimmer {
+  0% { left: -100%; opacity: 0; }
+  20% { left: 100%; opacity: 0.5; }
+  100% { left: 100%; opacity: 0; }
+}
+
+@keyframes craftCategoryBorderWalk {
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes craftCategorySlideUp {
+  0% { opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(5px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes craftCategoryRotateIn {
+  0% { opacity: 0; transform: rotate(-10deg) scale(0.9); }
+  100% { opacity: 1; transform: rotate(0) scale(1); }
+}
+
+@keyframes craftCategoryRipple {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+@keyframes craftCategorySpinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* -------------------- ANA KONTEYNER -------------------- */
+.craftCategories {
+  padding: 100px 0 120px;
+  background: linear-gradient(135deg, #f8fdfd 0%, #f0f8f8 50%, #e8f3f3 100%);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  isolation: isolate;
+}
+
+/* -------------------- DEKORATİF ARKA PLAN (PARTİKÜLLER) -------------------- */
+.craftCategories::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(0, 128, 128, 0.03) 0%, transparent 30%),
+    radial-gradient(circle at 90% 70%, rgba(0, 255, 255, 0.03) 0%, transparent 30%),
+    radial-gradient(circle at 30% 80%, rgba(0, 128, 128, 0.02) 0%, transparent 40%),
+    radial-gradient(circle at 70% 30%, rgba(0, 255, 255, 0.02) 0%, transparent 40%);
+  z-index: 0;
+}
+
+.craftCategories::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -10%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(0, 128, 128, 0.02) 0%, transparent 60%);
+  border-radius: 50%;
+  animation: craftCategorySpinSlow 60s linear infinite;
+  z-index: 0;
+}
+
+/* Geometric shapes */
+.craftCategoriesShape {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.craftCategoriesShape1 {
+  top: 10%;
+  left: 5%;
+  width: 200px;
+  height: 200px;
+  border: 2px solid rgba(0, 128, 128, 0.05);
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  animation: craftCategoryFloat 20s ease-in-out infinite;
+}
+
+.craftCategoriesShape2 {
+  bottom: 15%;
+  right: 8%;
+  width: 300px;
+  height: 300px;
+  border: 2px dashed rgba(0, 255, 255, 0.05);
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: craftCategoryFloat 25s ease-in-out infinite reverse;
+}
+
+/* -------------------- HEADER BÖLÜMÜ -------------------- */
+.craftCategoriesHeader {
+  text-align: center;
+  margin-bottom: 70px;
+  position: relative;
+  z-index: 5;
+  animation: craftCategorySlideUp 1s ease-out;
+}
+
+.craftCategoriesBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 128, 128, 0.1);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  color: #008080;
+  padding: 12px 32px 12px 28px;
+  border-radius: 60px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(0, 128, 128, 0.2);
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 128, 128, 0.1);
+}
+
+.craftCategoriesBadge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.2), 
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: craftCategoryShimmer 4s infinite;
+}
+
+.craftCategoriesBadge span {
+  position: relative;
+  z-index: 2;
+}
+
+.craftCategoriesBadgeIcon {
+  font-size: 18px;
+  animation: craftCategoryPulse 2s infinite;
+}
+
+.craftCategoriesTitle {
+  font-size: clamp(42px, 6vw, 58px);
+  font-weight: 800;
+  color: #0a2a2a;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 2px 10px rgba(0, 128, 128, 0.1);
+}
+
+.craftCategoriesTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 5px;
+  background: linear-gradient(90deg, transparent, #008080, #00ffff, #008080, transparent);
+  border-radius: 5px;
+  filter: blur(2px);
+  animation: craftCategoryBorderWalk 4s linear infinite;
+  background-size: 200% 100%;
+}
+
+.craftCategoriesDesc {
+  font-size: 18px;
+  color: #5a7a7a;
+  max-width: 650px;
+  margin: 35px auto 0;
+  line-height: 1.7;
+  font-weight: 400;
+  position: relative;
+  padding: 0 20px;
+}
+
+.craftCategoriesDesc::before,
+.craftCategoriesDesc::after {
+  content: '✦';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #008080;
+  opacity: 0.3;
+  font-size: 20px;
+}
+
+.craftCategoriesDesc::before {
+  left: 0;
+}
+
+.craftCategoriesDesc::after {
+  right: 0;
+}
+
+/* -------------------- ANA GRID -------------------- */
+.craftCategoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 25px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 30px;
+  position: relative;
+  z-index: 5;
+}
+
+/* -------------------- KATEGORİ KARTI (3D GLASSMORPHISM) -------------------- */
+.craftCategoryCard {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  padding: 40px 20px 35px;
+  border-radius: 40px;
+  text-align: center;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.02),
+    0 10px 20px rgba(0, 128, 128, 0.02),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 128, 128, 0.1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  animation: craftCategorySlideUp 1s ease-out;
+  animation-fill-mode: both;
+}
+
+.craftCategoryCard:nth-child(1) { animation-delay: 0.1s; }
+.craftCategoryCard:nth-child(2) { animation-delay: 0.15s; }
+.craftCategoryCard:nth-child(3) { animation-delay: 0.2s; }
+.craftCategoryCard:nth-child(4) { animation-delay: 0.25s; }
+.craftCategoryCard:nth-child(5) { animation-delay: 0.3s; }
+.craftCategoryCard:nth-child(6) { animation-delay: 0.35s; }
+.craftCategoryCard:nth-child(7) { animation-delay: 0.4s; }
+
+/* Kartın parlayan border'ı */
+.craftCategoryCard::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.3), 
+    rgba(0, 128, 128, 0.5), 
+    rgba(0, 255, 255, 0.3), 
+    transparent
+  );
+  border-radius: 42px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background-size: 200% 100%;
+  animation: craftCategoryBorderWalk 3s linear infinite;
+}
+
+.craftCategoryCard:hover::before {
+  opacity: 1;
+}
+
+/* İç glow efekti */
+.craftCategoryCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.1), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  border-radius: 40px;
+}
+
+.craftCategoryCard:hover::after {
+  opacity: 1;
+}
+
+/* 3D Hover efekti */
+.craftCategoryCard:hover {
+  transform: translateY(-15px) scale(1.05) rotateX(2deg) rotateY(2deg);
+  box-shadow: 
+    0 30px 60px rgba(0, 128, 128, 0.15),
+    0 20px 40px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 255, 255, 0.3);
+}
+
+/* -------------------- KATEGORİ İKONU -------------------- */
+.craftCategoryIcon {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(145deg, #ffffff, #f0f8f8);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 25px;
+  font-size: 48px;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 
+    0 20px 30px rgba(0, 128, 128, 0.05),
+    0 5px 15px rgba(0, 0, 0, 0.02),
+    inset 0 -3px 0 rgba(0, 128, 128, 0.1);
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(0, 128, 128, 0.1);
+}
+
+/* İkonun parıltısı */
+.craftCategoryIcon::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  background: linear-gradient(90deg, #008080, #00ffff, #008080);
+  border-radius: 33px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  filter: blur(5px);
+}
+
+.craftCategoryCard:hover .craftCategoryIcon::before {
+  opacity: 0.5;
+  animation: craftCategoryPulse 2s infinite;
+}
+
+/* İkon hover animasyonu */
+.craftCategoryCard:hover .craftCategoryIcon {
+  background: linear-gradient(145deg, #008080, #006666);
+  color: white;
+  transform: scale(1.15) rotate(8deg) translateY(-5px);
+  box-shadow: 
+    0 25px 40px rgba(0, 128, 128, 0.3),
+    0 10px 20px rgba(0, 0, 0, 0.1);
+  border-color: transparent;
+}
+
+/* -------------------- KATEGORİ İSİM -------------------- */
+.craftCategoryName {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a2e2e;
+  margin-bottom: 8px;
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 2;
+  letter-spacing: -0.3px;
+}
+
+.craftCategoryCard:hover .craftCategoryName {
+  color: #008080;
+  transform: scale(1.08) translateY(-2px);
+  text-shadow: 0 2px 10px rgba(0, 128, 128, 0.2);
+}
+
+/* -------------------- KATEGORİ SAYI -------------------- */
+.craftCategoryCount {
+  font-size: 15px;
+  color: #6f8f8f;
+  font-weight: 500;
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(0, 128, 128, 0.03);
+  border-radius: 30px;
+  border: 1px solid rgba(0, 128, 128, 0.05);
+}
+
+.craftCategoryCard:hover .craftCategoryCount {
+  color: #ffffff;
+  background: #008080;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+  border-color: transparent;
+}
+
+/* -------------------- KATEGORİ AÇIKLAMA (HOVER'DA GÖSTER) -------------------- */
+.craftCategoryDesc {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+  font-size: 12px;
+  color: white;
+  background: linear-gradient(135deg, #008080, #006666);
+  padding: 15px 10px;
+  border-radius: 0 0 40px 40px;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 15px 30px rgba(0, 128, 128, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+}
+
+.craftCategoryCard:hover .craftCategoryDesc {
+  opacity: 1;
+  transform: translateY(0);
+  bottom: 0;
+}
+
+/* -------------------- DİĞER KATEGORİLER ÖZEL KART -------------------- */
+.craftCategoryCardOther {
+  background: linear-gradient(145deg, rgba(0, 128, 128, 0.02), rgba(0, 255, 255, 0.02));
+  border: 2px dashed rgba(0, 128, 128, 0.2);
+}
+
+.craftCategoryCardOther .craftCategoryIcon {
+  background: rgba(0, 128, 128, 0.03);
+  font-size: 40px;
+  font-weight: 700;
+  color: #008080;
+}
+
+.craftCategoryCardOther:hover .craftCategoryIcon {
+  background: #008080;
+  color: white;
+  transform: scale(1.15) rotate(360deg);
+}
+
+/* -------------------- KATEGORİLER ALT BİLGİ -------------------- */
+.craftCategoriesFooter {
+  text-align: center;
+  margin-top: 60px;
+  position: relative;
+  z-index: 5;
+  animation: craftCategorySlideUp 1s 0.6s both;
+}
+
+.craftCategoriesMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 16px 40px;
+  border-radius: 60px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a2e2e;
+  border: 1px solid rgba(0, 128, 128, 0.2);
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 10px 25px rgba(0, 128, 128, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.craftCategoriesMore::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.2), 
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.8s ease;
+}
+
+.craftCategoriesMore:hover::before {
+  transform: translateX(100%);
+}
+
+.craftCategoriesMore:hover {
+  background: #008080;
+  color: white;
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 128, 128, 0.3);
+  border-color: transparent;
+  gap: 25px;
+  padding-right: 50px;
+}
+
+.craftCategoriesMore span {
+  font-size: 22px;
+  transition: transform 0.5s ease;
+}
+
+.craftCategoriesMore:hover span {
+  transform: translateX(10px) rotate(90deg);
+}
+
+.craftCategoriesMoreCount {
+  background: rgba(0, 128, 128, 0.1);
+  padding: 4px 12px;
+  border-radius: 30px;
+  font-size: 14px;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+}
+
+.craftCategoriesMore:hover .craftCategoriesMoreCount {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+@media (max-width: 1200px) {
+  .craftCategoriesGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .craftCategoriesGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .craftCategories {
+    padding: 70px 0 80px;
+  }
+  
+  .craftCategoriesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 0 20px;
+  }
+  
+  .craftCategoriesTitle {
+    font-size: 36px;
+  }
+  
+  .craftCategoriesDesc {
+    font-size: 16px;
+    padding: 0 15px;
+  }
+  
+  .craftCategoriesDesc::before,
+  .craftCategoriesDesc::after {
+    display: none;
+  }
+  
+  .craftCategoryCard {
+    padding: 30px 15px 25px;
+  }
+  
+  .craftCategoryIcon {
+    width: 80px;
+    height: 80px;
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+  
+  .craftCategoryName {
+    font-size: 18px;
+  }
+  
+  .craftCategoryCount {
+    font-size: 13px;
+  }
+  
+  .craftCategoryDesc {
+    font-size: 11px;
+    padding: 12px 8px;
+  }
+  
+  .craftCategoriesMore {
+    padding: 14px 30px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .craftCategoriesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 15px;
+  }
+  
+  .craftCategoriesTitle {
+    font-size: 32px;
+  }
+  
+  .craftCategoriesBadge {
+    padding: 8px 20px 8px 16px;
+    font-size: 12px;
+    letter-spacing: 3px;
+  }
+  
+  .craftCategoryCard {
+    padding: 25px 12px 20px;
+    border-radius: 30px;
+  }
+  
+  .craftCategoryIcon {
+    width: 70px;
+    height: 70px;
+    font-size: 36px;
+    border-radius: 22px;
+  }
+  
+  .craftCategoryName {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  
+  .craftCategoryCount {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+  
+  .craftCategoryDesc {
+    border-radius: 0 0 30px 30px;
+    padding: 10px 5px;
+    font-size: 10px;
+  }
+  
+  .craftCategoriesMore {
+    padding: 12px 25px;
+    font-size: 13px;
+  }
+}
+
+/* -------------------- HORIZONTAL SCROLL (MOBİL İÇİN) -------------------- */
+@media (max-width: 480px) and (orientation: portrait) {
+  .craftCategoriesGrid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 10px 15px 20px;
+    gap: 15px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .craftCategoriesGrid::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .craftCategoryCard {
+    min-width: 160px;
+    scroll-snap-align: start;
+  }
+}

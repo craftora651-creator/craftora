@@ -1,0 +1,474 @@
+/* components/benefits.css */
+
+/* ===== AVANTAJLAR ANA KONTEYNER ===== */
+.kanka_benefits_efsane_abi {
+  padding: 120px 0;
+  background: linear-gradient(145deg, #0a1f2e, #0a2a2a);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: white;
+}
+
+/* ===== PREMIUM DEKORASYON ===== */
+.kanka_benefits_efsane_abi::before {
+  content: '★';
+  position: absolute;
+  top: -20%;
+  right: -5%;
+  font-size: 500px;
+  opacity: 0.02;
+  color: white;
+  transform: rotate(15deg);
+  animation: kanka_benefits_spin_abi 50s linear infinite;
+}
+
+.kanka_benefits_efsane_abi::after {
+  content: '✓';
+  position: absolute;
+  bottom: -20%;
+  left: -5%;
+  font-size: 500px;
+  opacity: 0.02;
+  color: white;
+  transform: rotate(-15deg);
+  animation: kanka_benefits_spin_abi 40s linear infinite reverse;
+}
+
+@keyframes kanka_benefits_spin_abi {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== IŞIK HÜZMELERİ ===== */
+.kanka_benefits_light_abi {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 30%, rgba(0,128,128,0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(139,92,246,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ===== KONTEYNER ===== */
+.kanka_benefits_container_abi {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 5;
+}
+
+/* ===== HEADER ===== */
+.kanka_benefits_header_abi {
+  text-align: center;
+  margin-bottom: 80px;
+  position: relative;
+}
+
+.kanka_benefits_badge_abi {
+  display: inline-block;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  color: #4db6ac;
+  padding: 14px 35px;
+  border-radius: 60px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(77,182,172,0.3);
+  text-transform: uppercase;
+  box-shadow: 0 0 30px rgba(77,182,172,0.1);
+  animation: kanka_benefits_badge_glow_abi 3s infinite;
+}
+
+@keyframes kanka_benefits_badge_glow_abi {
+  0%, 100% { border-color: rgba(77,182,172,0.3); box-shadow: 0 0 30px rgba(77,182,172,0.1); }
+  50% { border-color: rgba(77,182,172,0.8); box-shadow: 0 0 50px rgba(77,182,172,0.2); }
+}
+
+.kanka_benefits_title_abi {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 25px;
+  letter-spacing: -0.02em;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .kanka_benefits_title_abi {
+    font-size: 64px;
+  }
+}
+
+.kanka_benefits_title_abi span {
+  background: linear-gradient(145deg, #4db6ac, #008080);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+.kanka_benefits_title_abi span::after {
+  content: '✨';
+  position: absolute;
+  top: -20px;
+  right: -45px;
+  font-size: 48px;
+  -webkit-text-fill-color: initial;
+  animation: kanka_benefits_sparkle_abi 2s ease-in-out infinite;
+}
+
+@keyframes kanka_benefits_sparkle_abi {
+  0%, 100% { opacity: 0.5; transform: scale(0.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(15deg); }
+}
+
+.kanka_benefits_desc_abi {
+  font-size: 18px;
+  color: rgba(255,255,255,0.7);
+  max-width: 700px;
+  margin: 30px auto 0;
+  line-height: 1.8;
+}
+
+/* ===== AVANTAJ GRID ===== */
+.kanka_benefits_grid_abi {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  margin-bottom: 80px;
+}
+
+@media (max-width: 1024px) {
+  .kanka_benefits_grid_abi {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .kanka_benefits_grid_abi {
+    grid-template-columns: 1fr;
+  }
+  
+  .kanka_benefits_title_abi {
+    font-size: 48px;
+  }
+}
+
+/* ===== AVANTAJ KARTI - EFSANE HOVER ===== */
+.kanka_benefit_card_abi {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 50px;
+  padding: 45px 35px;
+  text-align: center;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.kanka_benefit_card_abi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: linear-gradient(180deg, rgba(77,182,172,0.1) 0%, transparent 100%);
+  transition: height 0.5s ease;
+  z-index: 0;
+}
+
+.kanka_benefit_card_abi:hover::before {
+  height: 100%;
+}
+
+.kanka_benefit_card_abi:hover {
+  transform: translateY(-15px) scale(1.05);
+  border-color: rgba(77,182,172,0.3);
+  box-shadow: 0 30px 50px rgba(0,0,0,0.3);
+  background: rgba(255,255,255,0.05);
+}
+
+/* ===== İKON ===== */
+.kanka_benefit_icon_wrap_abi {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(145deg, rgba(77,182,172,0.1), rgba(0,128,128,0.05));
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+  position: relative;
+  z-index: 2;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(77,182,172,0.2);
+}
+
+.kanka_benefit_card_abi:hover .kanka_benefit_icon_wrap_abi {
+  background: linear-gradient(145deg, #4db6ac, #008080);
+  transform: scale(1.1) rotate(8deg);
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 20px 40px rgba(77,182,172,0.4);
+}
+
+.kanka_benefit_icon_abi {
+  font-size: 56px;
+  color: #4db6ac;
+  transition: all 0.5s ease;
+}
+
+.kanka_benefit_card_abi:hover .kanka_benefit_icon_abi {
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ===== BAŞLIK ===== */
+.kanka_benefit_title_abi {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+  letter-spacing: -0.02em;
+}
+
+/* ===== AÇIKLAMA ===== */
+.kanka_benefit_text_abi {
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 25px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== ÖZEL BADGE ===== */
+.kanka_benefit_badge_abi {
+  display: inline-block;
+  background: rgba(77,182,172,0.1);
+  border: 1px solid rgba(77,182,172,0.3);
+  color: #4db6ac;
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.kanka_benefit_card_abi:hover .kanka_benefit_badge_abi {
+  background: #4db6ac;
+  color: white;
+  border-color: white;
+}
+
+/* ===== İSTATİSTİK BÖLÜMÜ ===== */
+.kanka_stats_showcase_abi {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  margin-top: 60px;
+  padding-top: 60px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+@media (max-width: 768px) {
+  .kanka_stats_showcase_abi {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kanka_stat_showcase_abi {
+  text-align: center;
+  padding: 30px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 40px;
+  border: 1px solid rgba(255,255,255,0.03);
+  transition: all 0.4s ease;
+}
+
+.kanka_stat_showcase_abi:hover {
+  background: rgba(77,182,172,0.05);
+  border-color: rgba(77,182,172,0.2);
+  transform: translateY(-10px);
+}
+
+.kanka_stat_number_showcase_abi {
+  font-size: 52px;
+  font-weight: 800;
+  background: linear-gradient(145deg, #4db6ac, #008080);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.kanka_stat_label_showcase_abi {
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* ===== GARANTİ BÖLÜMÜ ===== */
+.kanka_guarantee_abi {
+  margin-top: 80px;
+  background: linear-gradient(145deg, rgba(77,182,172,0.05), rgba(0,128,128,0.02));
+  border-radius: 80px;
+  padding: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+  border: 1px solid rgba(77,182,172,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.kanka_guarantee_abi::before {
+  content: '✓✓✓';
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  font-size: 120px;
+  opacity: 0.03;
+  color: white;
+  transform: rotate(-10deg);
+}
+
+.kanka_guarantee_content_abi {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.kanka_guarantee_icon_abi {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(145deg, #4db6ac, #008080);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: white;
+  box-shadow: 0 20px 40px rgba(77,182,172,0.3);
+}
+
+.kanka_guarantee_text_abi h4 {
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.kanka_guarantee_text_abi p {
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+.kanka_guarantee_btn_abi {
+  padding: 18px 45px;
+  background: transparent;
+  border: 2px solid #4db6ac;
+  border-radius: 60px;
+  color: #4db6ac;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.kanka_guarantee_btn_abi::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(77,182,172,0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.kanka_guarantee_btn_abi:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.kanka_guarantee_btn_abi:hover {
+  background: #4db6ac;
+  color: white;
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(77,182,172,0.4);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .kanka_benefits_efsane_abi {
+    padding: 80px 0;
+  }
+  
+  .kanka_guarantee_abi {
+    padding: 40px;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .kanka_guarantee_content_abi {
+    justify-content: center;
+  }
+  
+  .kanka_stat_showcase_abi {
+    padding: 20px;
+  }
+  
+  .kanka_stat_number_showcase_abi {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanka_benefits_title_abi {
+    font-size: 36px;
+  }
+  
+  .kanka_benefit_card_abi {
+    padding: 35px 25px;
+  }
+  
+  .kanka_benefit_icon_wrap_abi {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .kanka_benefit_icon_abi {
+    font-size: 48px;
+  }
+  
+  .kanka_benefit_title_abi {
+    font-size: 22px;
+  }
+}

@@ -1,0 +1,1179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Symbols+Outlined');
+
+/* ========== CRAFTORA ULTRA HEADER ========== */
+/* Tasarım: Glassmorphism 2.0 + Neumorphism + Neon */
+/* Animasyonlar: Sinematik ağır çekim */
+/* Yapım: Kanka özel ♥ */
+
+/* -------------------- ANIMATION KEYFRAMES -------------------- */
+@keyframes pxCinematicDrop {
+  0% { 
+    transform: translateY(-150%); 
+    opacity: 0; 
+    filter: blur(20px);
+  }
+  100% { 
+    transform: translateY(0); 
+    opacity: 1; 
+    filter: blur(0);
+  }
+}
+
+@keyframes pxSlowRise {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.95);
+    filter: blur(10px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes pxHeartbeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.15); }
+  50% { transform: scale(1.08); }
+  75% { transform: scale(1.12); }
+}
+
+@keyframes pxFloatAround {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg); 
+  }
+  33% { 
+    transform: translateY(-5px) rotate(2deg); 
+  }
+  66% { 
+    transform: translateY(5px) rotate(-2deg); 
+  }
+}
+
+@keyframes pxNeonBreathing {
+  0%, 100% { 
+    box-shadow: 0 0 5px #008080, 0 0 15px #008080, 0 0 25px #00ffff;
+    opacity: 0.8;
+  }
+  50% { 
+    box-shadow: 0 0 15px #00ffff, 0 0 35px #008080, 0 0 45px #00ffff;
+    opacity: 1;
+  }
+}
+
+@keyframes pxWaveSlow {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  50% { transform: translateX(100%) skewX(-15deg); }
+  100% { transform: translateX(100%) skewX(-15deg); }
+}
+
+@keyframes pxPulseGlow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.3); }
+}
+
+@keyframes pxSpinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pxShimmerSlow {
+  0% { left: -100%; opacity: 0; }
+  20% { left: 100%; opacity: 0.6; }
+  100% { left: 100%; opacity: 0; }
+}
+
+/* -------------------- CSS RESET -------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* -------------------- VARIABLES -------------------- */
+:root {
+  /* Ana Renkler */
+  --px-primary: #008080;
+  --px-primary-dark: #006666;
+  --px-primary-light: #00a3a3;
+  --px-neon: #00ffff;
+  --px-neon-soft: rgba(0, 255, 255, 0.4);
+  --px-neon-pulse: #00ccff;
+  
+  /* Dark Theme */
+  --px-dark: #0a1a1f;
+  --px-dark-soft: #1e2a3a;
+  --px-dark-glass: rgba(8, 20, 28, 0.85);
+  
+  /* Light Theme */
+  --px-light: #ffffff;
+  --px-light-soft: #f0fafa;
+  --px-light-glass: rgba(255, 255, 255, 0.92);
+  
+  /* Accent */
+  --px-gray: #6b7b8b;
+  --px-gray-soft: #8a9aa8;
+  --px-danger: #ff4757;
+  --px-danger-soft: #ff6b8b;
+  --px-success: #00ffa3;
+  
+  /* Glassmorphism */
+  --px-glass-dark: rgba(10, 25, 35, 0.8);
+  --px-glass-light: rgba(255, 255, 255, 0.95);
+  --px-glass-border: rgba(0, 255, 255, 0.12);
+  --px-glass-border-light: rgba(0, 128, 128, 0.15);
+  
+  /* Gölgeler */
+  --px-shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --px-shadow-md: 0 10px 40px rgba(0, 128, 128, 0.15);
+  --px-shadow-lg: 0 20px 60px rgba(0, 128, 128, 0.25);
+  --px-shadow-neon: 0 0 30px rgba(0, 255, 255, 0.3);
+  
+  /* Animasyonlar - YAVAŞLATILDI! */
+  --px-transition-cinematic: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  --px-transition-slow: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --px-transition-base: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  --px-transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --px-transition-smooth: all 0.7s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* -------------------- CONTAINER -------------------- */
+.pxContainer {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* -------------------- TOP BAR (CİNEMATİK) -------------------- */
+.pxTopBar {
+  background: var(--px-glass-dark);
+  backdrop-filter: blur(16px) saturate(200%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
+  border-bottom: 1px solid var(--px-glass-border);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  position: relative;
+  z-index: 101;
+  animation: pxCinematicDrop 1.2s ease-out; /* YAVAŞLADI! */
+}
+
+.pxTopBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--px-neon), 
+    var(--px-primary), 
+    var(--px-neon), 
+    transparent
+  );
+  animation: pxWaveSlow 4s infinite; /* YAVAŞLADI! */
+  opacity: 0.7;
+}
+
+.pxTopBar::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.3), 
+    rgba(0, 128, 128, 0.5), 
+    rgba(0, 255, 255, 0.3), 
+    transparent
+  );
+  filter: blur(4px);
+  animation: pxWaveSlow 5s infinite;
+}
+
+.pxTopBarScrolled {
+  background: var(--px-glass-light);
+  border-bottom: 1px solid var(--px-glass-border-light);
+  backdrop-filter: blur(16px) saturate(200%);
+}
+
+.pxTopBar .pxContainer {
+  padding: 10px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Top Left Links */
+.pxTopLeft {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.pxTopLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 500;
+  transition: var(--px-transition-slow); /* YAVAŞLADI! */
+  position: relative;
+  padding: 6px 10px;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.pxTopBarScrolled .pxTopLink {
+  color: var(--px-dark-soft);
+}
+
+.pxTopLink::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.15), 
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 1.2s ease; /* YAVAŞLADI! */
+}
+
+.pxTopLink:hover::before {
+  transform: translateX(100%);
+}
+
+.pxTopLink:hover {
+  color: var(--px-neon);
+  transform: translateX(8px) scale(1.02);
+  text-shadow: 0 0 15px var(--px-neon);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.pxTopLink .material-icons-outlined {
+  font-size: 16px !important;
+  transition: var(--px-transition-bounce);
+}
+
+.pxTopLink:hover .material-icons-outlined {
+  transform: rotate(360deg) scale(1.2); /* DÖNÜŞ EKLENDİ! */
+}
+
+.pxLinkText {
+  position: relative;
+}
+
+.pxLinkText::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--px-neon), var(--px-primary));
+  transition: width 0.5s ease;
+}
+
+.pxTopLink:hover .pxLinkText::after {
+  width: 100%;
+}
+
+/* Top Center Badges */
+.pxTopCenter {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.pxTopBadge {
+  position: relative;
+  padding: 5px 14px;
+  background: rgba(0, 128, 128, 0.15);
+  border-radius: 30px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  transition: var(--px-transition-slow);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.pxTopBarScrolled .pxTopBadge {
+  color: var(--px-dark-soft);
+  background: rgba(0, 128, 128, 0.06);
+  border-color: rgba(0, 128, 128, 0.12);
+}
+
+.pxTopBadge::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.2), 
+    transparent
+  );
+  border-radius: 32px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.pxTopBadge:hover::before {
+  opacity: 1;
+}
+
+.pxTopBadge:hover {
+  background: rgba(0, 128, 128, 0.25);
+  border-color: var(--px-neon);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 5px 25px rgba(0, 255, 255, 0.3);
+  color: white;
+}
+
+/* Top Right Buttons */
+.pxTopRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pxTopButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 7px 18px;
+  border-radius: 40px;
+  transition: var(--px-transition-slow);
+  backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.pxTopBarScrolled .pxTopButton {
+  background: rgba(0, 128, 128, 0.03);
+  color: var(--px-dark-soft);
+  border-color: rgba(0, 128, 128, 0.1);
+}
+
+.pxTopButton::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.4), transparent);
+  transform: translate(-50%, -50%);
+  transition: width 0.8s ease, height 0.8s ease; /* YAVAŞLADI! */
+}
+
+.pxTopButton:hover::after {
+  width: 250px;
+  height: 250px;
+}
+
+.pxTopButton:hover {
+  background: var(--px-primary);
+  color: white;
+  border-color: var(--px-neon);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(0, 128, 128, 0.4);
+}
+
+.pxExpandIcon {
+  font-size: 16px !important;
+  transition: transform 0.6s ease; /* YAVAŞLADI! */
+}
+
+.pxTopButton:hover .pxExpandIcon {
+  transform: rotate(180deg) scale(1.2);
+}
+
+/* -------------------- MAIN HEADER (EPİK) -------------------- */
+.pxMainHeader {
+  background: rgba(8, 22, 30, 0.8);
+  backdrop-filter: blur(18px) saturate(220%);
+  -webkit-backdrop-filter: blur(18px) saturate(220%);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: var(--px-transition-cinematic); /* YAVAŞLADI! */
+  animation: pxCinematicDrop 1.2s 0.2s ease-out both; /* YAVAŞLADI! */
+}
+
+.pxMainHeaderScrolled {
+  background: var(--px-light-glass);
+  backdrop-filter: blur(18px) saturate(220%);
+  border-bottom: 1px solid rgba(0, 128, 128, 0.15);
+  box-shadow: 0 15px 50px rgba(0, 128, 128, 0.12);
+}
+
+.pxMainHeader .pxContainer {
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+}
+
+/* -------------------- LOGO (BÜYÜLÜ) -------------------- */
+.pxLogoWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+/* İkon kısmı - artık daire şeklinde ve minimalist */
+.pxLogoIconBox {
+  background: linear-gradient(135deg, var(--px-primary), var(--px-primary-light));
+  padding: 10px;
+  border-radius: 50%; /* Daire yaptık! */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--px-transition-bounce);
+  box-shadow: 0 8px 20px rgba(0, 128, 128, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+/* Dairenin içindeki ikon */
+.pxLogoIcon {
+  font-size: 24px !important;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0;
+  transition: var(--px-transition-bounce);
+  position: relative;
+  z-index: 2;
+}
+
+/* Hover efekti - daire büyüyor ve dönüyor */
+.pxLogoWrap:hover .pxLogoIconBox {
+  transform: scale(1.15) rotate(360deg);
+  background: linear-gradient(135deg, var(--px-primary-light), var(--px-primary-dark));
+  box-shadow: 0 15px 30px rgba(0, 255, 255, 0.4);
+}
+
+.pxLogoWrap:hover .pxLogoIcon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
+/* Craftora yazısı - artık daha belirgin */
+.pxLogoText {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff 0%, #e0f0f0 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 15px rgba(0, 128, 128, 0.2);
+  transition: var(--px-transition-slow);
+  position: relative;
+}
+
+/* Yazının altına ince bir çizgi efekti */
+.pxLogoText::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--px-primary), var(--px-neon), transparent);
+  transition: width 0.4s ease;
+  border-radius: 2px;
+}
+
+.pxLogoWrap:hover .pxLogoText::after {
+  width: 100%;
+}
+
+/* Hover'da yazı hafif parlar */
+.pxLogoWrap:hover .pxLogoText {
+  text-shadow: 0 0 20px var(--px-neon), 0 0 40px rgba(0, 255, 255, 0.3);
+  transform: translateX(2px);
+}
+
+/* Scrolled durumunda yazı rengi */
+.pxMainHeaderScrolled .pxLogoText {
+  background: linear-gradient(135deg, var(--px-primary-dark), var(--px-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(0, 128, 128, 0.2);
+}
+
+/* -------------------- SEARCH (SÜPERNOVA) -------------------- */
+.pxSearchWrap {
+  flex-grow: 1;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px) saturate(200%);
+  border-radius: 60px;
+  padding: 4px;
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  transition: var(--px-transition-slow);
+  position: relative;
+  overflow: hidden;
+}
+
+.pxMainHeaderScrolled .pxSearchWrap {
+  background: rgba(240, 250, 255, 0.9);
+  border: 1px solid rgba(0, 128, 128, 0.2);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.03);
+}
+
+.pxSearchWrap::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  background: linear-gradient(45deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.05), 
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: pxSpinSlow 8s linear infinite; /* YAVAŞLADI! */
+}
+
+.pxSearchFocused {
+  border-color: var(--px-neon);
+  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 6px rgba(0, 255, 255, 0.1), 
+              0 15px 40px rgba(0, 128, 128, 0.2);
+}
+
+.pxSearchInput {
+  background: transparent;
+  border: none;
+  flex-grow: 1;
+  padding: 14px 24px;
+  font-size: 15px;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  color: white;
+  font-weight: 400;
+  transition: var(--px-transition-base);
+}
+
+.pxMainHeaderScrolled .pxSearchInput {
+  color: var(--px-dark);
+}
+
+.pxSearchInput::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 300;
+  font-size: 14px;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.pxSearchFocused .pxSearchInput::placeholder {
+  opacity: 0.7;
+  transform: translateX(10px);
+}
+
+.pxSearchDivider {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, 
+    transparent, 
+    rgba(0, 255, 255, 0.4), 
+    transparent
+  );
+  margin: 0 10px;
+  animation: pxPulseGlow 3s infinite;
+}
+
+.pxMainHeaderScrolled .pxSearchDivider {
+  background: linear-gradient(to bottom, 
+    transparent, 
+    rgba(0, 128, 128, 0.3), 
+    transparent
+  );
+}
+
+.pxCategoryBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: var(--px-transition-slow);
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  position: relative;
+}
+
+.pxMainHeaderScrolled .pxCategoryBtn {
+  color: var(--px-dark-soft);
+}
+
+.pxCategoryBtn:hover {
+  color: var(--px-neon);
+  transform: scale(1.08);
+  text-shadow: 0 0 15px var(--px-neon);
+}
+
+.pxCategoryBtn .material-icons-outlined {
+  font-size: 20px !important;
+  transition: transform 0.6s ease;
+}
+
+.pxCategoryBtn:hover .material-icons-outlined {
+  transform: rotate(360deg) scale(1.2); /* TAM TUR DÖNÜŞ! */
+}
+
+.pxSearchBtn {
+  background: linear-gradient(145deg, #ffffff, #f8f8f8);
+  padding: 12px;
+  border: none;
+  border-radius: 50px;
+  color: var(--px-primary);
+  cursor: pointer;
+  transition: var(--px-transition-bounce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 2px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.pxSearchBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(0, 255, 255, 0.6), 
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.pxSearchBtn:hover::before {
+  opacity: 1;
+  animation: pxPulseGlow 2s infinite;
+}
+
+.pxSearchBtn:hover {
+  background: var(--px-primary);
+  color: white;
+  transform: scale(1.15) rotate(720deg); /* 2 TAM TUR! */
+  box-shadow: 0 15px 40px rgba(0, 128, 128, 0.5);
+}
+
+.pxSearchIcon {
+  font-size: 24px !important; /* BÜYÜDÜ! */
+  transition: transform 0.6s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.pxSearchBtn:hover .pxSearchIcon {
+  transform: scale(1.2) rotate(90deg);
+}
+.pxUserRole {
+  color: var(--px-gray-soft);
+}
+/* -------------------- USER ACTIONS (GÖRKEMLİ) -------------------- */
+.pxUserActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pxIconGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* İkon Wrap - BÜYÜDÜ ve HOVER EFEKTLERİ EKLENDİ! */
+.pxIconWrap {
+  position: relative;
+  cursor: pointer;
+  transition: var(--px-transition-slow);
+  padding: 12px; /* BÜYÜDÜ! (eskiden 8px) */
+  border-radius: 16px; /* Biraz büyüdü */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.pxMainHeaderScrolled .pxIconWrap {
+  background: rgba(0, 128, 128, 0.03);
+  border-color: rgba(0, 128, 128, 0.1);
+}
+
+/* HOVER ANİMASYONLARI - ÇOK ZENGİN! */
+.pxIconWrap::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.2), 
+    transparent
+  );
+  transform: rotate(45deg) translateX(-100%);
+  transition: transform 1s ease;
+}
+
+.pxIconWrap:hover::before {
+  transform: rotate(45deg) translateX(100%);
+}
+
+.pxIconWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, 
+    rgba(0, 255, 255, 0.3), 
+    transparent 80%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.pxIconWrap:hover::after {
+  opacity: 1;
+  animation: pxPulseGlow 2s infinite;
+}
+
+.pxIconWrap:hover {
+  transform: translateY(-5px) scale(1.15); /* DAHA FAZLA BÜYÜME! */
+  background: rgba(0, 255, 255, 0.15);
+  border-color: var(--px-neon);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+}
+
+.pxIcon {
+  font-size: 26px !important; /* BÜYÜDÜ! (eskiden 20px) */
+  color: white;
+  transition: var(--px-transition-bounce);
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+}
+
+.pxMainHeaderScrolled .pxIcon {
+  color: var(--px-dark-soft);
+}
+
+/* İKON HOVER ANİMASYONLARI - HER BİRİ FARKLI! */
+.pxIconWrap:hover .pxIcon {
+  color: white;
+  animation: pxHeartbeat 1s ease infinite; /* KALP ATIŞI! */
+}
+
+/* Favori ikonu özel hover */
+.pxIconWrap:first-child:hover .pxIcon {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 15px #ff6b8b);
+}
+
+/* Sepet ikonu özel hover */
+.pxIconWrap:nth-child(2):hover .pxIcon {
+  transform: rotate(15deg) scale(1.2);
+  filter: drop-shadow(0 0 15px #00ffa3);
+}
+
+/* Badge - Animasyonlu */
+.pxBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, var(--px-danger-soft), var(--px-danger));
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 12px rgba(255, 71, 87, 0.5);
+  animation: pxHeartbeat 2.5s infinite; /* YAVAŞ KALP ATIŞI */
+  z-index: 3;
+  font-size: 10px;
+}
+
+.pxIconWrap:hover .pxBadge {
+  animation: pxHeartbeat 0.8s infinite; /* HIZLI KALP ATIŞI! */
+  transform: scale(1.1);
+  box-shadow: 0 5px 20px rgba(255, 71, 87, 0.7);
+}
+
+/* User Button - BÜYÜDÜ! */
+.pxUserWrap {
+  position: relative;
+}
+
+.pxUserBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px; /* BÜYÜDÜ! (eskiden 8px) */
+  border-radius: 16px;
+  transition: var(--px-transition-slow);
+  position: relative;
+  overflow: hidden;
+}
+
+.pxMainHeaderScrolled .pxUserBtn {
+  background: rgba(0, 128, 128, 0.03);
+  color: var(--px-dark-soft);
+  border-color: rgba(0, 128, 128, 0.1);
+}
+
+/* User Button Hover - EFSANE! */
+.pxUserBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.2), 
+    transparent
+  );
+  transform: translateX(-100%) rotate(45deg);
+  transition: transform 1s ease;
+}
+
+.pxUserBtn:hover::before {
+  transform: translateX(100%) rotate(45deg);
+}
+
+.pxUserBtn::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(0, 255, 255, 0.3), 
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.pxUserBtn:hover::after {
+  opacity: 1;
+}
+
+.pxUserBtn:hover, .pxUserBtnActive {
+  background: var(--px-primary);
+  color: white;
+  border-color: var(--px-neon);
+  transform: scale(1.12) translateY(-3px); /* DAHA FAZLA! */
+  box-shadow: 0 12px 35px rgba(0, 255, 255, 0.4);
+}
+
+.pxUserBtn .pxIcon {
+  font-size: 26px !important;
+  transition: var(--px-transition-bounce);
+}
+
+.pxUserBtn:hover .pxIcon {
+  transform: scale(1.15) rotate(10deg);
+  filter: drop-shadow(0 0 15px white);
+}
+
+/* -------------------- USER DROPDOWN (SİNEMATİK) -------------------- */
+.pxDropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 280px;
+  background: rgba(12, 22, 32, 0.98);
+  backdrop-filter: blur(25px) saturate(250%);
+  -webkit-backdrop-filter: blur(25px) saturate(250%);
+  border: 1px solid rgba(0, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 12px;
+  z-index: 1000;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 
+              0 0 0 1px rgba(0, 255, 255, 0.15);
+  animation: pxSlowRise 0.6s cubic-bezier(0.23, 1, 0.32, 1); /* YAVAŞLADI! */
+  transform-origin: top right;
+}
+
+/* Dropdown Header */
+.pxDropdownHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: linear-gradient(145deg, 
+    rgba(0, 128, 128, 0.2), 
+    rgba(0, 128, 128, 0.05)
+  );
+  border-radius: 14px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  transition: var(--px-transition-base);
+}
+
+.pxDropdownHeader:hover {
+  background: linear-gradient(145deg, 
+    rgba(0, 128, 128, 0.25), 
+    rgba(0, 128, 128, 0.1)
+  );
+  transform: translateX(3px);
+}
+
+.pxUserAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, var(--px-primary), var(--px-primary-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  box-shadow: 0 6px 15px rgba(0, 128, 128, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: var(--px-transition-bounce);
+}
+
+.pxDropdownHeader:hover .pxUserAvatar {
+  transform: rotate(5deg) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 255, 255, 0.4);
+}
+
+.pxUserInfo {
+  flex: 1;
+}
+
+.pxUserName {
+  display: block;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  transition: var(--px-transition-base);
+}
+
+.pxDropdownHeader:hover .pxUserName {
+  color: var(--px-neon);
+  transform: translateX(3px);
+}
+
+.pxUserEmail {
+  display: block;
+  color: var(--px-neon);
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.9;
+  word-break: break-all;
+  transition: var(--px-transition-base);
+}
+
+/* Dropdown Menu */
+.pxDropdownMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Menu Item - SÜPER HOVER */
+.pxMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--px-transition-slow);
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.pxMenuItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--px-primary), var(--px-neon));
+  border-radius: 0 4px 4px 0;
+  transform: scaleY(0);
+  transition: transform 0.4s ease;
+}
+
+.pxMenuItem:hover::before {
+  transform: scaleY(1);
+}
+
+.pxMenuItem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.1), 
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.8s ease;
+}
+
+.pxMenuItem:hover::after {
+  transform: translateX(100%);
+}
+
+.pxMenuItem:hover {
+  background: rgba(0, 255, 255, 0.1);
+  transform: translateX(8px) scale(1.02);
+  color: white;
+  box-shadow: 0 5px 15px rgba(0, 128, 128, 0.2);
+}
+
+.pxMenuItem .material-icons-outlined {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: var(--px-transition-bounce);
+  z-index: 2;
+}
+
+.pxMenuItem:hover .material-icons-outlined {
+  color: var(--px-neon);
+  transform: scale(1.2) rotate(5deg);
+  filter: drop-shadow(0 0 10px var(--px-neon));
+}
+
+/* Divider */
+.pxDivider {
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.3), 
+    rgba(0, 128, 128, 0.3), 
+    rgba(0, 255, 255, 0.3), 
+    transparent
+  );
+  margin: 8px 0;
+}
+
+/* Logout Özel */
+.pxLogout {
+  color: var(--px-danger-soft);
+}
+
+.pxLogout:hover {
+  background: rgba(255, 71, 87, 0.15);
+  color: var(--px-danger);
+}
+
+.pxLogout .material-icons-outlined {
+  color: var(--px-danger-soft);
+}
+
+.pxLogout:hover .material-icons-outlined {
+  color: var(--px-danger) !important;
+  filter: drop-shadow(0 0 10px var(--px-danger));
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+@media (max-width: 1200px) {
+  .pxSearchWrap { max-width: 450px; }
+}
+
+@media (max-width: 1024px) {
+  .pxSearchWrap { max-width: 350px; }
+  .pxTopCenter { display: none; }
+  .pxContainer { padding: 0 24px; }
+}
+
+@media (max-width: 768px) {
+  .pxSearchWrap { display: none; }
+  .pxMainHeader .pxContainer { padding: 12px 20px; gap: 24px; }
+  .pxTopBar .pxContainer { padding: 8px 20px; }
+  .pxTopLeft { gap: 16px; }
+  .pxTopRight { gap: 10px; }
+  .pxLogoText { font-size: 24px; }
+  .pxLogoIcon { font-size: 22px !important; }
+  .pxIconWrap { padding: 10px; }
+  .pxUserBtn { padding: 10px; }
+  .pxLogoIconBox {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pxLogoText { font-size: 22px; }
+  .pxLogoIconBox { padding: 6px; }
+  .pxTopLink .pxLinkText { display: none; }
+  .pxIcon { font-size: 22px !important; }
+  .pxUserBtn .pxIcon { font-size: 22px !important; }
+  .pxTopButton { padding: 5px 12px; }
+  .pxLogoIcon {
+    font-size: 20px !important;
+  }
+}

@@ -1,0 +1,222 @@
+/* ===== PASSWORD STRENGTH INDICATOR ===== */
+.el-password-strength {
+  margin-top: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.el-strength-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(203, 213, 225, 0.3);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.el-strength-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.el-strength-fill.weak {
+  background: #ef4444;
+}
+
+.el-strength-fill.medium {
+  background: #f59e0b;
+}
+
+.el-strength-fill.strong {
+  background: #10b981;
+}
+
+.el-strength-text {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.dark-mode .el-strength-text {
+  color: #94a3b8;
+}
+
+/* ===== TERMS & CONDITIONS ===== */
+.el-terms-wrapper {
+  margin-top: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.el-checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.el-terms-link {
+  color: var(--el-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.el-terms-link:hover {
+  color: var(--el-primary-light);
+  text-decoration: underline;
+}
+
+/* ===== DROPDOWN STYLES ===== */
+.el-select {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #1e293b;
+  appearance: none;
+  cursor: pointer;
+}
+
+.el-select:focus {
+  border-color: var(--el-primary);
+  box-shadow: 0 0 0 2px rgba(37, 106, 244, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dark-mode .el-select {
+  background: rgba(16, 22, 34, 0.5);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark-mode .el-select:focus {
+  background: rgba(16, 22, 34, 0.8);
+  border-color: var(--el-primary);
+}
+
+/* ===== RADIO BUTTONS ===== */
+.el-radio-group {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.el-radio-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.el-radio {
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.el-radio:checked {
+  border-color: var(--el-primary);
+  border-width: 5px;
+}
+
+.dark-mode .el-radio {
+  border-color: #4b5563;
+}
+
+.el-radio-label {
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.dark-mode .el-radio-label {
+  color: #94a3b8;
+}
+
+/* ===== BIRTHDAY SELECTOR ===== */
+.el-birthday-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.el-birthday-select {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+.el-birthday-select:focus {
+  border-color: var(--el-primary);
+  box-shadow: 0 0 0 2px rgba(37, 106, 244, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dark-mode .el-birthday-select {
+  background: rgba(16, 22, 34, 0.5);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+/* ===== AVATAR UPLOAD ===== */
+.el-avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.el-avatar-preview {
+  width: 80px;
+  height: 80px;
+  background: rgba(37, 106, 244, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--el-primary);
+  color: var(--el-primary);
+}
+
+.el-avatar-preview.has-image {
+  border: 2px solid var(--el-primary);
+  overflow: hidden;
+}
+
+.el-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.el-upload-btn {
+  padding: 0.5rem 1.5rem;
+  background: rgba(37, 106, 244, 0.1);
+  border: 1px solid var(--el-primary);
+  border-radius: 9999px;
+  color: var(--el-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.el-upload-btn:hover {
+  background: var(--el-primary);
+  color: white;
+}

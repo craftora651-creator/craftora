@@ -1,0 +1,116 @@
+.statCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: var(--card-bg, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.08);
+  transition:
+    border 0.2s,
+    box-shadow 0.2s;
+}
+.statCard:hover {
+  border-color: #6366f1;
+  box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.12);
+}
+.statCardGlow {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  filter: blur(32px);
+  opacity: 0.5;
+  z-index: 0;
+}
+.statCardGlow.emerald {
+  background: rgba(16, 185, 129, 0.2);
+}
+.statCardGlow.blue {
+  background: rgba(59, 130, 246, 0.2);
+}
+.statCardGlow.purple {
+  background: rgba(139, 92, 246, 0.2);
+}
+.statCardGlow.rose {
+  background: rgba(244, 63, 94, 0.2);
+}
+.statCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+.statCardIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.statCardIcon.emerald {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+.statCardIcon.blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+.statCardIcon.purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+.statCardIcon.rose {
+  background: rgba(244, 63, 94, 0.1);
+  color: #f43f5e;
+}
+.statCardChange {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.statCardChange.emerald {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+.statCardChange.blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+.statCardChange.purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+.statCardChange.rose {
+  background: rgba(244, 63, 94, 0.1);
+  color: #f43f5e;
+}
+.statCardTitle {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  z-index: 1;
+  position: relative;
+}
+.statCardValue {
+  color: #f1f5f9;
+  font-size: 2rem;
+  font-weight: 700;
+  z-index: 1;
+  position: relative;
+}

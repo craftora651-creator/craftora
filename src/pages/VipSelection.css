@@ -1,0 +1,426 @@
+/* ==================== GLOBAL ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+.vip-container {
+  min-height: 100vh;
+  background: radial-gradient(circle at 20% 30%, #0A0C1A, #05060A);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==================== BACKGROUND EFFECTS ==================== */
+.vip-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes floatParticle {
+  0% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(-30px) translateX(-10px); }
+  75% { transform: translateY(-20px) translateX(20px); }
+  100% { transform: translateY(0) translateX(0); }
+}
+
+.vip-light-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ==================== HEADER ==================== */
+.vip-header {
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 10;
+  animation: fadeInDown 0.8s ease;
+}
+
+.vip-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.vip-title-gradient {
+  background: linear-gradient(135deg, #00FFA3, #00A3FF, #8000FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+.vip-title-gradient::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00FFA3, #00A3FF, #8000FF, transparent);
+  animation: gradientShift 3s linear infinite;
+}
+
+.vip-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ==================== CARDS CONTAINER ==================== */
+.vip-cards {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 2rem;
+  position: relative;
+  z-index: 20;
+  flex-wrap: wrap;
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeInUp 0.8s ease;
+}
+
+/* ==================== CARD ==================== */
+.vip-card {
+  position: relative;
+  width: 380px;
+  border-radius: 32px;
+  padding: 2.5rem 2rem;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.vip-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.vip-card-popular {
+  transform: scale(1.05);
+  border: 2px solid rgba(0, 255, 163, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 255, 163, 0.1);
+}
+
+.vip-card-popular:hover {
+  transform: scale(1.07) translateY(-10px);
+}
+
+.vip-card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.vip-card:hover .vip-card-glow {
+  opacity: 1;
+}
+
+/* ==================== CARD BADGE ==================== */
+.vip-card-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1.5rem;
+  align-self: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vip-card-badge-popular {
+  background: linear-gradient(135deg, #00FFA3, #00A3FF);
+  color: #000;
+  font-weight: 700;
+  border: none;
+}
+
+/* ==================== CARD CONTENT ==================== */
+.vip-card-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.vip-card-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.vip-card-price {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: baseline;
+}
+
+.vip-card-price-currency {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin-right: 2px;
+}
+
+.vip-card-price-amount {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.vip-card-price-period {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: 4px;
+}
+
+.vip-card-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* ==================== CARD BUTTON ==================== */
+.vip-card-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.vip-card-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.vip-card-button:hover::before {
+  left: 100%;
+}
+
+.vip-card-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.vip-card-button-arrow {
+  transition: transform 0.3s ease;
+}
+
+.vip-card-button:hover .vip-card-button-arrow {
+  transform: translateX(5px);
+}
+
+/* ==================== CARD FEATURES ==================== */
+.vip-card-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  flex: 1;
+}
+
+.vip-card-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+}
+
+.vip-card-feature-check {
+  color: #00FFA3;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.vip-card-feature-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== LEARN MORE BUTTON ==================== */
+.vip-card-learn-more {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  align-self: flex-start;
+}
+
+.vip-card-learn-more:hover {
+  color: #fff;
+  gap: 1rem;
+}
+
+/* ==================== SKIP BUTTON ==================== */
+.vip-skip-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 4rem;
+  position: relative;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vip-skip-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px);
+  gap: 1rem;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientShift {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1200px) {
+  .vip-cards {
+    gap: 1.5rem;
+  }
+  
+  .vip-card {
+    width: 340px;
+  }
+  
+  .vip-title {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .vip-container {
+    padding: 2rem 1rem;
+  }
+  
+  .vip-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .vip-card {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .vip-card-popular {
+    transform: scale(1);
+  }
+  
+  .vip-card-popular:hover {
+    transform: translateY(-10px);
+  }
+  
+  .vip-title {
+    font-size: 2.2rem;
+  }
+  
+  .vip-subtitle {
+    font-size: 1rem;
+  }
+}

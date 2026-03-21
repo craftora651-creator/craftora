@@ -1,0 +1,85 @@
+{
+  "satici_temalari": [
+    {
+      "id": 1,
+      "satici_id": 101,
+      "tema_id": "dark-knight",
+      "tema_adi": "Dark Knight Teması",
+      "aktif_mi": true,
+      "satin_alma_tarihi": "2024-01-15",
+      "son_guncelleme": "2024-01-20",
+      "durum": "aktif",
+      "tema_ayarlari": {
+        "renkler": {
+          "ana_renk": "#000000",
+          "arkaplan": "#1a1a1a",
+          "yazi_renk": "#ffffff"
+        },
+        "urunler": {
+          "sayfa_basi_urun": 12,
+          "gorunum": "grid",
+          "siralama": "yeniler"
+        },
+        "videolar": {
+          "otomatik_oynat": true,
+          "sessiz": false
+        },
+        "reels": {
+          "otomatik_kaydir": true,
+          "dikey": true
+        }
+      }
+    },
+    {
+      "id": 2,
+      "satici_id": 102,
+      "tema_id": "light-queen",
+      "tema_adi": "Light Queen Teması",
+      "aktif_mi": false,
+      "satin_alma_tarihi": "2024-01-18",
+      "son_guncelleme": "2024-01-18",
+      "durum": "pasif",
+      "tema_ayarlari": {
+        "renkler": {
+          "ana_renk": "#FF69B4",
+          "arkaplan": "#ffffff",
+          "yazi_renk": "#333333"
+        },
+        "urunler": {
+          "sayfa_basi_urun": 9,
+          "gorunum": "liste",
+          "siralama": "populer"
+        },
+        "videolar": {
+          "otomatik_oynat": false,
+          "sessiz": true
+        },
+        "reels": {
+          "otomatik_kaydir": false,
+          "dikey": true
+        }
+      }
+    }
+  ],
+  
+  "tema_kutuphanesi": [
+    {
+      "id": "dark-knight",
+      "isim": "Dark Knight",
+      "kategori": "e-ticaret",
+      "fiyat": 299,
+      "versiyon": "1.0.0",
+      "yazar": "Craftora",
+      "aciklama": "Karanlık tema, e-ticaret siteleri için ideal"
+    },
+    {
+      "id": "light-queen",
+      "isim": "Light Queen",
+      "kategori": "moda",
+      "fiyat": 249,
+      "versiyon": "1.0.0",
+      "yazar": "Craftora",
+      "aciklama": "Aydınlık ve zarif, moda siteleri için"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+/* components/LogosSection.css */
+
+/* Main Section */
+.logos-section {
+  padding-top: 2.5rem; /* py-10 = 2.5rem */
+  padding-bottom: 2.5rem;
+  border-top: 1px solid rgba(229, 231, 235, 0.5); /* border-y border-gray-200/50 */
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  background-color: rgba(255, 255, 255, 0.3); /* bg-white/30 */
+  overflow: hidden;
+}
+
+.dark-mode .logos-section {
+  border-color: rgba(255, 255, 255, 0.05); /* dark:border-white/5 */
+  background-color: rgba(0, 0, 0, 0.1); /* dark:bg-black/10 */
+}
+
+/* Container */
+.logos-container {
+  max-width: 80rem; /* max-w-7xl = 80rem */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem; /* px-4 = 1rem */
+  padding-right: 1rem;
+  text-align: center;
+  margin-bottom: 2rem; /* mb-8 = 2rem */
+}
+
+/* Heading */
+.logos-heading {
+  color: var(--primary); /* text-primary */
+  font-size: 0.875rem; /* text-sm = 0.875rem */
+  font-weight: 700; /* font-bold */
+  text-transform: uppercase;
+  letter-spacing: 0.1em; /* tracking-widest */
+}
+
+.dark-mode .logos-heading {
+  color: rgba(0, 102, 102, 0.8); /* dark:text-primary-dark/80 */
+}
+
+/* Marquee Container */
+.logos-marquee-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  overflow-x: hidden;
+}
+
+/* Marquee Track */
+.logos-marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 4rem; /* gap-16 = 4rem */
+  padding-left: 2rem; /* px-8 = 2rem */
+  padding-right: 2rem;
+  white-space: nowrap;
+  animation: scroll 30s linear infinite;
+}
+
+.logos-marquee-track-duplicate {
+  position: absolute;
+  top: 0;
+  left: 100%; /* left-full */
+  display: flex;
+  align-items: center;
+  gap: 4rem; /* gap-16 = 4rem */
+  padding-left: 2rem; /* px-8 = 2rem */
+  padding-right: 2rem;
+  white-space: nowrap;
+  animation: scroll 30s linear infinite;
+}
+
+/* Logo Items */
+.logo-item {
+  font-size: 1.5rem; /* text-2xl = 1.5rem */
+  font-weight: 700; /* font-bold */
+  color: #d1d5db; /* text-gray-300 */
+}
+
+.dark-mode .logo-item {
+  color: #4b5563; /* dark:text-gray-600 */
+}

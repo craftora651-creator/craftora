@@ -1,0 +1,590 @@
+/* components/onboarding/styles/onboarding.css */
+
+/* ================ GELİŞMİŞ RENK PALETİ ================ */
+:root {
+  /* WARM THEME - Sıcak, Samimi, El Yapımı Hissi */
+  --warm-primary: #FF6B8B;
+  --warm-primary-light: #FF8FA3;
+  --warm-primary-dark: #E55A78;
+  --warm-secondary: #FFD166;
+  --warm-secondary-light: #FFE085;
+  --warm-secondary-dark: #FFC247;
+  --warm-accent: #06D6A0;
+  --warm-accent-light: #2CFFB9;
+  --warm-accent-dark: #04B584;
+  --warm-bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  --warm-bg-gradient-hover: linear-gradient(135deg, #f7d97c 0%, #ffaf97 100%);
+  --warm-text: #2D3436;
+  --warm-text-light: #636E72;
+  --warm-shadow: rgba(255, 107, 139, 0.3);
+  
+  /* MODERN THEME - Profesyonel, Hızlı, Temiz */
+  --modern-primary: #118AB2;
+  --modern-primary-light: #1AA5D1;
+  --modern-primary-dark: #0D7090;
+  --modern-secondary: #073B4C;
+  --modern-secondary-light: #0A4D63;
+  --modern-secondary-dark: #052935;
+  --modern-accent: #EF476F;
+  --modern-accent-light: #FF6B8B;
+  --modern-accent-dark: #D63060;
+  --modern-bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --modern-bg-gradient-hover: linear-gradient(135deg, #7688FF 0%, #8A5DBF 100%);
+  --modern-text: #FFFFFF;
+  --modern-text-light: #E9ECEF;
+  --modern-shadow: rgba(17, 138, 178, 0.3);
+  
+  /* CREATIVE THEME - Yaratıcı, Renkli, Eğlenceli */
+  --creative-primary: #8338EC;
+  --creative-primary-light: #9D5CFF;
+  --creative-primary-dark: #6A20D9;
+  --creative-secondary: #3A86FF;
+  --creative-secondary-light: #5B9AFF;
+  --creative-secondary-dark: #1A6EE6;
+  --creative-accent: #FB5607;
+  --creative-accent-light: #FF7A3D;
+  --creative-accent-dark: #E04400;
+  --creative-bg-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --creative-bg-gradient-hover: linear-gradient(135deg, #f5a8ff 0%, #ff6b81 100%);
+  --creative-text: #FFFFFF;
+  --creative-text-light: #F8F9FA;
+  --creative-shadow: rgba(131, 56, 236, 0.3);
+  
+  /* NEUTRAL COLORS */
+  --white: #FFFFFF;
+  --black: #000000;
+  --gray-100: #F8F9FA;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-700: #495057;
+  --gray-900: #212529;
+  
+  /* SUCCESS/ERROR */
+  --success: #06D6A0;
+  --error: #EF476F;
+  --warning: #FFD166;
+  
+  /* SHADOWS */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.3);
+  
+  /* BORDER RADIUS */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+  
+  /* TRANSITIONS */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ================ GELİŞMİŞ ANİMASYONLAR ================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  33% { 
+    transform: translateY(-15px) rotate(3deg); 
+  }
+  66% { 
+    transform: translateY(-8px) rotate(-2deg); 
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  25% { 
+    transform: translateY(-10px); 
+  }
+  50% { 
+    transform: translateY(-5px); 
+  }
+  75% { 
+    transform: translateY(-2px); 
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes colorWave {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  25% {
+    transform: translate(15px, -15px) scale(1.15) rotate(5deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-10px, 10px) scale(0.9) rotate(-5deg);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-15px, -8px) scale(1.1) rotate(3deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes confettiRain {
+  0% {
+    opacity: 0;
+    transform: translateY(-100px) rotate(0deg) scale(0);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0) rotate(180deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg) scale(1);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% { 
+    opacity: 0.2; 
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2);
+  }
+}
+
+/* ================ GELİŞMİŞ THEME MIXIN BENZERİ CLASSES ================ */
+/* WARM THEME STYLES */
+.theme-warm {
+  background: var(--warm-bg-gradient);
+  color: var(--warm-text);
+  transition: background var(--transition-slow);
+}
+
+.theme-warm:hover {
+  background: var(--warm-bg-gradient-hover);
+}
+
+.theme-warm .nextButton {
+  background: linear-gradient(
+    135deg, 
+    var(--warm-primary), 
+    var(--warm-accent)
+  );
+  box-shadow: var(--shadow-md), 
+              0 4px 20px var(--warm-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-warm .nextButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.7s ease;
+}
+
+.theme-warm .nextButton:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-lg), 
+              0 8px 30px var(--warm-shadow);
+}
+
+.theme-warm .nextButton:hover::before {
+  left: 100%;
+}
+
+.theme-warm .stepDot.active {
+  background: linear-gradient(135deg, var(--warm-primary), var(--warm-secondary));
+  animation: glow 2s infinite, bounce 1.5s infinite;
+}
+
+/* MODERN THEME STYLES */
+.theme-modern {
+  background: var(--modern-bg-gradient);
+  color: var(--modern-text);
+  transition: background var(--transition-slow);
+}
+
+.theme-modern:hover {
+  background: var(--modern-bg-gradient-hover);
+}
+
+.theme-modern .nextButton {
+  background: linear-gradient(
+    135deg, 
+    var(--modern-primary), 
+    var(--modern-accent)
+  );
+  box-shadow: var(--shadow-md), 
+              0 4px 20px var(--modern-shadow);
+  position: relative;
+}
+
+.theme-modern .nextButton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  padding: 2px;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rotate 3s linear infinite;
+}
+
+.theme-modern .nextButton:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-lg), 
+              0 8px 30px var(--modern-shadow);
+}
+
+.theme-modern .stepDot.active {
+  background: linear-gradient(135deg, var(--modern-primary), var(--modern-accent));
+  animation: pulse 2s infinite, bounce 1.5s infinite;
+}
+
+/* CREATIVE THEME STYLES */
+.theme-creative {
+  background: var(--creative-bg-gradient);
+  color: var(--creative-text);
+  transition: background var(--transition-slow);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-creative::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s infinite linear;
+}
+
+.theme-creative .nextButton {
+  background: linear-gradient(
+    135deg, 
+    var(--creative-primary), 
+    var(--creative-accent),
+    var(--creative-secondary)
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+  box-shadow: var(--shadow-md), 
+              0 4px 20px var(--creative-shadow),
+              0 0 40px rgba(131, 56, 236, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.theme-creative .nextButton::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--creative-primary),
+    var(--creative-secondary),
+    var(--creative-accent),
+    var(--creative-primary)
+  );
+  border-radius: var(--radius-full);
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(15px);
+  animation: rainbow 3s linear infinite;
+}
+
+.theme-creative .nextButton:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: var(--shadow-xl), 
+              0 8px 40px var(--creative-shadow),
+              0 0 60px rgba(131, 56, 236, 0.3);
+}
+
+.theme-creative .stepDot.active {
+  background: linear-gradient(135deg, var(--creative-primary), var(--creative-secondary), var(--creative-accent));
+  background-size: 200% 200%;
+  animation: gradientShift 2s infinite, glow 1.5s infinite, bounce 1s infinite;
+}
+
+/* ================ GELİŞMİŞ EFEKTLER ================ */
+.rainbow-border {
+  position: relative;
+  border: double 4px transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.theme-creative .rainbow-border {
+  background-image: 
+    linear-gradient(var(--creative-bg-gradient), var(--creative-bg-gradient)),
+    linear-gradient(45deg, var(--creative-primary), var(--creative-secondary), var(--creative-accent), var(--creative-primary));
+  animation: rainbow 3s linear infinite;
+}
+
+/* Particle efekti için */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ripple efekti */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+}
+
+/* Twinkle efekti */
+.twinkle {
+  animation: twinkle 1.5s infinite alternate;
+}
+
+/* Float efekti */
+.float-element {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Scale efekti */
+.scale-in {
+  animation: scaleIn 0.5s var(--transition-bounce);
+}
+
+/* Slide efekti */
+.slide-right {
+  animation: slideInRight 0.5s var(--transition-bounce);
+}
+
+.slide-left {
+  animation: slideInLeft 0.5s var(--transition-bounce);
+}
+
+/* ================ RESPONSIVE BREAKPOINTS ================ */
+@media (max-width: 768px) {
+  :root {
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1.25rem;
+  }
+  
+  .stepCard {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.75rem;
+  }
+  
+  .stepCard {
+    padding: 1.5rem 1rem;
+    margin: 0 1rem;
+  }
+  
+  .button {
+    padding: 0.8rem 1.5rem;
+    min-width: 120px;
+  }
+}
+
+/* ================ PERFORMANS OPTİMİZASYONU ================ */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.transform-gpu {
+  transform: translateZ(0);
+}
+
+/* ================ DARK MODE HAZIRLIK ================ */
+@media (prefers-color-scheme: dark) {
+  .theme-warm {
+    --warm-text: #F8F9FA;
+    --warm-text-light: #E9ECEF;
+  }
+}

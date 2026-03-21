@@ -1,0 +1,397 @@
+/* css/RobotBuddy.css - ELEXTRA TASARIMI ROBOT */
+
+.robot-buddy {
+  position: relative;
+  width: 256px;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto; /* Ortalamak için */
+}
+
+/* ===== KONUŞMA BALONU ===== */
+.robot-bubble {
+  position: absolute;
+  top: -60px;
+  right: -40px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  padding: 12px 24px;
+  border-radius: 9999px;
+  animation: bounce 3s infinite;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.bubble-text {
+  color: #256af4;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.bubble-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 24px;
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transform: rotate(45deg);
+  border-top: 0;
+  border-left: 0;
+}
+
+/* ===== EL SALLAMA EFEKTLERİ ===== */
+.hand-pulse {
+  position: absolute;
+  top: 40px;
+  right: -10px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+}
+
+.pulse-ring {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background: rgba(37, 106, 244, 0.2);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.pulse-ring:nth-child(2) {
+  width: 80px;
+  height: 80px;
+  animation-delay: 0.5s;
+}
+
+/* ===== ROBOT FİGÜRÜ ===== */
+.robot-figure {
+  width: 256px;
+  height: 320px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== KAFA ===== */
+.robot-head {
+  width: 160px;
+  height: 128px;
+  background: #f1f5f9;
+  border-bottom: 4px solid #cbd5e1;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Yüz Ekranı */
+.robot-face {
+  width: 128px;
+  height: 96px;
+  background: #0f172a;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Gözler */
+.robot-eyes {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.robot-eye {
+  width: 16px;
+  height: 12px;
+  background: #256af4;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #256af4;
+  transition: transform 0.05s linear;
+  animation: blink 5s infinite;
+}
+
+.robot-eye.left {
+  transform-origin: center;
+}
+
+.robot-eye.right {
+  transform-origin: center;
+}
+
+/* Tarama Işığı */
+.robot-scanner {
+  position: absolute;
+  bottom: 16px;
+  width: 80px;
+  height: 2px;
+  background: rgba(37, 106, 244, 0.3);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.scanner-beam {
+  width: 50%;
+  height: 100%;
+  background: rgba(37, 106, 244, 0.8);
+  animation: ping 3s infinite;
+}
+
+/* Kulak/Sensörler */
+.robot-ear {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 48px;
+  background: #f48c25;
+  border-radius: 9999px;
+}
+
+.robot-ear.left {
+  left: -12px;
+}
+
+.robot-ear.right {
+  right: -12px;
+}
+
+/* ===== BOYUN ===== */
+.robot-neck {
+  width: 48px;
+  height: 24px;
+  background: #cbd5e1;
+  margin-top: -4px;
+  z-index: 0;
+}
+
+/* ===== GÖVDE ===== */
+.robot-body {
+  width: 192px;
+  height: 208px;
+  background: #f1f5f9;
+  border-bottom: 4px solid #cbd5e1;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Göğüs Plakası */
+.chest-plate {
+  position: absolute;
+  inset: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+}
+
+.power-core {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #256af4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.power-core-inner {
+  width: 24px;
+  height: 24px;
+  background: #256af4;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #256af4;
+  animation: pulse 2s infinite;
+}
+
+.power-bar {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  margin-bottom: 8px;
+}
+
+.power-bar.short {
+  width: 66.666667%;
+  align-self: flex-start;
+}
+
+/* ===== KOLLAR ===== */
+.robot-arm {
+  position: absolute;
+  top: 128px;
+  width: 40px;
+  height: 128px;
+  background: #f1f5f9;
+  border-bottom: 4px solid #cbd5e1;
+  border-radius: 9999px;
+  transform-origin: top;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.robot-arm.left {
+  right: -32px;
+  transform: rotate(-45deg);
+  transition: transform 0.1s ease-out;
+}
+
+.robot-arm.right {
+  left: -32px;
+  transform: rotate(0deg);
+}
+
+/* Eller */
+.hand {
+  position: absolute;
+  bottom: 0;
+  width: 56px;
+  height: 56px;
+  background: #f1f5f9;
+  border-bottom: 4px solid #cbd5e1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.robot-arm.left .hand {
+  right: -8px;
+  transform: rotate(45deg);
+}
+
+.robot-arm.right .hand {
+  left: -4px;
+}
+
+.finger {
+  width: 24px;
+  height: 8px;
+  background: #f48c25;
+  border-radius: 9999px;
+  transform: rotate(45deg);
+}
+
+/* ===== ANİMASYONLAR ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  70% { transform: scale(1.1); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+@keyframes blink {
+  0%, 90%, 100% { height: 12px; }
+  95% { height: 2px; }
+}
+
+@keyframes ping {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .robot-buddy {
+    transform: scale(0.95);
+  }
+  
+  .robot-bubble {
+    transform: scale(0.95);
+    right: -35px;
+    top: -55px;
+  }
+}
+
+@media (max-width: 768px) {
+  .robot-buddy {
+    transform: scale(0.85);
+    margin: 0 auto;
+  }
+  
+  .robot-bubble {
+    transform: scale(0.85);
+    right: -30px;
+    top: -50px;
+    padding: 8px 16px;
+  }
+  
+  .bubble-text {
+    font-size: 12px;
+  }
+  
+  .hand-pulse {
+    transform: scale(0.85);
+    right: -15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .robot-buddy {
+    transform: scale(0.75);
+  }
+  
+  .robot-bubble {
+    transform: scale(0.75);
+    right: -25px;
+    top: -45px;
+    padding: 6px 12px;
+  }
+  
+  .bubble-text {
+    font-size: 10px;
+  }
+  
+  .hand-pulse {
+    transform: scale(0.75);
+    right: -20px;
+  }
+}
+
+/* Yatay ekranlar için */
+@media (max-height: 600px) and (orientation: landscape) {
+  .robot-buddy {
+    transform: scale(0.7);
+  }
+  
+  .robot-bubble {
+    top: -40px;
+  }
+}

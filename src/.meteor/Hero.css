@@ -1,0 +1,822 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+
+/* ========== CRAFTORA EFSANE HERO ========== */
+/* Tasarım: Sinematik + 3D + Particle Effects + Neon */
+/* Animasyonlar: Profesyonel, Akıcı, Büyüleyici */
+/* Yapım: Kanka özel ♥ - Gören Bayılsın Diye! */
+
+/* -------------------- ANIMATION KEYFRAMES -------------------- */
+@keyframes craftHeroZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.15); }
+}
+
+@keyframes craftHeroZoomOut {
+  0% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes craftHeroSlideUp {
+  0% { opacity: 0; transform: translateY(70px) scale(0.9); filter: blur(10px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes craftHeroSlideRight {
+  0% { opacity: 0; transform: translateX(-70px) scale(0.9); filter: blur(10px); }
+  100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+
+@keyframes craftHeroPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes craftHeroGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 128, 128, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 128, 0.4); }
+}
+
+@keyframes craftHeroFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(1deg); }
+  75% { transform: translateY(8px) rotate(-1deg); }
+}
+
+@keyframes craftHeroShimmer {
+  0% { left: -100%; opacity: 0; }
+  20% { left: 100%; opacity: 0.6; }
+  100% { left: 100%; opacity: 0; }
+}
+
+@keyframes craftHeroRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes craftHeroParticle {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-100px) translateX(50px) scale(0); opacity: 0; }
+}
+
+@keyframes craftHeroTextGlitch {
+  0%, 100% { transform: skew(0deg); text-shadow: none; }
+  95% { transform: skew(2deg); text-shadow: 2px 0 0 rgba(0,255,255,0.3), -2px 0 0 rgba(255,0,255,0.3); }
+  96% { transform: skew(-2deg); text-shadow: -2px 0 0 rgba(0,255,255,0.3), 2px 0 0 rgba(255,0,255,0.3); }
+  97% { transform: skew(1deg); }
+  98% { transform: skew(-1deg); }
+}
+
+@keyframes craftHeroBorderWalk {
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes craftHeroRipple {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes craftHeroStarTwinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes craftHeroWave {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  50% { transform: translateX(100%) skewX(-15deg); }
+  100% { transform: translateX(100%) skewX(-15deg); }
+}
+
+/* -------------------- ANA KONTEYNER -------------------- */
+.craftHero {
+  width: 100%;
+  height: 90vh;
+  min-height: 750px;
+  max-height: 1080px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0a1a1f 0%, #1a2f35 100%);
+  isolation: isolate;
+}
+
+/* -------------------- PARÇACIK EFEKTLERİ (PARTICLE) -------------------- */
+.craftHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(0, 128, 128, 0.1) 0%, transparent 50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.craftHeroParticles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.craftParticle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(0, 255, 255, 0.5);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+  animation: craftHeroParticle 8s linear infinite;
+  pointer-events: none;
+}
+
+/* Rastgele yerleştirilen partiküller için */
+.craftParticle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+.craftParticle:nth-child(2) { left: 20%; top: 70%; animation-delay: 2s; width: 6px; height: 6px; }
+.craftParticle:nth-child(3) { left: 30%; top: 40%; animation-delay: 4s; background: rgba(255, 255, 255, 0.8); }
+.craftParticle:nth-child(4) { left: 50%; top: 80%; animation-delay: 1s; width: 3px; height: 3px; }
+.craftParticle:nth-child(5) { left: 70%; top: 30%; animation-delay: 5s; background: rgba(0, 255, 200, 0.7); }
+.craftParticle:nth-child(6) { left: 85%; top: 60%; animation-delay: 3s; width: 5px; height: 5px; }
+.craftParticle:nth-child(7) { left: 40%; top: 90%; animation-delay: 6s; }
+.craftParticle:nth-child(8) { left: 60%; top: 15%; animation-delay: 7s; }
+.craftParticle:nth-child(9) { left: 15%; top: 85%; animation-delay: 2.5s; }
+.craftParticle:nth-child(10) { left: 90%; top: 45%; animation-delay: 5.5s; }
+
+/* -------------------- SLIDE KONTEYNER -------------------- */
+.craftSlide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.2s cubic-bezier(0.645, 0.045, 0.355, 1), 
+              visibility 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  z-index: 5;
+}
+
+.craftSlideActive {
+  opacity: 1;
+  visibility: visible;
+  z-index: 10;
+}
+
+/* -------------------- SLIDE BACKGROUND -------------------- */
+.craftSlideBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
+  transition: transform 12s ease;
+}
+
+.craftSlideActive .craftSlideBg {
+  animation: craftHeroZoom 12s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+/* Background overlay - ÇOK KATMANLI SİNEMATİK */
+.craftSlideBg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    rgba(0, 20, 20, 0.8) 0%, 
+    rgba(0, 40, 40, 0.5) 30%, 
+    rgba(0, 60, 60, 0.3) 60%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* -------------------- OVERLAY (SİNEMATİK KATMANLAR) -------------------- */
+.craftOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 70% 50%, rgba(0, 30, 30, 0.3) 0%, rgba(0, 10, 10, 0.8) 100%);
+  z-index: -1;
+}
+
+.craftOverlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(0, 255, 255, 0.05) 0%, 
+    transparent 30%,
+    transparent 70%,
+    rgba(0, 128, 128, 0.05) 100%
+  );
+  z-index: 2;
+  mix-blend-mode: overlay;
+}
+
+.craftOverlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 2px,
+    transparent 2px,
+    transparent 8px
+  );
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* -------------------- KONTEYNER -------------------- */
+.craftContainer {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 48px;
+  width: 100%;
+  position: relative;
+  z-index: 20;
+}
+
+/* -------------------- İÇERİK ANA -------------------- */
+.craftContent {
+  max-width: 750px;
+  color: white;
+  position: relative;
+  z-index: 30;
+}
+
+.craftSlideActive .craftContent {
+  animation: craftHeroSlideRight 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* -------------------- BADGE (EFSANE) -------------------- */
+.craftBadge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 128, 128, 0.2);
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  padding: 10px 28px 10px 20px;
+  border-radius: 60px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  color: white;
+  animation: craftHeroGlow 3s infinite;
+}
+
+.craftBadge::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.3), 
+    rgba(255, 255, 255, 0.5), 
+    rgba(0, 255, 255, 0.3), 
+    transparent
+  );
+  border-radius: 62px;
+  z-index: -1;
+  animation: craftHeroBorderWalk 6s linear infinite;
+}
+
+.craftBadge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: craftHeroShimmer 4s infinite;
+}
+
+.craftBadge span {
+  position: relative;
+  z-index: 2;
+}
+
+.craftBadgeIcon {
+  margin-right: 12px;
+  font-size: 20px;
+  animation: craftHeroPulse 2s infinite;
+}
+
+/* -------------------- BAŞLIK (3D CİNAMETİK) -------------------- */
+.craftTitle {
+  font-size: clamp(48px, 8vw, 90px);
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 25px;
+  color: white;
+  letter-spacing: -0.02em;
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.5),
+    0 5px 20px rgba(0, 0, 0, 0.4),
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 15px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  display: inline-block;
+}
+
+.craftTitleLine {
+  display: block;
+  overflow: hidden;
+  position: relative;
+}
+
+.craftTitleWord {
+  display: inline-block;
+  animation: craftHeroSlideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: calc(0.1s * var(--word-index, 1));
+}
+
+.craftHighlight {
+  background: linear-gradient(135deg, #00ffff, #008080, #00c8c8);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+  animation: craftHeroFloat 4s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.craftHighlight::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+  filter: blur(4px);
+  border-radius: 4px;
+  animation: craftHeroWave 3s infinite;
+}
+
+.craftTitle:hover .craftHighlight {
+  animation: craftHeroTextGlitch 0.8s ease;
+}
+
+/* -------------------- AÇIKLAMA -------------------- */
+.craftDesc {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.8;
+  margin-bottom: 40px;
+  max-width: 600px;
+  font-weight: 400;
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.3px;
+  position: relative;
+  padding-left: 25px;
+  border-left: 3px solid rgba(0, 255, 255, 0.5);
+  animation: craftHeroSlideUp 1s 0.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* -------------------- BUTON (SÜPERNOVA) -------------------- */
+.craftButton {
+  padding: 18px 58px 18px 35px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: linear-gradient(145deg, #008080, #006666, #004d4d);
+  background-size: 200% 200%;
+  color: white;
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 
+    0 15px 35px rgba(0, 128, 128, 0.5),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: craftHeroSlideUp 1s 0.4s both;
+}
+
+.craftButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent
+  );
+  transform: translateX(-100%) skewX(-15deg);
+  transition: transform 0.8s ease;
+}
+
+.craftButton:hover::before {
+  transform: translateX(100%) skewX(-15deg);
+}
+
+.craftButton::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(90deg, #00ffff, #008080, #00ffff);
+  border-radius: 62px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.craftButton:hover::after {
+  opacity: 0.8;
+}
+
+.craftButton:hover {
+  background: linear-gradient(145deg, #006666, #004c4c, #003333);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 
+    0 25px 45px rgba(0, 128, 128, 0.6),
+    0 10px 20px rgba(0, 0, 0, 0.3);
+  letter-spacing: 5px;
+  padding-right: 65px;
+}
+
+.craftButtonText {
+  position: relative;
+  z-index: 2;
+}
+
+.craftButtonIcon {
+  font-size: 24px;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  z-index: 2;
+}
+
+.craftButton:hover .craftButtonIcon {
+  transform: translateX(15px) rotate(360deg);
+}
+
+/* -------------------- RIPPLE EFEKTLERİ -------------------- */
+.craftButtonRipple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  animation: craftHeroRipple 2s infinite;
+  pointer-events: none;
+}
+
+/* -------------------- STATS BÖLÜMÜ -------------------- */
+.craftStats {
+  display: flex;
+  gap: 70px;
+  margin-top: 70px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  animation: craftHeroSlideUp 1s 0.6s both;
+}
+
+.craftStats::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 150px;
+  height: 3px;
+  background: linear-gradient(90deg, #00ffff, #008080, transparent);
+  border-radius: 3px;
+  filter: blur(2px);
+}
+
+.craftStatItem {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.craftStatItem::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.craftStatItem:hover::after {
+  transform: translateX(100%);
+}
+
+.craftStatNumber {
+  font-size: 46px;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff, #b0ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  display: inline-block;
+  animation: craftHeroFloat 5s ease-in-out infinite;
+  animation-delay: calc(0.2s * var(--stat-index, 1));
+}
+
+.craftStatLabel {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 600;
+  position: relative;
+  padding-left: 0;
+  transition: padding-left 0.3s ease;
+}
+
+.craftStatItem:hover .craftStatLabel {
+  padding-left: 10px;
+  color: white;
+}
+
+/* -------------------- NAVİGASYON DOTS (3D) -------------------- */
+.craftDots {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 30;
+  padding: 15px 25px;
+  background: rgba(0, 20, 20, 0.3);
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  border-radius: 60px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.craftDot {
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  position: relative;
+}
+
+.craftDot::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.3), transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.craftDot:hover::before {
+  opacity: 1;
+}
+
+.craftDot:hover {
+  background: white;
+  transform: scale(1.5);
+  border-color: #00ffff;
+  box-shadow: 0 0 30px #00ffff;
+}
+
+.craftDotActive {
+  width: 60px;
+  background: linear-gradient(90deg, #00ffff, #008080);
+  border-color: white;
+  border-radius: 30px;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.craftDotActive::before {
+  opacity: 1;
+}
+
+/* -------------------- OK BUTONLARI (3D) -------------------- */
+.craftPrev,
+.craftNext {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;
+  height: 70px;
+  background: rgba(0, 30, 30, 0.4);
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  border-radius: 50%;
+  color: white;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 30;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.craftPrev {
+  left: 40px;
+}
+
+.craftNext {
+  right: 40px;
+}
+
+.craftPrev::before,
+.craftNext::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.3), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.craftPrev:hover::before,
+.craftNext:hover::before {
+  opacity: 1;
+}
+
+.craftPrev::after,
+.craftNext::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(90deg, #00ffff, #008080, #00ffff);
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.craftPrev:hover::after,
+.craftNext:hover::after {
+  opacity: 0.8;
+}
+
+.craftPrev:hover,
+.craftNext:hover {
+  background: #008080;
+  color: white;
+  transform: translateY(-50%) scale(1.2) rotate(360deg);
+  border-color: white;
+  box-shadow: 0 20px 40px rgba(0, 128, 128, 0.5);
+}
+
+/* -------------------- PROGRESS BAR (SİNEMATİK) -------------------- */
+.craftProgress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #00ffff, #008080, #00c8c8, #00ffff);
+  background-size: 200% 100%;
+  width: 0%;
+  z-index: 40;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.7);
+  animation: craftHeroBorderWalk 3s linear infinite;
+}
+
+/* -------------------- SCROLL INDICATOR -------------------- */
+.craftScrollIndicator {
+  position: absolute;
+  bottom: 50px;
+  right: 50px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-size: 12px;
+  letter-spacing: 2px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.craftScrollIndicator:hover {
+  opacity: 1;
+}
+
+.craftScrollLine {
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(to bottom, #00ffff, transparent);
+  animation: craftHeroPulse 2s infinite;
+  margin-top: 10px;
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+@media (max-width: 1200px) {
+  .craftContainer { padding: 0 40px; }
+  .craftTitle { font-size: 70px; }
+  .craftPrev { left: 25px; }
+  .craftNext { right: 25px; }
+}
+
+@media (max-width: 1024px) {
+  .craftHero { height: 80vh; min-height: 650px; }
+  .craftTitle { font-size: 60px; }
+  .craftStats { gap: 50px; }
+  .craftStatNumber { font-size: 40px; }
+  .craftPrev, .craftNext { width: 60px; height: 60px; font-size: 28px; }
+}
+
+@media (max-width: 768px) {
+  .craftHero { height: 85vh; min-height: 600px; }
+  .craftContainer { padding: 0 25px; }
+  .craftContent { text-align: center; max-width: 100%; }
+  .craftTitle { font-size: 48px; }
+  .craftDesc { 
+    margin-left: auto; 
+    margin-right: auto; 
+    border-left: none;
+    padding-left: 0;
+    border-bottom: 3px solid rgba(0, 255, 255, 0.5);
+    padding-bottom: 20px;
+  }
+  .craftStats { 
+    justify-content: center; 
+    flex-wrap: wrap; 
+    gap: 30px; 
+    margin-top: 40px;
+    padding-top: 30px;
+  }
+  .craftStatItem { align-items: center; }
+  .craftPrev { left: 15px; }
+  .craftNext { right: 15px; }
+  .craftDots { bottom: 30px; padding: 12px 20px; }
+  .craftScrollIndicator { display: none; }
+}
+
+@media (max-width: 480px) {
+  .craftHero { min-height: 550px; }
+  .craftTitle { font-size: 38px; }
+  .craftButton { padding: 16px 45px 16px 25px; font-size: 14px; }
+  .craftBadge { padding: 8px 20px 8px 15px; font-size: 12px; }
+  .craftStatNumber { font-size: 32px; }
+  .craftStatLabel { font-size: 11px; letter-spacing: 2px; }
+  .craftPrev, .craftNext { width: 50px; height: 50px; font-size: 24px; }
+  .craftDots { gap: 12px; }
+  .craftDot { width: 12px; height: 12px; }
+  .craftDotActive { width: 40px; }
+}
