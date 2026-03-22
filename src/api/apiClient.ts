@@ -326,21 +326,29 @@ class ApiClient {
 
   // ----- GOOGLE AUTH -----
   async googleAuth(idToken: string): Promise<AuthResponse> {
-    try {
-      // ✅ Direkt AuthResponse döner!
-      const response = await this.fastApiClient.post<AuthResponse>(
-        "/api/auth/google",
-        { id_token: idToken },
-        { skipAuth: true } as CustomAxiosRequestConfig,
-      );
+  try {
+    const response = await this.fastApiClient.post<AuthResponse>(
+      "/api/auth/google",
+      { id_token: idToken },
+      { skipAuth: true } as CustomAxiosRequestConfig,
+    );
 
-      // ✅ response.data zaten AuthResponse!
-      return response.data;
-    } catch (error) {
-      console.error("Google auth error:", error);
-      throw error;
+    // ✅ Token'ı kaydet!
+    if (response.data.access_token) {
+      this.setToken(response.data.access_token);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+      console.log("✅ Token kaydedildi!");
     }
+
+    return response.data;
+  } catch (error) {
+    console.error("Google auth error:", error);
+    throw error;
   }
+}
 
   async logout(): Promise<void> {
     try {
