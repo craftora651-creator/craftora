@@ -562,3 +562,42 @@ body.header-shrink .cta-button { transform: translateY(0); height:2.2rem; paddin
   .top-nav-container, .logo-icon, .logo-text, .nav-links .nav-link, .cta-button, .nav-actions { animation: none !important; transform: none !important; }
   .nav-link::after, .cta-button::after, .btn-animate.clicked::before { display: none !important; }
 }
+
+
+/* ===== MOBİL EKRANLARDA SADECE LOGO VE HAMBURGER ===== */
+@media (max-width: 768px) {
+  /* Navigasyon linklerini gizle */
+  .nav-links {
+    display: none !important;
+  }
+  
+  /* Login linkini gizle */
+  .login-link {
+    display: none !important;
+  }
+  
+  /* CTA butonunu gizle */
+  .cta-button {
+    display: none !important;
+  }
+  
+  /* Dark mode toggle'ı gizle */
+  .theme-toggle {
+    display: none !important;
+  }
+  
+  /* Logo container'ı sola yasla */
+  .logo-container {
+    flex: 1;
+  }
+  
+  /* Nav-actions'ta sadece hamburger kalacak */
+  .nav-actions {
+    gap: 0;
+  }
+  
+  /* Hamburger butonunu göster */
+  .hamburger {
+    display: inline-flex !important;
+  }
+}
