@@ -210,7 +210,7 @@ const handleComplete = async () => {
     console.log('📤 Gönderilen shop data:', shopData);
 
     // 4️⃣ FastAPI'ye gönder
-    const response = await apiClient.post('/api/shops', shopData);
+    const response = await apiClient.post('/api/shops/', shopData);
     
     console.log('✅ Mağaza oluşturuldu:', response);
     alert('🎉 Mağazanız başarıyla oluşturuldu!');
