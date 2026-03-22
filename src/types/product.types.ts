@@ -189,45 +189,79 @@ export interface ProductBaseRequest {
 }
 
 // Create product request
-export interface ProductCreateRequest extends ProductBaseRequest {
+// Create product request
+// Create product request
+// product.types.ts
+
+// Create product request - API'nin beklediği formatta tamamen yeniden yaz
+export interface ProductCreateRequest {
+  // ===== ZORUNLU ALANLAR =====
+  name: string;
+  base_price: number;
+  product_type: "physical" | "digital" | "service";
+  shop_id: string;
+  
+  // ===== OPSİYONEL ALANLAR =====
+  description?: string;
+  short_description?: string;
+  compare_at_price?: number;
+  cost_per_item?: number;
+  status?: "draft" | "pending" | "published" | "sold_out" | "archived" | "deleted";
+  primary_category?: string;
+  secondary_categories?: string[];
+  tags?: string[];
+  
+  // SEO
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  slug?: string;
+  
   // Digital product specific
-  name: string;         
-  status?: ProductStatus;        
-  description?: string;             // Açıklama
-  base_price: number;               // Fiyat
-  currency: Currency;               // USD, TRY etc.
-  product_type: ProductType;        // 'digital'
-  primary_category?: string; 
   file_url?: string;
   file_name?: string;
-  file_type?: FileType;
+  file_type?: "pdf" | "video" | "audio" | "archive" | "image" | "document" | "software" | "other";
   file_size?: number;
   download_limit?: number;
   access_duration_days?: number;
   watermark_enabled?: boolean;
   drm_enabled?: boolean;
+  
+  // Physical product specific
   weight?: number;
-  dimensions?: ProductDimensions;
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+    unit: "cm" | "m" | "inch";
+  };
   requires_shipping?: boolean;
   shipping_class?: string;
+  
+  // Inventory
   stock_quantity?: number;
   low_stock_threshold?: number;
   allows_backorder?: boolean;
   sku?: string;
   barcode?: string;
+  
+  // Media
   feature_image_url?: string;
   thumbnail_url?: string;
   video_url?: string;
   image_gallery?: string[];
-  fulfillment_type?: FulfillmentType;
-  shop_id: string;
+  
+  // Fulfillment
+  fulfillment_type?: "auto" | "manual" | "drip";
   processing_time_days?: number;
-  digital_delivery_method?: 'instant' | 'manual' | 'drip';
+  digital_delivery_method?: "instant" | "manual" | "drip";
+  
+  // Sale
   is_on_sale?: boolean;
   sale_starts_at?: string;
   sale_ends_at?: string;
-  stock_type?: 'unlimited' | 'limited';
 }
+
 
 // Update product request (partial)
 export interface ProductUpdateRequest {
@@ -397,6 +431,10 @@ export interface ProductResponse {
   last_restocked_at?: string;
   created_at: string;
   updated_at?: string;
+
+  supplier_id?: string;
+  supplier_name?: string;
+  supplier_product_id?: string;
   
   // Computed properties
   is_available: boolean;

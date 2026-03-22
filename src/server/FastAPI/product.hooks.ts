@@ -240,7 +240,7 @@ export const useCreateProduct = () => {
   return useMutation<ProductResponse, Error, ProductCreateRequest>({
     mutationFn: async (productData) => {
       const response = await apiClient.post<ProductResponse>(
-        "/api/products",
+        "/api/products/",
         productData
       );
 

@@ -7,18 +7,26 @@ import OrdersPage from '../config/Orders';
 import ReportsPage from '../config/Reports';
 import PhysicalProductsPage from '../config/PhysicalProductsPage';
 import SuppliersPage from '../config/SuppliersPage';
-import MyShopsPage from '../config/MyShops'; // 👈 YENİ
-import { Routes, Route } from 'react-router-dom'; // 👈 en üste ekle!
-import ProductDetail from '../lib/ProductDetail';  // 👈 yolunu kontrol et
-import EditProduct from '../helpers/EditProduct';  // 👈 yolunu kontrol et
+import MyShopsPage from '../config/MyShops';
+import { Routes, Route } from 'react-router-dom';
+import ProductDetail from '../lib/ProductDetail';
+import EditProduct from '../helpers/EditProduct';
 import AnalyticsDetail from '../lib/AnalyticsDetail';
 import SupplierDetail from '../lib/SupplierDetail';
 import SupplierSettings from '../lib/SupplierSettings';
 import CreateModal from '../.paket/CreateModal';
 import ThemesPage from '../config/ThemesPage';
+import { Chart } from 'chart.js';
+
+declare global {
+  interface Window {
+    Chart: typeof Chart;
+    revenueChart: Chart | undefined;
+    trafficChart: Chart | undefined;
+  }
+}
 
 const KankamAdminPanel = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const getActiveSectionFromPath = useCallback(() => {
     const path = location.pathname;
@@ -34,23 +42,21 @@ const KankamAdminPanel = () => {
     if (path.includes('/admin/myshops')) return 'myshops'; // 👈 YENİ
     if (path.includes('/admin/themes')) return 'themes';
     return 'dashboard';
-  }, [location.pathname]); // location.pathname değişince fonksiyon yeniden oluşur
+  }, [location.pathname]);
 
   const [activeSection, setActiveSection] = useState(getActiveSectionFromPath());
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [openCreateModal, setOpenCreateModal] = useState(false);
-
   const handleOpenCreateModal = () => setOpenCreateModal(true);
   const handleCloseCreateModal = () => setOpenCreateModal(false);
 
-  // URL değişince activeSection'ı güncelle
   useEffect(() => {
     setActiveSection(getActiveSectionFromPath());
   }, [getActiveSectionFromPath]); // sadece getActiveSectionFromPath yeterli
 
-  // Renk temaları
+
   const theme = {
     dark: {
       bg: '#0f172a',
@@ -58,7 +64,8 @@ const KankamAdminPanel = () => {
       border: '#334155',
       text: '#f1f5f9',
       textSecondary: '#94a3b8',
-      hover: '#2d3a4f'
+      hover: '#2d3a4f',
+      primary: '#0ea5e9'
     },
     light: {
       bg: '#f8fafc',
@@ -66,34 +73,25 @@ const KankamAdminPanel = () => {
       border: '#e2e8f0',
       text: '#0f172a',
       textSecondary: '#475569',
-      hover: '#f1f5f9'
+      hover: '#f1f5f9',
+      primary: '#0ea5e9'
     }
   };
-
   const colors = theme[isDarkMode ? 'dark' : 'light'];
-
   useEffect(() => {
     const handleResize = () => {
       // Desktop'a geçince (1024px'den büyük) sidebar'ı aç
       if (window.innerWidth > 1024) {
-        setIsMobileMenuOpen(false); // Desktop'ta zaten açık, false yaparak fixed position'dan kurtar
+        setIsMobileMenuOpen(false);
       }
-      // Mobile/tablet'ten desktop'a geçerken sorun olmaması için
     };
-
     window.addEventListener('resize', handleResize);
-
-    // İlk yüklemede de kontrol et
     if (window.innerWidth > 1024) {
       setIsMobileMenuOpen(false);
     }
-
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // Responsive stiller için media query'leri style tag içinde tanımlıyoruz
   useEffect(() => {
-    // Chart.js'i yükle
     const loadScripts = () => {
       if (!document.querySelector('#chartjs-script')) {
         const script = document.createElement('script');
@@ -106,9 +104,8 @@ const KankamAdminPanel = () => {
   }, []);
 
   const GoProduct = () => {
-    handleOpenCreateModal(); // Modalı aç
+    handleOpenCreateModal();
   };
-
 
   return (
     <div style={{
@@ -138,6 +135,24 @@ const KankamAdminPanel = () => {
       overflow-x: hidden;
     }
 
+    /* Sidebar scrollbar stilleri */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #0ea5e9;
+  border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
+}
+
     /* === TEMEL STILLER === */
     .admin-container {
       display: flex;
@@ -145,15 +160,7 @@ const KankamAdminPanel = () => {
       position: relative;
     }
 
-    .sidebar {
-      width: 280px;
-      flex-shrink: 0;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1000;
-    }
+   
 
     .main-content-wrapper {
       flex: 1;
@@ -222,17 +229,7 @@ const KankamAdminPanel = () => {
     /* === TABLET (769px - 1024px) === */
 @media (min-width: 769px) and (max-width: 1024px) {
   /* Sidebar - tablette de mobil gibi drawer olsun */
-  .sidebar {
-    position: fixed !important;
-    left: -100%;
-    width: 320px !important;
-    max-width: 85%;
-    height: 100vh;
-    z-index: 1200;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: none;
-    top: 0;
-  }
+ 
 
   .sidebar.open {
     left: 0 !important;
@@ -543,15 +540,7 @@ const KankamAdminPanel = () => {
       }
 
       /* ===== SIDEBAR (DOKUNMA) ===== */
-      .sidebar {
-        position: fixed;
-        width: 85% !important;
-        max-width: 320px;
-        height: 100vh;
-        z-index: 1200;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: none;
-      }
+     
 
       .sidebar.open {
         box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
@@ -821,7 +810,9 @@ const KankamAdminPanel = () => {
             ? (isMobileMenuOpen ? 0 : '-100%')
             : 0,
           zIndex: 1200,
-          transition: 'left 0.3s cubic-bezier(0.4,0,0.2,1)'
+          transition: 'left 0.3s cubic-bezier(0.4,0,0.2,1)',
+          overflowY: 'auto',      // 👈 BUNU EKLE
+          overflowX: 'hidden',
         }}>
           {/* Logo */}
           <div style={{ padding: '24px' }}>
@@ -937,17 +928,22 @@ const KankamAdminPanel = () => {
         )}
 
         {/* Ana İçerik */}
-        <div className={`main-content-wrapper ${isMobileMenuOpen ? 'blur' : ''}`} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className={`main-content-wrapper ${isMobileMenuOpen ? 'blur' : ''}`} style={{ flex: 1, paddingTop: '80px', minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Header */}
           {/* Header - DÜZELTİLMİŞ VERSİYON */}
           <div className="header" style={{
+            position: 'fixed',
+            top: 0,
+            left: window.innerWidth <= 1024 ? 0 : 280,
+            right: 0,
+            zIndex: 1000,
             height: 80,
             borderBottom: `1px solid ${colors.border}`,
             backgroundColor: colors.surface,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 24px'
+            padding: '0 24px',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               {/* Hamburger buton - SADECE MOBİLDE GÖRÜNÜR */}
@@ -1291,9 +1287,8 @@ const SidebarButton = ({
     <div
       onClick={() => {
         navigate(path);
-        // Tablet ve mobilde sidebar'ı kapat
-        if (window.innerWidth <= 1024) { // 1024px'e kadar (tablet + mobil)
-          setIsMobileMenuOpen(false); // DOĞRUDAN false yap
+        if (window.innerWidth <= 1024) {
+          setIsMobileMenuOpen(false);
         }
       }}
       style={{
@@ -1327,31 +1322,28 @@ const SidebarButton = ({
   );
 };
 
-// Dashboard İçeriği
-const DashboardContent = ({ colors, isDarkMode }) => {
-  const [chartsCreated, setChartsCreated] = useState(false);
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.Chart && !chartsCreated) {
-      createCharts();
-      setChartsCreated(true);
-    }
-    const checkChartJs = setInterval(() => {
-      if (typeof window !== 'undefined' && window.Chart && !chartsCreated) {
-        createCharts();
-        setChartsCreated(true);
-        clearInterval(checkChartJs);
-      }
-    }, 100);
-    return () => {
-      clearInterval(checkChartJs);
-    };
-  }, [chartsCreated, isDarkMode]);
+interface DashboardContentProps {
+  colors: {
+    bg: string;
+    surface: string;
+    border: string;
+    text: string;
+    textSecondary: string;
+    hover: string;
+    primary: string;
+  };
+  isDarkMode: boolean;
+}
 
+// Dashboard İçeriği
+const DashboardContent = ({ colors, isDarkMode }: DashboardContentProps) => {
+  const [chartsCreated, setChartsCreated] = useState(false);
   const createCharts = () => {
     // Revenue Chart
-    const ctx1 = document.getElementById('revenue-chart')?.getContext('2d');
+    const canvas1 = document.getElementById('revenue-chart') as HTMLCanvasElement | null;
+    const ctx1 = canvas1?.getContext('2d');
+
     if (ctx1 && window.Chart) {
-      // Önceki chart'ı temizle
       if (window.revenueChart) {
         window.revenueChart.destroy();
       }
@@ -1395,9 +1387,10 @@ const DashboardContent = ({ colors, isDarkMode }) => {
     }
 
     // Traffic Sources Pie Chart
-    const ctx2 = document.getElementById('traffic-chart')?.getContext('2d');
+    const canvas2 = document.getElementById('traffic-chart') as HTMLCanvasElement | null;
+    const ctx2 = canvas2?.getContext('2d');
+
     if (ctx2 && window.Chart) {
-      // Önceki chart'ı temizle
       if (window.trafficChart) {
         window.trafficChart.destroy();
       }
@@ -1424,6 +1417,36 @@ const DashboardContent = ({ colors, isDarkMode }) => {
       });
     }
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initCharts = () => {
+      if (typeof window !== 'undefined' && window.Chart) {
+        createCharts();
+        if (isMounted) {
+          setChartsCreated(true);
+        }
+      }
+    };
+
+    initCharts();
+
+    const checkChartJs = setInterval(() => {
+      if (typeof window !== 'undefined' && window.Chart && !chartsCreated && isMounted) {
+        createCharts();
+        setChartsCreated(true);
+        clearInterval(checkChartJs);
+      }
+    }, 100);
+
+    return () => {
+      isMounted = false;
+      clearInterval(checkChartJs);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 👈 Boş array, sadece mount'ta çalışır
+
 
   return (
     <div>
@@ -1571,35 +1594,16 @@ const DashboardContent = ({ colors, isDarkMode }) => {
             </div>
 
             {/* Legend - Alt alta */}
+            {/* Legend - Alt alta */}
             <div style={{
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
               gap: 16
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 8, height: 8, backgroundColor: '#0ea5e9', borderRadius: 2 }} />
-                  <span style={{ fontSize: 13, color: colors.textSecondary }}>Organic Search</span>
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 'bold', color: colors.text }}>45%</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 8, height: 8, backgroundColor: '#a855f7', borderRadius: 2 }} />
-                  <span style={{ fontSize: 13, color: colors.textSecondary }}>Social Media</span>
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 'bold', color: colors.text }}>25%</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 8, height: 8, backgroundColor: '#f59e0b', borderRadius: 2 }} />
-                  <span style={{ fontSize: 13, color: colors.textSecondary }}>Direct</span>
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 'bold', color: colors.text }}>18%</span>
-              </div>
+              <TrafficLegend color="#0ea5e9" label="Organic Search" percentage="45%" colors={colors} />
+              <TrafficLegend color="#a855f7" label="Social Media" percentage="25%" colors={colors} />
+              <TrafficLegend color="#f59e0b" label="Direct" percentage="18%" colors={colors} />
             </div>
           </div>
         </div>
@@ -1736,7 +1740,25 @@ const DashboardContent = ({ colors, isDarkMode }) => {
   );
 };
 
-const StatCard = ({ icon, color, bgColor, change, title, value, colors }) => (
+interface StatCardProps {
+  icon: string;
+  color: string;
+  bgColor: string;
+  change: string;
+  title: string;
+  value: string;
+  colors: {
+    bg: string;
+    surface: string;
+    border: string;
+    text: string;
+    textSecondary: string;
+    hover: string;
+    primary: string;
+  };
+}
+
+const StatCard = ({ icon, color, bgColor, change, title, value, colors }: StatCardProps) => (
   <div style={{
     backgroundColor: colors.surface,
     borderRadius: 20,
@@ -1772,8 +1794,23 @@ const StatCard = ({ icon, color, bgColor, change, title, value, colors }) => (
   </div>
 );
 
+interface TrafficLegendProps {
+  color: string;
+  label: string;
+  percentage: string;
+  colors: {
+    bg: string;
+    surface: string;
+    border: string;
+    text: string;
+    textSecondary: string;
+    hover: string;
+    primary: string;
+  };
+}
+
 // Traffic Legend - colors parametresi eklendi
-const TrafficLegend = ({ color, label, percentage, colors }) => (
+const TrafficLegend = ({ color, label, percentage, colors }: TrafficLegendProps) => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <div style={{ width: 10, height: 10, backgroundColor: color, borderRadius: 3 }} />
@@ -1783,8 +1820,24 @@ const TrafficLegend = ({ color, label, percentage, colors }) => (
   </div>
 );
 
-// Product Row
-const ProductRow = ({ icon, name, category, price, sales, colors }) => (
+interface ProductRowProps {
+  icon: string;
+  name: string;
+  category: string;
+  price: string;
+  sales: string;
+  colors: {
+    bg: string;
+    surface: string;
+    border: string;
+    text: string;
+    textSecondary: string;
+    hover: string;
+    primary: string;
+  };
+}
+
+const ProductRow = ({ icon, name, category, price, sales, colors }: ProductRowProps) => (
   <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
     <td style={{ padding: '16px 24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -1820,8 +1873,22 @@ const ProductRow = ({ icon, name, category, price, sales, colors }) => (
   </tr>
 );
 
-// Customer Item
-const CustomerItem = ({ name, action, time, colors }) => (
+interface CustomerItemProps {
+  name: string;
+  action: string;
+  time: string;
+  colors: {
+    bg: string;
+    surface: string;
+    border: string;
+    text: string;
+    textSecondary: string;
+    hover: string;
+    primary: string;
+  };
+}
+
+const CustomerItem = ({ name, action, time, colors }: CustomerItemProps) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
       <div style={{
@@ -1838,10 +1905,6 @@ const CustomerItem = ({ name, action, time, colors }) => (
       </div>
     </div>
     <span style={{ fontSize: 11, color: colors.textSecondary, fontWeight: 500 }}>{time}</span>
-
-
   </div>
-
 );
-
 export default KankamAdminPanel;

@@ -12,7 +12,6 @@ import {
   setCurrentOperation
 } from '../redux/productSlice';
 import type { ProductCreateRequest, ProductResponse } from '../types/product.types';
-import { ProductType, Currency, ProductStatus, FulfillmentType } from '../types/product.types';
 import { FilePurpose } from '../types/upload.types';
 import { AxiosError } from 'axios';
 import SuccessModal from "../.paket/SuccessModal";
@@ -307,28 +306,35 @@ const AddPhysicalProduct: React.FC = () => {
       }
 
       // Ürün verisini hazırla
+      // AddPhysicalProduct.tsx'te DOĞRU kullanım:
+
       const productData: ProductCreateRequest = {
         name: formData.urunAdi,
-        sku: formData.sku || undefined,
-        barcode: formData.barcode || undefined,
-        short_description: formData.kisaAciklama || undefined,
         description: formData.aciklama,
-        primary_category: formData.kategori,
+        short_description: formData.kisaAciklama,
+
+        product_type: "physical",
         base_price: parseFloat(formData.fiyat),
         compare_at_price: formData.indirimliFiyat ? parseFloat(formData.indirimliFiyat) : undefined,
-        cost_per_item: formData.maliyet ? parseFloat(formData.maliyet) : undefined,
-        product_type: ProductType.PHYSICAL,
-        currency: Currency.TRY,
-        shop_id: shopId,
-        image_gallery: coverImageUrls,
-        feature_image_url: coverImageUrls.length > 0 ? coverImageUrls[0] : undefined,
-        status: formData.urunDurumu === 'draft' ? ProductStatus.DRAFT :
-          formData.urunDurumu === 'published' ? ProductStatus.PUBLISHED :
-            ProductStatus.ARCHIVED,
-        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
 
-        // Fiziksel özellikler (sadece ürün bilgisi)
+        shop_id: shopId,
+        primary_category: formData.kategori,
+
+        status: formData.urunDurumu === 'draft' ? "draft" :
+          formData.urunDurumu === 'published' ? "published" : "archived",
+
+        fulfillment_type: "manual",
+
+        stock_quantity: stokData.trackInventory ? parseInt(stokData.stockQuantity) || 0 : -1,
+        low_stock_threshold: parseInt(stokData.lowStockThreshold) || 5,
+        allows_backorder: stokData.allowBackorders,
+
+        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
+        sku: formData.sku || undefined,
+        barcode: formData.barcode || undefined,
+
         weight: physicalData.weight ? parseFloat(physicalData.weight) : undefined,
+
         dimensions: physicalData.length ? {
           length: parseFloat(physicalData.length),
           width: parseFloat(physicalData.width),
@@ -336,34 +342,21 @@ const AddPhysicalProduct: React.FC = () => {
           unit: physicalData.dimensionUnit as 'cm' | 'm' | 'inch',
         } : undefined,
 
-        // Stok bilgileri
-        stock_quantity: stokData.trackInventory ? parseInt(stokData.stockQuantity) || 0 : -1,
-        low_stock_threshold: parseInt(stokData.lowStockThreshold) || 5,
-        allows_backorder: stokData.allowBackorders,
+        requires_shipping: true,
 
-        // Tedarikçi bilgileri (ileride eklenecek)
-        fulfillment_type: FulfillmentType.MANUAL,
-
-        // Varyantlar
-        variants: hasVariants ? generatedVariants.map(v => ({
-          ...v,
-          price: v.price || parseFloat(formData.fiyat),
-        })) : undefined,
+        image_gallery: coverImageUrls,
+        feature_image_url: coverImageUrls.length > 0 ? coverImageUrls[0] : undefined,
       };
-
       const result = await createProduct.mutateAsync(productData) as ProductResponse;
-
       setCreatedProduct(result);
       setIsModalError(false);
       setModalError('');
       setSuccessModalOpen(true);
       dispatch(setSelectedProduct(result));
       dispatch(clearFormDraft());
-
     } catch (error) {
       console.error('❌ Hata:', error);
       let errorMessage = 'Bilinmeyen bir hata oluştu';
-
       if (error instanceof AxiosError && error.response) {
         const responseData = error.response.data as FastAPIErrorResponse;
         if (error.response.status === 422) {
@@ -384,12 +377,10 @@ const AddPhysicalProduct: React.FC = () => {
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-
       setCreatedProduct({ name: formData.urunAdi } as ProductResponse);
       setIsModalError(true);
       setModalError(errorMessage);
       setSuccessModalOpen(true);
-
     } finally {
       setIsUploading(false);
       dispatch(setCurrentOperation({ type: null, productId: null, shopId: null }));

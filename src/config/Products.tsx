@@ -5,7 +5,6 @@ import { useDeleteProduct } from '../server/FastAPI/product.hooks';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';  // 👈 GERİ GETİR!
 
-
 interface ProductsPageProps {
   colors: {
     bg: string;
@@ -13,6 +12,7 @@ interface ProductsPageProps {
     border: string;
     text: string;
     textSecondary: string;
+    primary: string;
   };
 }
 
@@ -27,57 +27,18 @@ const ProductsPage = ({ colors }: ProductsPageProps) => {
   const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [supplierFilter, setSupplierFilter] = useState('all');
-  const [cjModalOpen, setCjModalOpen] = useState(false);
-
-  const addCJProduct = () => {
-    const newProduct = {
-      id: Date.now().toString(),
-      name: 'Distance Measuring Instrument',
-      description: 'Electronic Measuring Ruler Tool',
-      base_price: 3.14,
-      status: 'published',
-      product_type: 'physical',
-      supplier_id: 'cj',
-      supplier_name: 'CJ Dropshipping',
-      supplier_product_id: 'CJXFLPJY00674-Black',
-      feature_image_url: 'https://via.placeholder.com/40/f59e0b/ffffff?text=CJ',
-      created_at: new Date().toISOString(),
-      sku: 'CJXFLPJY00674-Black',
-      stock_quantity: 32,
-      category: 'Elektronik'
-    };
-
-    const updatedProducts = [...products, newProduct];
-    queryClient.setQueryData(['products', 'my'], updatedProducts);
-    alert('✅ CJ ürünü eklendi!');
-  };
-
   const productsPerPage = 7;
   const queryClient = useQueryClient();  // 👈 GERİ GETİR!
   const { data: products = [], isLoading, error } = useMyProducts();
+
   useEffect(() => {
-  if (products.length > 0) {
-    console.log('✅ API ÜRÜN FORMATI:', JSON.stringify(products[0], null, 2));
-  }
-}, [products]);
+    if (products.length > 0) {
+      console.log('✅ API ÜRÜN FORMATI:', JSON.stringify(products[0], null, 2));
+    }
+  }, [products]);
   const deleteProduct = useDeleteProduct(productToDelete || '');
   const bulkDeleteProducts = useBulkDeleteProducts();
-  const SABIT_URUN = {
-    id: 'sabit-1',
-    name: '🏷️ Sabit Test Ürünü',
-    description: 'Bu ürün her zaman gösterilecek',
-    base_price: 49.99,
-    status: 'published',
-    product_type: 'physical',
-    supplier_name: 'CJ Dropshipping',
-    supplier_product_id: 'CJ-TEST-123',
-    feature_image_url: 'https://via.placeholder.com/40/0ea5e9/ffffff?text=Test',
-    created_at: new Date().toISOString(),
-    sku: 'TEST-001',
-    stock_quantity: 10,
-    category: 'Test'
-  };
-  const tumUrunler = [SABIT_URUN, ...products];
+  const tumUrunler = products;
   const filteredProducts = tumUrunler.filter(product => {
     if (statusFilter !== 'all' && product.status !== statusFilter) {
       return false;
@@ -118,13 +79,6 @@ const ProductsPage = ({ colors }: ProductsPageProps) => {
         : [...prev, productId]
     );
   };
-  const toggleAll = () => {
-    if (selectedProducts.length === currentProducts.length) {
-      setSelectedProducts([]);
-    } else {
-      setSelectedProducts(currentProducts.map(p => p.id));
-    }
-  };
   const navigate = useNavigate();
   const handleDeleteClick = (productId: string, productName: string) => {
     setProductToDelete(productId);
@@ -149,7 +103,6 @@ const ProductsPage = ({ colors }: ProductsPageProps) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   const isMobile = windowWidth <= 768;
-  const isTablet = windowWidth > 768 && windowWidth <= 1024;
   if (isLoading) {
     return (
       <div style={{
@@ -534,295 +487,295 @@ const ProductsPage = ({ colors }: ProductsPageProps) => {
       </div>
 
       {/* Ürün Listesi Tablosu */}
-   <div style={{
-  backgroundColor: colors.surface,
-  borderRadius: 12,
-  border: `1px solid ${colors.border}`,
-  padding: 20
-}}>
-  {/* BAŞLIK - İsteğe bağlı */}
-  <div style={{
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    paddingBottom: 12,
-    borderBottom: `1px solid ${colors.border}`
-  }}>
-    <h2 style={{ fontSize: 20, fontWeight: 600, color: colors.text, margin: 0 }}>
-      🛍️ Ürünlerim
-    </h2>
-    <span style={{ color: colors.textSecondary, fontSize: 14 }}>
-      {currentProducts.length} ürün
-    </span>
-  </div>
-
-  {/* ÜRÜN KARTLARI GRID */}
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: 20
-  }}>
-    {currentProducts.map((product) => (
-      <div
-        key={product.id}
-        style={{
-          backgroundColor: colors.surface,
-          borderRadius: 16,
-          border: `1px solid ${colors.border}`,
-          overflow: 'hidden',
-          transition: 'all 0.2s',
-          boxShadow: selectedProducts.includes(product.id) 
-            ? `0 0 0 2px ${colors.primary}20, 0 4px 12px rgba(0,0,0,0.1)` 
-            : '0 2px 8px rgba(0,0,0,0.04)',
-          position: 'relative'
-        }}
-      >
-        {/* SEÇİM CHECKBOX */}
+      <div style={{
+        backgroundColor: colors.surface,
+        borderRadius: 12,
+        border: `1px solid ${colors.border}`,
+        padding: 20
+      }}>
+        {/* BAŞLIK - İsteğe bağlı */}
         <div style={{
-          position: 'absolute',
-          top: 12,
-          right: 12,
-          zIndex: 2
-        }}>
-          <input
-            type="checkbox"
-            checked={selectedProducts.includes(product.id)}
-            onChange={() => toggleProduct(product.id)}
-            style={{
-              width: 20,
-              height: 20,
-              cursor: 'pointer',
-              accentColor: colors.primary
-            }}
-          />
-        </div>
-
-        {/* RESİM ALANI */}
-        <div style={{
-          height: 200,
-          backgroundColor: colors.bg,
           display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          overflow: 'hidden'
+          marginBottom: 20,
+          paddingBottom: 12,
+          borderBottom: `1px solid ${colors.border}`
         }}>
-          {product.feature_image_url ? (
-            <img
-              src={product.feature_image_url}
-              alt={product.name}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                transition: 'transform 0.3s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            />
-          ) : (
-            <span style={{ fontSize: 48, opacity: 0.3 }}>📦</span>
-          )}
-
-          {/* TİP BADGE - Resim üstünde */}
-          <div style={{
-            position: 'absolute',
-            top: 12,
-            left: 12,
-            backgroundColor: colors.surface + 'cc',
-            backdropFilter: 'blur(4px)',
-            padding: '4px 10px',
-            borderRadius: 30,
-            fontSize: 11,
-            fontWeight: 600,
-            color: product.product_type === 'digital' ? '#0ea5e9' : '#a855f7',
-            border: `1px solid ${colors.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4
-          }}>
-            {product.product_type === 'digital' ? '📱' : '📦'}
-            {product.product_type === 'digital' ? 'Dijital' : 'Fiziksel'}
-          </div>
+          <h2 style={{ fontSize: 20, fontWeight: 600, color: colors.text, margin: 0 }}>
+            🛍️ Ürünlerim
+          </h2>
+          <span style={{ color: colors.textSecondary, fontSize: 14 }}>
+            {currentProducts.length} ürün
+          </span>
         </div>
 
-        {/* ÜRÜN İÇERİĞİ */}
-        <div style={{ padding: 16 }}>
-          {/* ÜRÜN ADI (Uzun isimler için özel) */}
-          <div style={{
-            fontSize: 16,
-            fontWeight: 600,
-            color: colors.text,
-            lineHeight: 1.4,
-            marginBottom: 12,
-            minHeight: 44,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}>
-            {product.name}
-          </div>
-
-          {/* TEDARİKÇİ ve DURUM */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16
-          }}>
-            {/* TEDARİKÇİ */}
-            {product.supplier_name ? (
+        {/* ÜRÜN KARTLARI GRID */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+          gap: 20
+        }}>
+          {currentProducts.map((product) => (
+            <div
+              key={product.id}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: 16,
+                border: `1px solid ${colors.border}`,
+                overflow: 'hidden',
+                transition: 'all 0.2s',
+                boxShadow: selectedProducts.includes(product.id)
+                  ? `0 0 0 2px ${colors.primary}20, 0 4px 12px rgba(0,0,0,0.1)`
+                  : '0 2px 8px rgba(0,0,0,0.04)',
+                position: 'relative'
+              }}
+            >
+              {/* SEÇİM CHECKBOX */}
               <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                backgroundColor: colors.primary + '10',
-                padding: '4px 10px',
-                borderRadius: 30,
-                fontSize: 12,
-                fontWeight: 500,
-                color: colors.primary
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                zIndex: 2
               }}>
-                <span style={{ fontSize: 14 }}>⚡</span>
-                CJ
+                <input
+                  type="checkbox"
+                  checked={selectedProducts.includes(product.id)}
+                  onChange={() => toggleProduct(product.id)}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    cursor: 'pointer',
+                    accentColor: colors.primary
+                  }}
+                />
               </div>
-            ) : (
-              <span style={{ fontSize: 12, color: colors.textLight }}>—</span>
-            )}
 
-            {/* DURUM */}
-            <span style={{
-              padding: '4px 8px',
-              backgroundColor: product.status === 'published' ? 'rgba(16,185,129,0.1)' : 'rgba(244,67,54,0.1)',
-              color: product.status === 'published' ? '#10b981' : '#ef4444',
-              fontSize: 11,
-              fontWeight: 500,
-              borderRadius: 30
-            }}>
-              {product.status === 'published' ? '✅ Yayında' : '✏️ Taslak'}
-            </span>
-          </div>
-
-          {/* FİYAT ve TARİH */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginBottom: 16,
-            padding: 12,
-            backgroundColor: colors.bg,
-            borderRadius: 12
-          }}>
-            <div>
-              <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 2 }}>Fiyat</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: colors.text }}>
-                ${Number(product.base_price).toFixed(2)}
-              </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 2 }}>Eklenme</div>
-              <div style={{ fontSize: 13, color: colors.textSecondary }}>
-                {new Date(product.created_at).toLocaleDateString('tr-TR')}
-              </div>
-            </div>
-          </div>
-
-          {/* TEDARİKÇİ DETAY (Varsa) */}
-          {product.supplier_product_id && (
-            <div style={{
-              fontSize: 11,
-              color: colors.textLight,
-              marginBottom: 16,
-              padding: '8px 12px',
-              backgroundColor: colors.bg,
-              borderRadius: 8,
-              fontFamily: 'monospace'
-            }}>
-              🆔 {product.supplier_product_id}
-            </div>
-          )}
-
-          {/* İŞLEM BUTONLARI */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 8
-          }}>
-            <button
-              onClick={() => navigate(`/products/edit/${product.id}`)}
-              style={{
-                padding: '10px 0',
-                background: 'none',
-                border: `1px solid ${colors.border}`,
-                borderRadius: 30,
-                color: colors.text,
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: 'pointer',
+              {/* RESİM ALANI */}
+              <div style={{
+                height: 200,
+                backgroundColor: colors.bg,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 4,
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              ✏️ Düzenle
-            </button>
-            <button
-              onClick={() => navigate(`/products/view/${product.id}`)}
-              style={{
-                padding: '10px 0',
-                background: 'none',
-                border: `1px solid ${colors.border}`,
-                borderRadius: 30,
-                color: colors.text,
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              👁️ Görüntüle
-            </button>
-            <button
-              onClick={() => handleDeleteClick(product.id, product.name)}
-              style={{
-                padding: '10px 0',
-                background: '#ef4444',
-                border: 'none',
-                borderRadius: 30,
-                color: 'white',
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
-            >
-              🗑️ Sil
-            </button>
-          </div>
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                {product.feature_image_url ? (
+                  <img
+                    src={product.feature_image_url}
+                    alt={product.name}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.3s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  />
+                ) : (
+                  <span style={{ fontSize: 48, opacity: 0.3 }}>📦</span>
+                )}
+
+                {/* TİP BADGE - Resim üstünde */}
+                <div style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  backgroundColor: colors.surface + 'cc',
+                  backdropFilter: 'blur(4px)',
+                  padding: '4px 10px',
+                  borderRadius: 30,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: product.product_type === 'digital' ? '#0ea5e9' : '#a855f7',
+                  border: `1px solid ${colors.border}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}>
+                  {product.product_type === 'digital' ? '📱' : '📦'}
+                  {product.product_type === 'digital' ? 'Dijital' : 'Fiziksel'}
+                </div>
+              </div>
+
+              {/* ÜRÜN İÇERİĞİ */}
+              <div style={{ padding: 16 }}>
+                {/* ÜRÜN ADI (Uzun isimler için özel) */}
+                <div style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: colors.text,
+                  lineHeight: 1.4,
+                  marginBottom: 12,
+                  minHeight: 44,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {product.name}
+                </div>
+
+                {/* TEDARİKÇİ ve DURUM */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 16
+                }}>
+                  {/* TEDARİKÇİ */}
+                  {product.supplier_name ? (
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      backgroundColor: colors.primary + '10',
+                      padding: '4px 10px',
+                      borderRadius: 30,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: colors.primary
+                    }}>
+                      <span style={{ fontSize: 14 }}>⚡</span>
+                      CJ
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: 12, color: colors.textSecondary }}>—</span>
+                  )}
+
+                  {/* DURUM */}
+                  <span style={{
+                    padding: '4px 8px',
+                    backgroundColor: product.status === 'published' ? 'rgba(16,185,129,0.1)' : 'rgba(244,67,54,0.1)',
+                    color: product.status === 'published' ? '#10b981' : '#ef4444',
+                    fontSize: 11,
+                    fontWeight: 500,
+                    borderRadius: 30
+                  }}>
+                    {product.status === 'published' ? '✅ Yayında' : '✏️ Taslak'}
+                  </span>
+                </div>
+
+                {/* FİYAT ve TARİH */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-end',
+                  marginBottom: 16,
+                  padding: 12,
+                  backgroundColor: colors.bg,
+                  borderRadius: 12
+                }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 2 }}>Fiyat</div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: colors.text }}>
+                      ${Number(product.base_price).toFixed(2)}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 2 }}>Eklenme</div>
+                    <div style={{ fontSize: 13, color: colors.textSecondary }}>
+                      {new Date(product.created_at).toLocaleDateString('tr-TR')}
+                    </div>
+                  </div>
+                </div>
+
+                {/* TEDARİKÇİ DETAY (Varsa) */}
+                {product.supplier_product_id && (
+                  <div style={{
+                    fontSize: 11,
+                    color: colors.textSecondary,
+                    marginBottom: 16,
+                    padding: '8px 12px',
+                    backgroundColor: colors.bg,
+                    borderRadius: 8,
+                    fontFamily: 'monospace'
+                  }}>
+                    🆔 {product.supplier_product_id}
+                  </div>
+                )}
+
+                {/* İŞLEM BUTONLARI */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 8
+                }}>
+                  <button
+                    onClick={() => navigate(`/products/edit/${product.id}`)}
+                    style={{
+                      padding: '10px 0',
+                      background: 'none',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: 30,
+                      color: colors.text,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    ✏️ Düzenle
+                  </button>
+                  <button
+                    onClick={() => navigate(`/products/view/${product.id}`)}
+                    style={{
+                      padding: '10px 0',
+                      background: 'none',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: 30,
+                      color: colors.text,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    👁️ Görüntüle
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(product.id, product.name)}
+                    style={{
+                      padding: '10px 0',
+                      background: '#ef4444',
+                      border: 'none',
+                      borderRadius: 30,
+                      color: 'white',
+                      fontSize: 12,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
+                  >
+                    🗑️ Sil
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    ))}
-  </div>
-</div>
 
       {/* Sayfalama */}
       <div style={{

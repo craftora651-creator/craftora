@@ -37,6 +37,7 @@ import EcoMartTheme from './pages/EcoMartTheme';
 import CraftoraThemes from './pages/CraftoraThemes';
 import AddPhysicalProduct from './helpers/AddPhysicalProduct';
 import CJProductImport from './pages/CJProductImport';
+import RobotButton from './components/RobotButton';
 
 import "./index.css";
 
@@ -157,6 +158,7 @@ function App() {
                 )}
               </div>
             )}
+            <RobotButton />
 
             {/* PORTAL TRANSITION */}
             {isTransitioning && (
