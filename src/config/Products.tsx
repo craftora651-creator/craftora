@@ -3,7 +3,7 @@ import { useMyProducts, useBulkDeleteProducts } from '../server/FastAPI/product.
 import { useNavigate } from 'react-router-dom';
 import { useDeleteProduct } from '../server/FastAPI/product.hooks';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
-import { useQueryClient } from '@tanstack/react-query';  // 👈 GERİ GETİR!
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ProductsPageProps {
   colors: {

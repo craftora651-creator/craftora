@@ -1,6 +1,6 @@
 // App.tsx
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Header from "./components/Header";
@@ -30,7 +30,7 @@ import AddProduct from './helpers/AddProduct';
 import EditProduct from './helpers/EditProduct';
 import ProductDetail from './lib/ProductDetail';
 import AnalyticsDetail from './lib/AnalyticsDetail';
-import CrafotraGPT from './pages/CrafotraGPT'; // <-- YENİ
+import CrafotraGPT from './pages/CrafotraGPT';
 import Intro from './share/intro';
 import ShopThemesPage from './pages/ShopThemesPage';
 import EcoMartTheme from './pages/EcoMartTheme';
@@ -38,6 +38,11 @@ import CraftoraThemes from './pages/CraftoraThemes';
 import AddPhysicalProduct from './helpers/AddPhysicalProduct';
 import CJProductImport from './pages/CJProductImport';
 import RobotButton from './components/RobotButton';
+import ThemeRedirect from './pages/ThemeRedirect';
+import EnterpriseTheme from './themes/EnterpriseTheme';
+import ThemeEditor from './themes/settings/ThemeEdit';
+import { useCurrentUser } from './server/FastAPI/user.hooks';
+import SellerThemes from './pages/SellerThemes';
 
 import "./index.css";
 
@@ -46,7 +51,6 @@ function App() {
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
 
-  // ✅ INTRO STATE - SADECE İLK ZİYARETTE GÖSTER
   const [showIntro, setShowIntro] = useState(() => {
     const introShown = localStorage.getItem('craftora-intro-shown');
     return introShown !== 'true';
@@ -55,8 +59,27 @@ function App() {
   const [portalParticles, setPortalParticles] = useState<CSSProperties[]>([]);
   const [stardust, setStardust] = useState<CSSProperties[]>([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
 
-  // ✅ INTRO BİTTİĞİNDE
+  useEffect(() => {
+    localStorage.setItem('darkMode', String(isDarkMode));
+  }, [isDarkMode]);
+
+  const { data: user, isLoading: userLoading } = useCurrentUser();
+
+  if (userLoading) {
+    return <div>Yükleniyor...</div>;
+  }
+
+  console.log('🔍 user object:', user);  // ⬅️ EKLE
+
+  const shopId = user?.shop_id || '14cecd34-d21d-4cf9-8f9e-b39c62d71f14';
+
+  console.log('🔍 shopId from App:', shopId);  // ⬅️ EKLE
+
   const handleIntroComplete = () => {
     setShowIntro(false);
     localStorage.setItem('craftora-intro-shown', 'true');
@@ -90,14 +113,8 @@ function App() {
     }, 1400);
   };
 
-  // ✅ TEST BUTONU İÇİN NAVIGASYON
-  const goToCrafotraGPT = () => {
-    navigate('/crafotra-gpt');
-  };
-
   return (
     <>
-      {/* ✅ INTRO - SADECE showIntro true ise göster */}
       <AnimatePresence mode="wait">
         {showIntro && (
           <Intro
@@ -107,8 +124,6 @@ function App() {
           />
         )}
       </AnimatePresence>
-
-      {/* ANA İÇERİK */}
       <AnimatePresence mode="wait">
         {!showIntro && (
           <motion.div
@@ -118,7 +133,6 @@ function App() {
             transition={{ duration: 0.5 }}
             style={{ width: '100%' }}
           >
-            {/* 🧪 TEST BUTONU - En üstte sabit */}
             {!isTransitioning && (
               <div style={{
                 position: 'fixed',
@@ -128,9 +142,6 @@ function App() {
                 display: 'flex',
                 gap: '10px'
               }}>
-                
-
-                {/* Ana sayfaya dönüş butonu - sadece GPT sayfasındayken göster */}
                 {location.pathname === '/crafotra-gpt' && (
                   <button
                     onClick={() => navigate('/')}
@@ -159,8 +170,6 @@ function App() {
               </div>
             )}
             <RobotButton />
-
-            {/* PORTAL TRANSITION */}
             {isTransitioning && (
               <div className="cr-portal">
                 <div className="cr-field"></div>
@@ -195,9 +204,7 @@ function App() {
                 </div>
               </div>
             )}
-
             {isHomePage && !isTransitioning && <Header onGetStarted={handleGetStarted} />}
-
             <Routes>
               <Route
                 path="/"
@@ -208,8 +215,6 @@ function App() {
                     transition={{ delay: 0.2 }}
                   >
                     <Hero />
-                    {/* GroqTester'ı kaldırdık, butonla erişeceğiz */}
-                    
                     <CategoryShowcase isDarkMode={false} />
                     <div className="premium-background">
                       <StatsShowcase />
@@ -233,8 +238,7 @@ function App() {
                   </motion.div>
                 ) : null}
               />
-              
-              {/* YENİ ROUTE - CrafotraGPT */}
+              <Route path="/theme/:themeName" element={<ThemeRedirect />} />
               <Route path="/crafotra-gpt" element={<CrafotraGPT />} />
               <Route path="/craftora-themes" element={<CraftoraThemes />} />
               <Route path="/login" element={<Login />} />
@@ -255,22 +259,31 @@ function App() {
               <Route path="/medya" element={<Medya />} />
               <Route path="/theme/eco-mart" element={<EcoMartTheme />} />
               <Route path="/cj-import" element={<CJProductImport />} />
+              <Route path='seller-themes' element={<SellerThemes/>} />
 
-<Route 
-  path="/themes" 
-  element={
-    <ShopThemesPage 
-      colors={{
-        bg: '#f6f8f6',
-        surface: '#ffffff',
-        border: '#e2e8f0',
-        text: '#0f172a',
-        textSecondary: '#64748b',
-        hover: '#f1f5f9'
-      }} 
-    />
-  } 
-/>
+              <Route
+                path="/theme/enterprise/*"
+                element={<EnterpriseTheme shopId={shopId} />}
+              />
+              <Route
+                path="/theme-editor"
+                element={<ThemeEditor shopId={shopId} isDarkMode={isDarkMode} />}
+              />
+              <Route
+                path="/themes"
+                element={
+                  <ShopThemesPage
+                    colors={{
+                      bg: '#f6f8f6',
+                      surface: '#ffffff',
+                      border: '#e2e8f0',
+                      text: '#0f172a',
+                      textSecondary: '#64748b',
+                      hover: '#f1f5f9'
+                    }}
+                  />
+                }
+              />
             </Routes>
           </motion.div>
         )}

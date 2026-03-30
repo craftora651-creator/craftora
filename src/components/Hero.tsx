@@ -7,8 +7,6 @@ import '../css/Hero.css';
 const Hero: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Geri gelince animasyon
   useEffect(() => {
     const heroSection = document.querySelector('.hero-section');
     if (location.state?.from === 'medya') {
@@ -18,36 +16,28 @@ const Hero: React.FC = () => {
       }, 600);
     }
   }, [location]);
-
   const createStardust = () => {
     for (let i = 0; i < 30; i++) {
       const stardust = document.createElement('div');
       stardust.className = 'hero-stardust';
-      
-      // Rastalan varyasyonlar
       const angle = (i / 30) * Math.PI * 2;
       const distance = 100 + Math.random() * 150;
       const x = Math.cos(angle) * distance;
       const y = Math.sin(angle) * distance;
-      
       stardust.style.setProperty('--x', `${x}px`);
       stardust.style.setProperty('--y', `${y}px`);
       stardust.style.left = '50%';
       stardust.style.top = '50%';
       stardust.style.animationDelay = `${i * 0.02}s`;
-      
       document.body.appendChild(stardust);
-      
       setTimeout(() => {
         stardust.remove();
       }, 2000);
     }
   };
-
   const createBeams = () => {
     const beamsContainer = document.createElement('div');
     beamsContainer.className = 'hero-portal-beams';
-    
     for (let i = 0; i < 12; i++) {
       const beam = document.createElement('div');
       beam.className = 'hero-portal-beam';
@@ -55,35 +45,21 @@ const Hero: React.FC = () => {
       beam.style.animationDelay = `${i * 0.1}s`;
       beamsContainer.appendChild(beam);
     }
-    
     document.body.appendChild(beamsContainer);
-    
     setTimeout(() => {
       beamsContainer.remove();
     }, 2000);
   };
-
   const handleMedya = () => {
-    // Body'e geçiş class'ı ekle
     document.body.classList.add('page-transition');
-    
-    // Portal elementini ekle
     const portal = document.querySelector('.hero-portal');
     if (portal) {
       portal.classList.add('active');
     }
-    
-    // Işınları oluştur
     createBeams();
-    
-    // Yıldız tozlarını oluştur
     createStardust();
-    
-    // Animasyonlu geçiş
     setTimeout(() => {
       navigate('/medya', { state: { from: 'hero' } });
-      
-      // Temizlik
       setTimeout(() => {
         document.body.classList.remove('page-transition');
         document.body.classList.add('page-transition-end');
@@ -93,6 +69,9 @@ const Hero: React.FC = () => {
       }, 100);
     }, 1200);
   };
+  const Sumbit = () => {
+    navigate('/demo')
+  }
 
   return (
     <section className="hero-section">
@@ -194,6 +173,7 @@ const Hero: React.FC = () => {
               </motion.button>
               
               <motion.button 
+              onClick={Sumbit}
                 className="hero-secondary-button"
                 whileHover={{ 
                   scale: 1.1,

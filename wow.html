@@ -1,488 +1,115 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>EcoMart | Elevate Your Sustainable Lifestyle</title>
+<title>Elevate Commerce - AI Assistant</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#5ff042",
-                        "background-light": "#f6f8f6",
-                        "background-dark": "#132210",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "2xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                },
-            },
+<!-- BEGIN: Custom Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'elevate-blue': '#0070f3',
+            'elevate-dark': '#111827',
+          },
+          animation: {
+            'bounce-slow': 'bounce 3s infinite',
+            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
         }
-    </script>
-<style>
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .glass-dark {
-            background: rgba(19, 34, 16, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(95, 240, 66, 0.1);
-        }
-        body {
-            font-family: 'Manrope', sans-serif;
-        }
-    </style>
+      }
+    }
+  </script>
+<!-- END: Custom Configuration -->
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="speech-bubble-tail">
+    /* Custom CSS for the speech bubble tail */
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      right: 30px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid white;
+      filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.07));
+    }
+  </style>
+<!-- END: Custom Styles -->
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
-<!-- Navigation Header -->
-<header class="fixed top-0 left-0 right-0 z-50 glass dark:glass-dark border-b border-primary/10">
-<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-8">
-<div class="flex items-center gap-2">
-<div class="bg-primary p-2 rounded-lg shadow-lg shadow-primary/20">
-<span class="material-symbols-outlined text-background-dark text-2xl font-bold">eco</span>
-</div>
-<h1 class="text-xl font-800 tracking-tight text-slate-900 dark:text-slate-100">Eco<span class="text-primary">Mart</span></h1>
-</div>
-<nav class="hidden lg:flex items-center gap-10">
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Shop</a>
-<div class="relative group cursor-pointer flex items-center gap-1">
-<span class="text-sm font-semibold hover:text-primary transition-colors">Categories</span>
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</div>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Sustainability</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Journal</a>
-</nav>
-<div class="flex-1 max-w-md hidden md:block">
-<div class="relative group">
-<input class="w-full bg-slate-200/50 dark:bg-slate-800/50 border-none rounded-full py-2.5 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 text-sm transition-all" placeholder="Search curated goods..." type="text"/>
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">search</span>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<button class="p-2.5 rounded-full hover:bg-primary/10 transition-colors relative">
-<span class="material-symbols-outlined">shopping_cart</span>
-<span class="absolute top-1 right-1 bg-primary text-[10px] font-bold text-background-dark size-4 flex items-center justify-center rounded-full">3</span>
-</button>
-<button class="p-2.5 rounded-full hover:bg-primary/10 transition-colors">
-<span class="material-symbols-outlined">person</span>
-</button>
-<div class="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
-<button class="bg-primary hover:shadow-lg hover:shadow-primary/30 text-background-dark font-bold py-2.5 px-6 rounded-full text-sm transition-all hidden sm:block">
-                    Join Community
-                </button>
-</div>
-</div>
+<body class="bg-gray-50 font-sans antialiased overflow-hidden h-screen">
+<!-- BEGIN: Main Landing Content Placeholder -->
+<main class="max-w-7xl mx-auto px-4 py-12">
+<header class="mb-12">
+<h1 class="text-4xl font-extrabold text-elevate-dark tracking-tight">Elevate Commerce</h1>
+<p class="mt-4 text-xl text-gray-600">The premium marketplace for next-generation digital experiences.</p>
 </header>
-<main class="pt-20">
-<!-- Hero Section -->
-<section class="relative min-h-[85vh] flex items-center overflow-hidden px-6">
-<div class="absolute inset-0 z-0">
-<div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent"></div>
-<div class="absolute -top-24 -right-24 size-96 bg-primary/20 rounded-full blur-[120px]"></div>
-<div class="absolute bottom-0 left-0 size-80 bg-primary/10 rounded-full blur-[100px]"></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Decorative UI Elements to simulate a real site background -->
+<div class="h-64 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+<div class="h-4 w-24 bg-gray-200 rounded mb-4"></div>
+<div class="h-32 w-full bg-gray-50 rounded mb-4"></div>
+<div class="h-4 w-full bg-gray-100 rounded"></div>
+</div>
+<div class="h-64 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+<div class="h-4 w-24 bg-gray-200 rounded mb-4"></div>
+<div class="h-32 w-full bg-gray-50 rounded mb-4"></div>
+<div class="h-4 w-full bg-gray-100 rounded"></div>
+</div>
+<div class="h-64 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+<div class="h-4 w-24 bg-gray-200 rounded mb-4"></div>
+<div class="h-32 w-full bg-gray-50 rounded mb-4"></div>
+<div class="h-4 w-full bg-gray-100 rounded"></div>
 </div>
-<div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center relative z-10">
-<div class="space-y-8">
-<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
-<span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-</span>
-                        Summer Collection 2024
-                    </div>
-<h1 class="text-6xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-slate-900 dark:text-slate-100">
-                        Elevate Your <br/>
-<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-600">Sustainable</span> <br/>
-                        Lifestyle
-                    </h1>
-<p class="text-lg text-slate-600 dark:text-slate-400 max-w-lg leading-relaxed">
-                        Experience premium eco-conscious living with our curated collection of high-end organic goods designed for the modern minimalist.
-                    </p>
-<div class="flex flex-wrap gap-4 pt-4">
-<button class="px-8 py-4 bg-primary text-background-dark font-bold rounded-xl shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                            Explore Collection
-                        </button>
-<button class="px-8 py-4 glass dark:bg-slate-800/50 font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-colors">
-                            View Lookbook
-                        </button>
 </div>
-</div>
-<div class="relative hidden lg:block">
-<div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 rotate-2">
-<img alt="Luxury eco-friendly interior design" class="w-full aspect-[4/5] object-cover" data-alt="Modern minimalist living room with sustainable furniture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLEvS3DbRUo2FMHkeeNneVFsOhcM9dKKXRRs8Pc60-GTf510S8-zoC8wDYe9_bEyk_o-d3sNjnwUEQyNNo9dL5kajtCJOjySTYpECqlhS2fiNPlCPQm7y64kViFJ64-iVVtMKx1N6ozc5xfOTbbRtpBfkmOEeBofWwlzO1r2yd8WFVfEbs1OQV9J0vuEXm9J5GM_vpRB5KporpXKw5uzdmQGx970NeFWpF3h7iaxhqvKMsnO7iayKFvkbIbfOsoTGXYWh-glqJjC4"/>
-</div>
-<!-- Floating elements -->
-<div class="absolute -top-12 -left-12 glass dark:glass-dark p-6 rounded-2xl shadow-xl z-20 -rotate-3 border border-white/50">
-<div class="flex items-center gap-4">
-<div class="size-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined">eco</span>
-</div>
-<div>
-<p class="text-xs text-slate-500 font-bold uppercase">Certified Organic</p>
-<p class="font-bold">100% Sustainable</p>
-</div>
-</div>
-</div>
-<div class="absolute -bottom-8 -right-8 glass dark:glass-dark p-6 rounded-2xl shadow-xl z-20 rotate-3 border border-white/50">
-<div class="flex items-center gap-3">
-<div class="flex -space-x-3">
-<div class="size-10 rounded-full border-2 border-white bg-slate-300" data-alt="Customer avatar 1" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGWeCRIF-E-1NdtQQEC4wcUDo4PUVGIhOWXirDrntb4NAv0JuASgFDgx2oEPPRsUl4d5Y7uUlT6_7aJ93sulCtg4BdPtlyV5zE1-WLKQvWpRmpuPqewgSs5GJ1rR5Kgg88KXtmM8Y1aFoX7K57BfKrnQ98b8bsm8lbNSg_VDW5l7VkyBC54TGCje2_VMs3iIHpBgt0ARl6y_DWQotA7bJzrjAsmWTFnk88P4RBBU2UpB_pVlwkBkpA-khJzByESFLjhroIRGjEZMU')"></div>
-<div class="size-10 rounded-full border-2 border-white bg-slate-300" data-alt="Customer avatar 2" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD2cyhf-5HzJ0EiNdzRq0xMgTEqvTq5s3aSvXzAnnQR1RI67sfyAu_J4u6fuF0fwUQzinV7N8wHmiE91ocElgSMTcQ3K-JkpmTjOITm-26foQ41oAncrY1tgCrjHYu2nsSJsnDqaU21ttFANRRLawOHJ48uIWouHk0DIm9QD_RHrPT3jV2fD587kn2ie9ruQm9QQL0FlP5pbjcmLkmTMaRJ6HcH0ZN2qBgjLOaCQOCHHiNbMzvA7MNC-Wb1cHUk0uZhYm--LJTAEsg')"></div>
-<div class="size-10 rounded-full border-2 border-white bg-slate-300" data-alt="Customer avatar 3" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD784cpR9vu2a70NklYdz934VhMPWYAVUHyn8Pk1nQ2Cw6hvaXvygqs1TNBwwG0Bs1HUp_vG4k3isJw32hi2K2JWwjv9WUYjZyF_fIUrhxTjosw9sKK5Vhd2bjV8la3DOIPb-zBMi7lNccsSAJFm9b3Ms2E9TEMf8XoTE674OS8Xp1KqazAXsvsgt23wD3E9tnQnC4v0oYt7kXwsaFWYhpdZDznrB4DY9JQ7boSevffquJY0Nmggr-Uz7hxZQ_YtAEa4nLMIYiQzRo')"></div>
-</div>
-<p class="text-sm font-bold">12k+ Happy Customers</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Categories Section -->
-<section class="py-24 px-6 max-w-7xl mx-auto">
-<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-<div>
-<h2 class="text-3xl font-extrabold tracking-tight mb-2">Curated Categories</h2>
-<p class="text-slate-500">Discover sustainable essentials for every corner of your life.</p>
-</div>
-<a class="text-primary font-bold flex items-center gap-2 hover:underline" href="#">
-                    Browse All <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</a>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-<!-- Category Item -->
-<div class="group cursor-pointer flex flex-col items-center gap-4">
-<div class="size-24 rounded-full glass dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center shadow-lg group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-<span class="material-symbols-outlined text-3xl text-primary group-hover:text-background-dark transition-colors">home</span>
-</div>
-<span class="font-bold text-sm tracking-wide">Living</span>
-</div>
-<div class="group cursor-pointer flex flex-col items-center gap-4">
-<div class="size-24 rounded-full glass dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center shadow-lg group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-<span class="material-symbols-outlined text-3xl text-primary group-hover:text-background-dark transition-colors">spa</span>
-</div>
-<span class="font-bold text-sm tracking-wide">Beauty</span>
-</div>
-<div class="group cursor-pointer flex flex-col items-center gap-4">
-<div class="size-24 rounded-full glass dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center shadow-lg group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-<span class="material-symbols-outlined text-3xl text-primary group-hover:text-background-dark transition-colors">apparel</span>
-</div>
-<span class="font-bold text-sm tracking-wide">Fashion</span>
-</div>
-<div class="group cursor-pointer flex flex-col items-center gap-4">
-<div class="size-24 rounded-full glass dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center shadow-lg group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-<span class="material-symbols-outlined text-3xl text-primary group-hover:text-background-dark transition-colors">restaurant</span>
-</div>
-<span class="font-bold text-sm tracking-wide">Kitchen</span>
-</div>
-<div class="group cursor-pointer flex flex-col items-center gap-4">
-<div class="size-24 rounded-full glass dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center shadow-lg group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-<span class="material-symbols-outlined text-3xl text-primary group-hover:text-background-dark transition-colors">devices_other</span>
-</div>
-<span class="font-bold text-sm tracking-wide">Tech</span>
-</div>
-<div class="group cursor-pointer flex flex-col items-center gap-4">
-<div class="size-24 rounded-full glass dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center shadow-lg group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-<span class="material-symbols-outlined text-3xl text-primary group-hover:text-background-dark transition-colors">self_improvement</span>
-</div>
-<span class="font-bold text-sm tracking-wide">Wellness</span>
-</div>
-</div>
-</section>
-<!-- Popular Products -->
-<section class="py-24 px-6 bg-slate-100 dark:bg-slate-900/50">
-<div class="max-w-7xl mx-auto">
-<div class="text-center mb-16">
-<h2 class="text-4xl font-extrabold tracking-tight mb-4">Popular This Week</h2>
-<p class="text-slate-500 max-w-2xl mx-auto">Our most loved sustainable items chosen by the EcoMart community.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-<!-- Product Card 1 -->
-<div class="group glass dark:glass-dark rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
-<div class="relative h-72 overflow-hidden">
-<img alt="Organic Cotton Towel" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Soft white organic cotton towels stacked neatly" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7LIiWTPAIj6G3YrD4Lp-25c4wpGp-uQeR4nO2a081Y1r56lAPCLLs1zvf7MW9OBl5CcaPdcS09grmeaThyoEyk0nOYsjkNDjOKL7ndONBYdlzIxN06i1dkxCIedLC3Fd8HEpmQ215gzNTBfyGhT-CxUHDxIn5EJXDyHp9CIMCH5x9yCCcx-GXviro7Dr57TLO7F4lHwktxXKp2OFzJk8IYdCJ3JawKtXFw7h7Ga7dcaPwSgB8TrDlgGBUudtRvb1tUQhh_l77pPw"/>
-<div class="absolute top-4 right-4 glass px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest text-background-dark">Eco Choice</div>
-</div>
-<div class="p-6">
-<div class="flex justify-between items-start mb-2">
-<div>
-<h3 class="font-bold text-lg">Pure Cotton Set</h3>
-<p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Bath &amp; Living</p>
-</div>
-<span class="font-extrabold text-primary">$49.00</span>
-</div>
-<div class="flex items-center gap-1 text-yellow-500 mb-6">
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm">star_half</span>
-<span class="text-xs text-slate-500 ml-1">(128)</span>
-</div>
-<button class="w-full py-3 bg-background-dark dark:bg-primary dark:text-background-dark text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-background-dark transition-colors">
-<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                                Quick Add
-                            </button>
-</div>
-</div>
-<!-- Product Card 2 -->
-<div class="group glass dark:glass-dark rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
-<div class="relative h-72 overflow-hidden">
-<img alt="Natural Skin Oil" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Amber glass bottle of organic facial oil on stone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAksUOmp1VIdzDw_H9MpiifsVkNr0UN_5ITXNk9sGNAK6zIkATPvfeVqw9Cy0ApP8oqNB9B8gnY4bj-SDgPONWhaE8O39Jzoa5mvt87v89BCa0s6vQfhrqbV-g1E77b3JuyEhwpIs8BN1SJolrzdpb4kO6kx6iyiZoONrwnlDgvpg7c_OS8U189B88qBRkncpNbIg1c-FCEjw5znK5GxTZNfVsohE1KTyvV-y3hv4Fh8cwGEVsXfWHysyjQmETsuSnLqeBo5KNIH1o"/>
-</div>
-<div class="p-6">
-<div class="flex justify-between items-start mb-2">
-<div>
-<h3 class="font-bold text-lg">Botanical Serum</h3>
-<p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Beauty &amp; Care</p>
-</div>
-<span class="font-extrabold text-primary">$85.00</span>
-</div>
-<div class="flex items-center gap-1 text-yellow-500 mb-6">
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="text-xs text-slate-500 ml-1">(94)</span>
-</div>
-<button class="w-full py-3 bg-background-dark dark:bg-primary dark:text-background-dark text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-background-dark transition-colors">
-<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                                Quick Add
-                            </button>
-</div>
-</div>
-<!-- Product Card 3 -->
-<div class="group glass dark:glass-dark rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
-<div class="relative h-72 overflow-hidden">
-<img alt="Eco Tech Watch" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Modern smartwatch with a recycled material strap" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY5bylF2rQWV6OtjieKDOdIdPBIKSvB-kvPlG-81zNrvDS6QDLHEEzgQaCZqCtFUSZ4wfI-Z_fqZmy_Yk2CpYgB9WbAbY1LZ43k2kaRbdXFvxghkrVe3-MX7SKzrETlNduwMr8lmE6bMM--ooKwF2Jy5OwsoXhhriWFe-ff6K7e8KT1-FpC8OSeyfyPC1juWgB3soCSyCPC3LblV0ENSJqBVG-Bu4jjVv1PLdsCoFH4pUfiRLfmoBYFrx87xA_uernYe0BwUh_EjI"/>
-</div>
-<div class="p-6">
-<div class="flex justify-between items-start mb-2">
-<div>
-<h3 class="font-bold text-lg">Recycled Smartwatch</h3>
-<p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Gadgets</p>
-</div>
-<span class="font-extrabold text-primary">$299.00</span>
-</div>
-<div class="flex items-center gap-1 text-yellow-500 mb-6">
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm">star_outline</span>
-<span class="text-xs text-slate-500 ml-1">(210)</span>
-</div>
-<button class="w-full py-3 bg-background-dark dark:bg-primary dark:text-background-dark text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-background-dark transition-colors">
-<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                                Quick Add
-                            </button>
-</div>
-</div>
-<!-- Product Card 4 -->
-<div class="group glass dark:glass-dark rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
-<div class="relative h-72 overflow-hidden">
-<img alt="Essential Oils" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Collection of essential oil bottles on wooden tray" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_3C8GKOofpZ4_TtQ_XIcqpBnmdxAOcJYNhn5piet1k9DqjPUaxTGSfBiDhknT13uKalWXNh2vrdTPhZvwhxGagslPZER0uSD2Rpfhha1KI_BqFkNPNMpg3_2Liys78dlHuDeZx1yICczz4ccSPcRKifa-8c4cYzZOXat8hedV3TGwKjFqg9jkw0e50oy6JQHrmeSUf68C-KRIxC2hHwIzaLaEaLCPza-24oJ5Pon6X-9dd1AsHVbCVqE5syPW9kD3hrw4ldtkdNY"/>
-</div>
-<div class="p-6">
-<div class="flex justify-between items-start mb-2">
-<div>
-<h3 class="font-bold text-lg">Mood Diffuser Set</h3>
-<p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Wellness</p>
-</div>
-<span class="font-extrabold text-primary">$35.00</span>
-</div>
-<div class="flex items-center gap-1 text-yellow-500 mb-6">
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="material-symbols-outlined text-sm fill-1">star</span>
-<span class="text-xs text-slate-500 ml-1">(45)</span>
-</div>
-<button class="w-full py-3 bg-background-dark dark:bg-primary dark:text-background-dark text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-background-dark transition-colors">
-<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                                Quick Add
-                            </button>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Bento Box Featured Collection -->
-<section class="py-24 px-6 max-w-7xl mx-auto">
-<h2 class="text-4xl font-extrabold tracking-tight mb-12">Collections that Matter</h2>
-<div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[800px]">
-<!-- Bento Large -->
-<div class="md:col-span-2 md:row-span-2 relative group rounded-2xl overflow-hidden shadow-xl">
-<img alt="Kitchen Essentials" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Eco-friendly wooden kitchen tools on a clean surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJbbO92EXhKy41MknvWCr8y8HXYWOA8gxza_8dZiV86D_0KkNigHKdXHBidd9D2BczhW30rr8_2btJL8rdfRsGFFJhWvjZfMQ1LoocEfI-S7MV5PFXpdGiS_7J0rZwIo4ATQ3pqKKJbMP-xaegRqbRZAegOaO15c8dhemObZ0Nww3QhqJNrLWORs5Pe_79BwElSSG64XHZEeAV89_9b7n_e70YjHHHxTb4hLkPQC57PWPKVvWu2sBZLflKBcB_-f_l2f8Ua_othKw"/>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 via-transparent to-transparent"></div>
-<div class="absolute bottom-10 left-10 text-white">
-<span class="text-primary font-extrabold uppercase text-xs tracking-[0.2em] mb-4 block">Sustainable Home</span>
-<h3 class="text-4xl font-extrabold mb-4">The Conscious <br/> Kitchen</h3>
-<p class="max-w-xs mb-6 text-slate-300">Upgrade your daily routine with tools that are as beautiful as they are ethical.</p>
-<button class="bg-white text-background-dark font-bold px-8 py-3 rounded-full hover:bg-primary transition-colors">Explore</button>
-</div>
-</div>
-<!-- Bento Small 1 -->
-<div class="md:col-span-2 md:row-span-1 relative group rounded-2xl overflow-hidden shadow-xl">
-<img alt="Ethical Fashion" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Person wearing sustainable linen clothing outdoors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEkcKPX3Ixw8F4pIzYkOHoVe9H8Dz_z37bKn4V5MRdsXcZrJa1kP7NyhFnHeEEskxrqK_wFbC5ZFQfoQPfOqpmQ4VILpQGqRmutl2z9f6mSTPdPtpF5VigKnSuMT1J4hd0nL0HapTqCghA4aSK15va2ctWZCYYJ-hQRRvf4yWYB_QljCmjTYgmXTzGsfB81KR_34k_Zg2ngxyPrSJuykv159qOmIEnaLiH9LSaX0qS2wviKKZzotoPQI2Crc_l57bQnRmUtBn6q1w"/>
-<div class="absolute inset-0 bg-gradient-to-r from-background-dark/60 via-transparent to-transparent"></div>
-<div class="absolute inset-y-0 left-8 flex flex-col justify-center text-white">
-<span class="text-primary font-extrabold uppercase text-xs tracking-[0.2em] mb-2 block">Slow Fashion</span>
-<h3 class="text-2xl font-extrabold mb-2">Summer Linen</h3>
-<button class="text-sm font-bold border-b-2 border-primary w-fit pb-1 hover:text-primary transition-colors">Shop Now</button>
-</div>
-</div>
-<!-- Bento Small 2 -->
-<div class="md:col-span-1 md:row-span-1 relative group rounded-2xl overflow-hidden shadow-xl">
-<img alt="Zero Waste" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Reusable metal water bottle and coffee cup" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeIcvtQ0SZE_Z6OlWyH636RkAV2Ukq9skm7QdhY9IH93dp156y90MnODQ8sAGr6Ag6c3KIyJ9X0uWMOuPm4jZdtExOTMgGS1QKMlfiNafhW63J8ARQV57kuKI3dURsJ62axVOh06qoaEdRtKntSieFGjZ5gvmON1Dp74HZPCsmeDiFFKNJJEKcAbFbTCszMUWkbC4_GeyCgvv2f3fptJiCLt6gY4P1XsRPPHznv-lLswUdzKv9FIgxeuhycWdby3NWkr-TSvpEJD4"/>
-<div class="absolute inset-0 bg-background-dark/20 group-hover:bg-background-dark/40 transition-colors"></div>
-<div class="absolute bottom-6 left-6 text-white">
-<h3 class="text-xl font-extrabold">Zero Waste</h3>
-</div>
-</div>
-<!-- Bento Small 3 -->
-<div class="md:col-span-1 md:row-span-1 relative group rounded-2xl overflow-hidden shadow-xl">
-<div class="absolute inset-0 bg-primary/90 flex flex-col items-center justify-center text-center p-6">
-<span class="material-symbols-outlined text-4xl text-background-dark mb-4">eco</span>
-<h3 class="text-xl font-extrabold text-background-dark mb-2">Our Manifesto</h3>
-<p class="text-sm text-background-dark/80 mb-4">Why we believe in a greener future for commerce.</p>
-<a class="bg-background-dark text-white p-2 rounded-full flex items-center justify-center" href="#">
-<span class="material-symbols-outlined">chevron_right</span>
-</a>
-</div>
-</div>
-</div>
-</section>
-<!-- Trust Signals -->
-<section class="py-16 border-y border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-<div class="max-w-7xl mx-auto px-6">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-<div class="flex items-center gap-6">
-<div class="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-<span class="material-symbols-outlined text-3xl">local_shipping</span>
-</div>
-<div>
-<h4 class="font-bold text-lg mb-1">Carbon Neutral Shipping</h4>
-<p class="text-sm text-slate-500">Every delivery offset with verifiable carbon credits.</p>
-</div>
-</div>
-<div class="flex items-center gap-6">
-<div class="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-<span class="material-symbols-outlined text-3xl">verified</span>
-</div>
-<div>
-<h4 class="font-bold text-lg mb-1">Eco Certified</h4>
-<p class="text-sm text-slate-500">100% of our vendors meet strict organic &amp; fair-trade standards.</p>
-</div>
-</div>
-<div class="flex items-center gap-6">
-<div class="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-<span class="material-symbols-outlined text-3xl">recycling</span>
-</div>
-<div>
-<h4 class="font-bold text-lg mb-1">Infinite Recycling</h4>
-<p class="text-sm text-slate-500">Send back any used product for responsible recycling credits.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Newsletter -->
-<section class="py-24 px-6 overflow-hidden">
-<div class="max-w-5xl mx-auto relative glass dark:glass-dark rounded-[2.5rem] p-12 md:p-20 flex flex-col items-center text-center overflow-hidden border border-primary/20">
-<div class="absolute -top-24 -left-24 size-64 bg-primary/30 rounded-full blur-[80px]"></div>
-<div class="absolute -bottom-24 -right-24 size-64 bg-primary/20 rounded-full blur-[80px]"></div>
-<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 relative z-10">Join the <span class="text-primary">Eco</span> Movement</h2>
-<p class="text-lg text-slate-600 dark:text-slate-400 mb-10 max-w-xl relative z-10">Subscribe for early access to product drops, sustainability tips, and exclusive offers.</p>
-<form class="w-full max-w-md flex flex-col sm:flex-row gap-4 relative z-10">
-<input class="flex-1 bg-white dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary shadow-lg text-slate-900 dark:text-slate-100" placeholder="your@email.com" type="email"/>
-<button class="bg-primary hover:bg-emerald-500 text-background-dark font-extrabold px-10 py-4 rounded-2xl shadow-xl shadow-primary/30 transition-all hover:scale-105">
-                        Subscribe
-                    </button>
-</form>
-<p class="mt-6 text-xs text-slate-500 relative z-10">By subscribing, you agree to our Privacy Policy and Terms of Service.</p>
-</div>
-</section>
 </main>
-<!-- Footer -->
-<footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 pt-20 pb-10 px-6">
-<div class="max-w-7xl mx-auto">
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
-<div class="lg:col-span-2">
-<div class="flex items-center gap-2 mb-6">
-<div class="bg-primary p-2 rounded-lg">
-<span class="material-symbols-outlined text-background-dark text-xl font-bold">eco</span>
+<!-- END: Main Landing Content Placeholder -->
+<!-- BEGIN: AI Assistant Overlay Container -->
+<div class="fixed bottom-0 right-0 z-50 p-6 flex flex-col items-end pointer-events-none" data-purpose="ai-assistant-container" id="ai-assistant-wrapper">
+<!-- BEGIN: Speech Bubble -->
+<div class="speech-bubble mb-4 bg-white text-elevate-dark px-6 py-4 rounded-2xl shadow-xl border border-gray-100 animate-fade-in-up pointer-events-auto" data-purpose="assistant-message">
+<p class="text-lg font-medium">Hey, sana yardım edeyim mi?</p>
 </div>
-<h2 class="text-xl font-800 tracking-tight">Eco<span class="text-primary">Mart</span></h2>
+<!-- END: Speech Bubble -->
+<!-- BEGIN: Robot Character and Action Button -->
+<div class="relative flex flex-col items-center">
+<!-- Robot Image Container -->
+<div class="w-48 h-48 md:w-64 md:h-64 transition-transform duration-300 hover:scale-105 pointer-events-auto" data-purpose="robot-character-display">
+<img alt="Friendly 3D Robot Assistant waving" class="w-full h-full object-contain drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxfpYM3imEyWbu8gQghSBLTwi50jnfz0_a8KtOkM8PtXFC8KkRgMt3UPs85ZVJSYvrdG15oBFHLR-uOlRRfnzXE9ReDKrxTFYBF490OL8pGZSTulkd8QUCXjdy3cqGJzdKaEyuC-GblRMCf68B1yOTVvNVLL1HGyLr-hpCL-vF0Hadg0BUeh334goBMwI9kwNcAEj7oXLolBaQFFPYRK0dcFYIvKX3s5qy9GenWxZyFZ8oBtaOak5TNVP2pKPwdi_kUNtgWsgdvN3b"/>
 </div>
-<p class="text-slate-500 max-w-sm mb-8 leading-relaxed">
-                        Redefining commerce for a conscious world. We believe that premium quality and sustainability should never be mutually exclusive.
-                    </p>
-<div class="flex gap-4">
-<a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors group" href="#">
-<span class="material-symbols-outlined text-xl text-slate-600 dark:text-slate-400 group-hover:text-background-dark">public</span>
-</a>
-<a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors group" href="#">
-<span class="material-symbols-outlined text-xl text-slate-600 dark:text-slate-400 group-hover:text-background-dark">photo_camera</span>
-</a>
-<a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors group" href="#">
-<span class="material-symbols-outlined text-xl text-slate-600 dark:text-slate-400 group-hover:text-background-dark">smart_display</span>
-</a>
+<!-- Help Button -->
+<button class="mt-4 bg-elevate-blue hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-2 pointer-events-auto" data-purpose="chat-button" id="chat-trigger">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" fill-rule="evenodd"></path>
+</svg>
+        Chat with me
+      </button>
 </div>
+<!-- END: Robot Character and Action Button -->
 </div>
-<div>
-<h4 class="font-bold mb-6">Shop</h4>
-<ul class="space-y-4 text-sm text-slate-500">
-<li><a class="hover:text-primary transition-colors" href="#">All Products</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Bestsellers</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">New Arrivals</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Gift Cards</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-bold mb-6">Company</h4>
-<ul class="space-y-4 text-sm text-slate-500">
-<li><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Sustainability Report</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Impact Partners</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-bold mb-6">Support</h4>
-<ul class="space-y-4 text-sm text-slate-500">
-<li><a class="hover:text-primary transition-colors" href="#">Track Order</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Returns &amp; Exchanges</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Contact Us</a></li>
-</ul>
-</div>
-</div>
-<div class="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
-<p class="text-xs text-slate-400">© 2024 EcoMart Global Inc. All rights reserved.</p>
-<div class="flex gap-8 text-xs text-slate-400">
-<a class="hover:text-slate-900 transition-colors" href="#">Privacy Policy</a>
-<a class="hover:text-slate-900 transition-colors" href="#">Terms of Service</a>
-<a class="hover:text-slate-900 transition-colors" href="#">Cookie Settings</a>
-</div>
-</div>
-</div>
-</footer>
+<!-- END: AI Assistant Overlay Container -->
+<!-- BEGIN: Interactivity Script -->
+<script data-purpose="ui-interactions">
+    document.addEventListener('DOMContentLoaded', () => {
+      const chatBtn = document.getElementById('chat-trigger');
+      
+      chatBtn.addEventListener('click', () => {
+        // Log for demonstration, in production this would open a chat drawer/modal
+        console.log('Chat assistant initialized');
+        alert('Asistan sohbet penceresi açılıyor...');
+      });
+    });
+  </script>
+<!-- END: Interactivity Script -->
 </body></html>

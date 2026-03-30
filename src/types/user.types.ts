@@ -53,6 +53,7 @@ export interface UserResponse extends UserBase {
   is_admin: boolean;
   display_name: string;
   account_age_days: number;
+  shop_id?: string | null; 
 }
 
 export interface UserPublic {

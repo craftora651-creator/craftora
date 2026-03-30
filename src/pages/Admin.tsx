@@ -39,7 +39,7 @@ const KankamAdminPanel = () => {
     if (path.includes('/admin/reports')) return 'reports';
     if (path.includes('/admin/general')) return 'general';
     if (path.includes('/admin/help')) return 'help';
-    if (path.includes('/admin/myshops')) return 'myshops'; // 👈 YENİ
+    if (path.includes('/admin/myshops')) return 'myshops';
     if (path.includes('/admin/themes')) return 'themes';
     return 'dashboard';
   }, [location.pathname]);
@@ -55,7 +55,6 @@ const KankamAdminPanel = () => {
   useEffect(() => {
     setActiveSection(getActiveSectionFromPath());
   }, [getActiveSectionFromPath]); // sadece getActiveSectionFromPath yeterli
-
 
   const theme = {
     dark: {
@@ -102,7 +101,6 @@ const KankamAdminPanel = () => {
     };
     loadScripts();
   }, []);
-
   const GoProduct = () => {
     handleOpenCreateModal();
   };
@@ -134,8 +132,6 @@ const KankamAdminPanel = () => {
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
     }
-
-    /* Sidebar scrollbar stilleri */
 .sidebar::-webkit-scrollbar {
   width: 4px;
 }
@@ -159,9 +155,6 @@ const KankamAdminPanel = () => {
       min-height: 100vh;
       position: relative;
     }
-
-   
-
     .main-content-wrapper {
       flex: 1;
       min-width: 0;
@@ -790,10 +783,7 @@ const KankamAdminPanel = () => {
           scrollbar-color: #0ea5e9 ${colors.bg};
         }
       `}</style>
-
-
-
-
+      
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         {/* Sidebar */}
         <div className="sidebar" style={{
@@ -811,7 +801,7 @@ const KankamAdminPanel = () => {
             : 0,
           zIndex: 1200,
           transition: 'left 0.3s cubic-bezier(0.4,0,0.2,1)',
-          overflowY: 'auto',      // 👈 BUNU EKLE
+          overflowY: 'auto',    
           overflowX: 'hidden',
         }}>
           {/* Logo */}
@@ -835,9 +825,7 @@ const KankamAdminPanel = () => {
               </div>
             </div>
           </div>
-
           {/* Arama */}
-
           {/* Menü Butonları */}
           <nav style={{ flex: 1, padding: '0 16px' }}>
             {[
@@ -859,11 +847,9 @@ const KankamAdminPanel = () => {
                 isDarkMode={isDarkMode}
               />
             ))}
-
             <div style={{ marginTop: 40, marginBottom: 16, paddingLeft: 12 }}>
               <div style={{ fontSize: 11, color: colors.textSecondary, fontWeight: 'bold', letterSpacing: 1 }}>SETTINGS</div>
             </div>
-
             {[
               { id: 'suppliers', icon: 'link', label: 'Tedarikçiler', path: '/admin/suppliers' },
               { id: 'general', icon: 'settings', label: 'General', path: '/admin/general' },
@@ -879,7 +865,6 @@ const KankamAdminPanel = () => {
               />
             ))}
           </nav>
-
           {/* Profil */}
           <div style={{ padding: 24 }}>
             <div style={{
@@ -926,7 +911,6 @@ const KankamAdminPanel = () => {
             }}
           />
         )}
-
         {/* Ana İçerik */}
         <div className={`main-content-wrapper ${isMobileMenuOpen ? 'blur' : ''}`} style={{ flex: 1, paddingTop: '80px', minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Header */}
@@ -965,7 +949,6 @@ const KankamAdminPanel = () => {
               >
                 <span className="material-icons-round">menu</span>
               </div>
-
               <h1 style={{ fontSize: 24, fontWeight: 'bold', color: colors.text, margin: 0 }}>
                 {activeSection === 'dashboard' && 'Overview'}
                 {activeSection === 'products' && 'Products'}
@@ -980,7 +963,6 @@ const KankamAdminPanel = () => {
                 {activeSection === 'help' && 'Help Center'}
               </h1>
             </div>
-
             {/* Header sağ kısım - BUTONLAR */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
               {/* Arama - Mobilde icon, masaüstünde input */}
@@ -1008,7 +990,6 @@ const KankamAdminPanel = () => {
                     }}
                   />
                 </div>
-
                 {/* Mobil icon buton */}
                 <button
                   className="mobile-search-btn"
@@ -1029,7 +1010,6 @@ const KankamAdminPanel = () => {
                   <span className="material-icons-round">search</span>
                 </button>
               </div>
-
               {/* Dark Mode Toggle */}
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
@@ -1048,7 +1028,6 @@ const KankamAdminPanel = () => {
                 }}>
                 <span className="material-icons-round">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>
               </button>
-
               {/* Notifications */}
               <button style={{
                 background: 'none',
@@ -1076,7 +1055,6 @@ const KankamAdminPanel = () => {
                   border: `2px solid ${colors.surface}`
                 }} />
               </button>
-
               {/* Create Product Button */}
               <button
                 onClick={GoProduct}
@@ -1099,7 +1077,6 @@ const KankamAdminPanel = () => {
               </button>
             </div>
           </div>
-
           {/* Arama Overlay - Mobilde */}
           <div className={`search-overlay ${isSearchOpen ? 'open' : ''}`} style={{
             position: 'fixed',
@@ -1155,7 +1132,6 @@ const KankamAdminPanel = () => {
               </button>
             </div>
           </div>
-
           {/* Arama Overlay arkaplan karartma */}
           {isSearchOpen && (
             <div
@@ -1172,9 +1148,7 @@ const KankamAdminPanel = () => {
               onClick={() => setIsSearchOpen(false)}
             />
           )}
-
-          {/* İçerik Alanı */}
-          {/* İçerik Alanı */}
+          {/* İçerik Alani */}
           <div className="main-content" style={{
             flex: 1,
             overflow: 'auto',
@@ -1195,9 +1169,7 @@ const KankamAdminPanel = () => {
                 path="/analytics-shop"
                 element={<AnalyticsDetail colors={colors} />}
               />
-
               {/* 👇 YENİ - Ürün detay */}
-
               <Route path="/themes" element={
                 <ThemesPage colors={colors} />
               } />
@@ -1250,7 +1222,6 @@ const KankamAdminPanel = () => {
   );
 };
 
-// Sidebar Butonu
 // Sidebar Butonu
 interface SidebarButtonProps {
   id: string;

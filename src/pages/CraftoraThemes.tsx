@@ -1,6 +1,7 @@
 // pages/CraftoraThemes.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePurchaseTheme } from '../server/Gin/theme.hook';
 
 const CraftoraThemes = () => {
   const navigate = useNavigate();
@@ -8,10 +9,52 @@ const CraftoraThemes = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const { mutate: purchaseTheme, isPending } = usePurchaseTheme();
+
+  const handleFreeTheme = (themeId: string, themeName: string) => {
+    // theme_code 'enterprise' olarak gönder
+    purchaseTheme('enterprise', {
+      onSuccess: () => {
+        navigate('/admin/themes');
+      }
+    });
+  };
+
+  const [myThemes, setMyThemes] = useState<string[]>(() => {
+    const saved = localStorage.getItem('myThemes');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const addToMyThemes = (themeId: string) => {
+    const newThemes = [...myThemes, themeId];
+    setMyThemes(newThemes);
+    localStorage.setItem('myThemes', JSON.stringify(newThemes));
+  };
   const themesPerPage = 9; // Her sayfada 9 tema
 
   // Tüm temalar (marketplace) - 18 tema olsun ki 2 sayfa olsun
   const allThemes = [
+    // allThemes array'inin en başına şunu ekle:
+    {
+      id: 'enterprise',
+      name: 'Enterprise Theme',
+      description: 'Mimari tasarım ve estetik odaklı, modern e-ticaret teması. Sade, şık ve profesyonel.',
+      price: 0,  // ÜCRETSİZ
+      rating: 5.0,
+      reviews: 128,
+      sales: 3456,
+      image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=800&auto=format',
+      category: 'E-Ticaret',
+      author: 'Craftora Studio',
+      features: ['✨ Modern', '⚡ Hızlı', '📱 Responsive', '🎨 Özelleştirilebilir', '🏆 Award Winning'],
+      colors: ['#1a1a1a', '#c7a45b', '#ffffff', '#f5f5f5'],
+      isPopular: true,
+      isNew: true,
+      isFree: true
+    },
     {
       id: 'dark-knight',
       name: 'Dark Knight',
@@ -303,7 +346,7 @@ const CraftoraThemes = () => {
   ];
 
   const categories = ['Tümü', 'Teknoloji', 'Kurumsal', 'E-Ticaret', 'Minimal', 'Moda'];
-  
+
   // Filtreleme
   const filteredThemes = allThemes.filter(theme => {
     if (selectedCategory !== 'all' && theme.category !== selectedCategory) return false;
@@ -374,7 +417,7 @@ const CraftoraThemes = () => {
             </div>
             <span style={{ fontSize: '20px', fontWeight: 600, color: 'white' }}>Craftora Themes</span>
           </div>
-          
+
           <nav style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
             <a href="#" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '15px' }}>Temalar</a>
             <a href="#" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '15px' }}>Fiyatlandırma</a>
@@ -453,7 +496,7 @@ const CraftoraThemes = () => {
           }}>
             ✦ PREMIUM TEMALAR
           </span>
-          
+
           <h1 style={{
             fontSize: 'clamp(40px, 8vw, 64px)',
             fontWeight: 700,
@@ -468,7 +511,7 @@ const CraftoraThemes = () => {
               WebkitTextFillColor: 'transparent'
             }}>Premium Tema Çözümleri</span>
           </h1>
-          
+
           <p style={{
             fontSize: '18px',
             color: '#94a3b8',
@@ -621,12 +664,12 @@ const CraftoraThemes = () => {
                 border: '1px solid rgba(255,255,255,0.05)',
                 transition: 'all 0.3s ease',
                 transform: hoveredId === theme.id ? 'translateY(-8px)' : 'translateY(0)',
-                boxShadow: hoveredId === theme.id 
+                boxShadow: hoveredId === theme.id
                   ? '0 20px 40px rgba(0,0,0,0.3)'
                   : '0 10px 20px rgba(0,0,0,0.2)',
                 cursor: 'pointer'
               }}
-              onClick={() => navigate(`/theme-preview/${theme.id}`)}
+              onClick={() => navigate('/theme/enterprise')}
             >
               {/* Resim Alanı */}
               <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
@@ -641,7 +684,7 @@ const CraftoraThemes = () => {
                     transform: hoveredId === theme.id ? 'scale(1.05)' : 'scale(1)'
                   }}
                 />
-                
+
                 {/* Badgeler */}
                 <div style={{
                   position: 'absolute',
@@ -780,24 +823,49 @@ const CraftoraThemes = () => {
                       ${theme.price}
                     </span>
                   </div>
-                  
+
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setCartItems([...cartItems, theme.id]);
+                      if (theme.price === 0) {
+                        handleFreeTheme(theme.id, theme.name);
+                      } else {
+                        // ücretli tema için ödeme akışı
+                      }
                     }}
+                    disabled={isPending}
                     style={{
                       padding: '10px 24px',
-                      background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                      background: theme.price === 0
+                        ? 'linear-gradient(135deg, #10b981, #059669)'
+                        : 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
                       border: 'none',
                       borderRadius: '30px',
                       color: 'white',
                       fontSize: '14px',
                       fontWeight: 500,
-                      cursor: 'pointer'
+                      cursor: isPending ? 'not-allowed' : 'pointer',
+                      opacity: isPending ? 0.7 : 1
                     }}
                   >
-                    Sepete Ekle
+                    {isPending ? (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid white',
+                          borderTopColor: 'transparent',
+                          borderRadius: '50%',
+                          animation: 'spin 0.6s linear infinite'
+                        }} />
+                        Ekleniyor...
+                      </span>
+                    ) : theme.price === 0 ? (
+                      '✨ Ücretsiz Dene'
+                    ) : (
+                      `Sepete Ekle ($${theme.price})`
+                    )}
                   </button>
                 </div>
               </div>
@@ -845,7 +913,7 @@ const CraftoraThemes = () => {
                 style={{
                   width: '44px',
                   height: '44px',
-                  background: currentPage === page 
+                  background: currentPage === page
                     ? 'linear-gradient(135deg, #3b82f6, #8b5cf6)'
                     : '#0f172a',
                   border: '1px solid rgba(255,255,255,0.1)',
@@ -932,12 +1000,12 @@ const CraftoraThemes = () => {
               Profesyonel işletmeler için premium tema çözümleri. 150+ tema, sınırsız özelleştirme.
             </p>
           </div>
-          
+
           {['Ürünler', 'Şirket', 'Destek'].map(section => (
             <div key={section}>
               <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'white', marginBottom: '24px' }}>{section}</h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {[1,2,3,4].map(i => (
+                {[1, 2, 3, 4].map(i => (
                   <li key={i} style={{ marginBottom: '12px' }}>
                     <a href="#" style={{ color: '#64748b', textDecoration: 'none', fontSize: '14px' }}>
                       Link {i}
@@ -948,7 +1016,7 @@ const CraftoraThemes = () => {
             </div>
           ))}
         </div>
-        
+
         <div style={{
           maxWidth: '1280px',
           margin: '60px auto 0',

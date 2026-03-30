@@ -1,6 +1,7 @@
 // config/ThemesPage.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePurchasedThemes, useActivateTheme } from '../server/Gin/theme.hook';
 
 interface ThemesPageProps {
   colors: {
@@ -11,32 +12,35 @@ interface ThemesPageProps {
     textSecondary: string;
     hover: string;
   };
+  shopId: string;
 }
 
-const ThemesPage = ({ colors }: ThemesPageProps) => {
+const ThemesPage = ({ colors, shopId }: ThemesPageProps) => {
+  console.log("ThemesPage - shopId:", shopId);
   const navigate = useNavigate();
-  const [purchasedThemes, setPurchasedThemes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Satın alınan temaları JSON Server'dan çek
-  useEffect(() => {
-    fetchThemes();
-  }, []);
+  // Backend'den satın alınan temaları getir
+  const { data: purchasedThemes, isLoading, refetch } = usePurchasedThemes();
+  const { mutate: activateTheme, isPending: isActivating } = useActivateTheme();
 
-  const fetchThemes = async () => {
-    try {
-      // Burada satıcının ID'sini dinamik yapabilirsin
-      const response = await fetch('http://localhost:3000/satici_temalari?satici_id=101');
-      const data = await response.json();
-      setPurchasedThemes(data);
-    } catch (error) {
-      console.error('Temalar yüklenirken hata:', error);
-    } finally {
-      setLoading(false);
-    }
+  // Aktif etme işlemi
+  const handleActivate = (themeId: number) => {
+    activateTheme(themeId, {
+      onSuccess: () => {
+        refetch(); // Listeyi yenile
+        alert('Tema başarıyla aktifleştirildi!');
+      },
+      onError: (error) => {
+        alert('Tema aktifleştirilirken hata oluştu: ' + error.message);
+      }
+    });
   };
 
-  if (loading) {
+  const goToThemeShop = () => {
+    navigate('/craftora-themes');
+  };
+
+  if (isLoading) {
     return (
       <div style={{
         display: 'flex',
@@ -91,7 +95,7 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
 
         {/* Themes Shop Butonu */}
         <button
-          onClick={() => window.open('/craftora-themes', '_blank')}
+          onClick={goToThemeShop}
           style={{
             padding: '12px 24px',
             backgroundColor: '#0ea5e9',
@@ -122,7 +126,7 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
       </div>
 
       {/* Temalar Grid */}
-      {purchasedThemes.length === 0 ? (
+      {!purchasedThemes || purchasedThemes.length === 0 ? (
         <div style={{
           backgroundColor: colors.surface,
           borderRadius: '20px',
@@ -138,7 +142,7 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
             Craftora Themes Shop'dan temalara göz atabilirsin
           </p>
           <button
-            onClick={() => window.open('https://craftora.com/themes-shop', '_blank')}
+            onClick={goToThemeShop}
             style={{
               padding: '12px 32px',
               backgroundColor: '#0ea5e9',
@@ -182,23 +186,22 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = 'none';
               }}
-              onClick={() => navigate(`/admin/myshops?theme=${theme.id}`)}
             >
               {/* Tema Önizleme */}
               <div style={{
                 height: '180px',
-                background: `linear-gradient(135deg, ${theme.tema_ayarlari?.renkler?.ana_renk || '#0ea5e9'} 0%, ${theme.tema_ayarlari?.renkler?.arkaplan || '#1e293b'} 100%)`,
+                background: `linear-gradient(135deg, ${theme.settings?.colors?.primary || '#0ea5e9'} 0%, ${theme.settings?.colors?.background || '#1e293b'} 100%)`,
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
                 <span style={{ fontSize: '48px', opacity: 0.3 }}>
-                  {theme.tema_id === 'dark-knight' ? '🌙' : '☀️'}
+                  {theme.theme_code === 'enterprise' ? '🏢' : '🎨'}
                 </span>
 
                 {/* Aktif Badge */}
-                {theme.aktif_mi && (
+                {theme.is_active && (
                   <div style={{
                     position: 'absolute',
                     top: '12px',
@@ -233,7 +236,7 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
                     color: colors.text,
                     margin: 0
                   }}>
-                    {theme.tema_adi}
+                    {theme.theme_code === 'enterprise' ? 'Enterprise Theme' : theme.theme_code}
                   </h3>
                   <span style={{
                     fontSize: '12px',
@@ -242,7 +245,7 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
                     padding: '4px 8px',
                     borderRadius: '30px'
                   }}>
-                    v{theme.versiyon || '1.0'}
+                    v1.0
                   </span>
                 </div>
 
@@ -252,7 +255,7 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
                   gap: '8px',
                   marginBottom: '16px'
                 }}>
-                  {Object.values(theme.tema_ayarlari?.renkler || {}).map((color: string, i: number) => (
+                  {Object.values(theme.settings?.colors || {}).slice(0, 4).map((color: string, i: number) => (
                     <div
                       key={i}
                       style={{
@@ -267,60 +270,100 @@ const ThemesPage = ({ colors }: ThemesPageProps) => {
                   ))}
                 </div>
 
-                {/* İstatistikler */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '8px',
-                  padding: '12px 0',
-                  borderTop: `1px solid ${colors.border}`,
-                  borderBottom: `1px solid ${colors.border}`,
-                  marginBottom: '16px'
-                }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 600, color: colors.text }}>24</div>
-                    <div style={{ fontSize: '11px', color: colors.textSecondary }}>Ürün</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 600, color: colors.text }}>12</div>
-                    <div style={{ fontSize: '11px', color: colors.textSecondary }}>Video</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 600, color: colors.text }}>8</div>
-                    <div style={{ fontSize: '11px', color: colors.textSecondary }}>Reels</div>
-                  </div>
-                </div>
-
                 {/* Tarih ve Buton */}
+                {/* Tarih ve Butonlar */}
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  marginTop: '16px',
+                  paddingTop: '16px',
+                  borderTop: `1px solid ${colors.border}`,
+                  gap: '12px',
+                  flexWrap: 'wrap'
                 }}>
                   <span style={{ fontSize: '11px', color: colors.textSecondary }}>
-                    Satın Alma: {new Date(theme.satin_alma_tarihi).toLocaleDateString('tr-TR')}
+                    Satın Alma: {new Date(theme.purchased_at).toLocaleDateString('tr-TR')}
                   </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/admin/myshops?theme=${theme.id}`);
-                    }}
-                    style={{
-                      padding: '8px 16px',
-                      backgroundColor: 'transparent',
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: '30px',
-                      color: colors.text,
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <span style={{ fontSize: '14px' }}>⚙️</span>
-                    Düzenle
-                  </button>
+
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {/* Düzenle Butonu - YENİ */}
+                    {/* Düzenle Butonu */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/theme-editor?theme=${theme.theme_code}&shopId=${shopId}`);
+                      }}
+                      style={{
+                        padding: '8px 20px',
+                        backgroundColor: '#8b5cf6',
+                        border: 'none',
+                        borderRadius: '30px',
+                        color: 'white',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#7c3aed';
+                        e.currentTarget.style.transform = 'scale(1.02)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#8b5cf6';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    >
+                      <span style={{ fontSize: '14px' }}>✏️</span>
+                      Temayı Düzenle
+                    </button>
+
+                    {/* Aktif Et / Görüntüle Butonu */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!theme.is_active) {
+                          handleActivate(theme.theme_id);
+                        } else {
+                          navigate(`/theme/enterprise`);
+                        }
+                      }}
+                      disabled={isActivating}
+                      style={{
+                        padding: '8px 20px',
+                        backgroundColor: theme.is_active ? '#10b981' : '#0ea5e9',
+                        border: 'none',
+                        borderRadius: '30px',
+                        color: 'white',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: isActivating ? 'not-allowed' : 'pointer',
+                        opacity: isActivating ? 0.7 : 1,
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {isActivating ? (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{
+                            width: '12px',
+                            height: '12px',
+                            border: '2px solid white',
+                            borderTopColor: 'transparent',
+                            borderRadius: '50%',
+                            animation: 'spin 0.6s linear infinite'
+                          }} />
+                          İşleniyor...
+                        </span>
+                      ) : theme.is_active ? (
+                        '✨ Temayı Görüntüle'
+                      ) : (
+                        '🚀 Temayı Aktif Et'
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

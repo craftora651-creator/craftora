@@ -1,5 +1,6 @@
 // config/MyShops.tsx
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface MyShopsPageProps {
   colors: {
@@ -21,6 +22,11 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   
+  const navigate = useNavigate();
+  const HandleSumbitThemes = () => {
+    navigate('/seller-themes');
+  }
+
   // Tema ayarları (rastgele tema)
   const [aktifTema] = useState({
     id: 'dark-knight',
@@ -68,6 +74,8 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
     }
   };
 
+
+
   return (
     <div>
       {/* HEADER - Mağazam Başlık */}
@@ -99,7 +107,7 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
 
         {/* MAĞAZAMI GÖRÜNTÜLE BUTONU */}
         <button
-          onClick={() => window.open('/theme/eco-mart', '_blank')}
+          onClick={HandleSumbitThemes}
           style={{
             padding: '14px 32px',
             backgroundColor: '#0ea5e9',

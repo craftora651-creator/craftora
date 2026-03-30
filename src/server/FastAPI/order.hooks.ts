@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../api/apiClient";
 import type { 
   OrderResponse,
@@ -53,7 +53,7 @@ export const useMyOrders = (
       if (filters?.date_from) params.append("date_from", filters.date_from);
       if (filters?.date_to) params.append("date_to", filters.date_to);
       
-      const url = `/orders/my${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/api/orders/my${params.toString() ? `?${params.toString()}` : ""}`;
       return await apiClient.get<OrderCustomer[]>(url);
     },
     enabled: options?.enabled ?? true,
@@ -86,7 +86,7 @@ export const useShopOrders = (
       if (filters?.date_from) params.append("date_from", filters.date_from);
       if (filters?.date_to) params.append("date_to", filters.date_to);
       
-      const url = `/orders/shop/${shopId}${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/api/orders/shop/${shopId}${params.toString() ? `?${params.toString()}` : ""}`;
       return await apiClient.get<OrderSeller[]>(url);
     },
     enabled: options?.enabled ?? !!shopId,
@@ -107,7 +107,7 @@ export const useOrder = (
   return useQuery<OrderResponse, Error>({
     queryKey: ["order", "detail", orderId],
     queryFn: async () => {
-      return await apiClient.get<OrderResponse>(`/orders/${orderId}`);
+      return await apiClient.get<OrderResponse>(`/api/orders/${orderId}`);
     },
     enabled: options?.enabled ?? !!orderId,
     staleTime: options?.staleTime ?? 5 * 60 * 1000, // 5 dakika
@@ -160,7 +160,7 @@ export const useOrderDownloads = (
           download_limit: number;
           access_expires: string | null;
         }>;
-      }>(`/orders/${orderId}/downloads`);
+      }>(`/api/orders/${orderId}/downloads`);
     },
     enabled: options?.enabled ?? !!orderId,
   });
@@ -200,7 +200,7 @@ export const useSearchOrders = (
       if (searchParams.sort_by) params.append("sort_by", searchParams.sort_by);
       if (searchParams.sort_order) params.append("sort_order", searchParams.sort_order);
       
-      const url = `/orders/search${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/api/orders/search${params.toString() ? `?${params.toString()}` : ""}`;
       return await apiClient.get<OrderResponse[]>(url);
     },
     enabled: options?.enabled ?? true,
@@ -224,7 +224,7 @@ export const useSalesStatistics = (
       params.append("period", period);
       if (shopId) params.append("shop_id", shopId);
       
-      const url = `/orders/stats/sales${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/api/orders/stats/sales${params.toString() ? `?${params.toString()}` : ""}`;
       return await apiClient.get<OrderStats | ShopOrderStats>(url);
     },
     enabled: options?.enabled ?? true,
@@ -242,7 +242,7 @@ export const useCreateOrder = () => {
   
   return useMutation<OrderResponse, Error, OrderCreateRequest>({
     mutationFn: async (orderData: OrderCreateRequest) => {
-      return await apiClient.post<OrderResponse>("/orders", orderData);
+      return await apiClient.post<OrderResponse>("/api/orders", orderData);
     },
     onSuccess: (createdOrder) => {
       // Invalidate relevant queries
@@ -291,7 +291,7 @@ export const useUpdateOrderStatus = (orderId: string) => {
         new_status: string;
         updated_by: string;
         notes?: string;
-      }>(`/orders/${orderId}/status`, statusUpdate);
+      }>(`/api/orders/${orderId}/status`, statusUpdate);
     },
     onSuccess: (response) => {
       // Update order cache
@@ -341,7 +341,7 @@ export const useFulfillOrder = (orderId: string) => {
         fulfillment_status: string;
         tracking_number?: string;
         estimated_delivery_date?: string;
-      }>(`/orders/${orderId}/fulfill`, fulfillmentData);
+      }>(`/api/orders/${orderId}/fulfill`, fulfillmentData);
     },
     onSuccess: (response) => {
       // Update order cache
@@ -390,7 +390,7 @@ export const useMarkOrderDelivered = (orderId: string) => {
         order_number: string;
         fulfillment_status: string;
         delivered_at: string;
-      }>(`/orders/${orderId}/deliver`, deliveryData);
+      }>(`/api/orders/${orderId}/deliver`, deliveryData);
     },
     onSuccess: (response) => {
       // Update order cache
@@ -443,7 +443,7 @@ export const useRefundOrder = (orderId: string) => {
         remaining_balance: number;
         order_status: string;
         refund_reason: string;
-      }>(`/orders/${orderId}/refund`, refundData);
+      }>(`/api/orders/${orderId}/refund`, refundData);
     },
     onSuccess: (response) => {
       // Update order cache
@@ -509,7 +509,7 @@ export const useBulkOrderAction = () => {
           error?: string;
         }>;
         notify_customers: boolean;
-      }>("/orders/bulk/action", bulkAction);
+      }>("/api/orders/bulk/action", bulkAction);
     },
     onSuccess: (response) => {
       // Invalidate all order queries since we don't know which ones were updated
@@ -545,7 +545,7 @@ export const useExportOrders = () => {
         status: 'pending' | 'processing' | 'completed' | 'failed';
         download_url?: string;
         estimated_completion_time?: string;
-      }>("/orders/export", exportData);
+      }>("/api/orders/export", exportData);
     },
     onSuccess: (response) => {
       console.log(`Order export started: ${response.task_id}, status: ${response.status}`);
@@ -587,7 +587,7 @@ export const useAdminOrders = (
       if (searchParams.limit) params.append("limit", searchParams.limit.toString());
       if (searchParams.sort_by) params.append("sort_by", searchParams.sort_by);
       
-      const url = `/orders/admin/list${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/api/orders/admin/list${params.toString() ? `?${params.toString()}` : ""}`;
       return await apiClient.get<OrderResponse[]>(url);
     },
     enabled: options?.enabled ?? true,
@@ -623,7 +623,7 @@ export const useExportProgress = (taskId: string) => {
         estimated_completion_time?: string;
         created_at: string;
         completed_at?: string;
-      }>(`/orders/export/progress/${taskId}`);
+      }>(`/api/orders/export/progress/${taskId}`);
     },
     refetchInterval: (query) => {
       const data = query.state.data;
@@ -666,7 +666,7 @@ export const useOrderTimeline = (orderId: string) => {
           user_name?: string;
           metadata?: Record<string, unknown>;
         }>;
-      }>(`/orders/${orderId}/timeline`);
+      }>(`/api/orders/${orderId}/timeline`);
       return response.status_logs;
     },
     enabled: !!orderId,
