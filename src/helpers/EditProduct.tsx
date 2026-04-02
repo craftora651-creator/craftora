@@ -16,13 +16,18 @@ import {
     Button
 } from '@mui/material';
 
-
 const EditProduct: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { data: product, isLoading: productLoading } = useProduct(id || '');
     const updateProduct = useUpdateProduct(id || '');
     const uploadFile = useUploadFile();
+
+    // Theme state
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const saved = localStorage.getItem('darkMode');
+        return saved === 'true' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    });
 
     // State'ler
     const [formData, setFormData] = useState({
@@ -54,6 +59,16 @@ const EditProduct: React.FC = () => {
     // Kullanıcı ID'si
     const userId = localStorage.getItem('user_id') || 'test-user-id';
 
+    // Dark mode'u localStorage'a kaydet ve body bg ayarla
+    useEffect(() => {
+        localStorage.setItem('darkMode', String(isDarkMode));
+        if (isDarkMode) {
+            document.documentElement.style.backgroundColor = '#0f172a';
+        } else {
+            document.documentElement.style.backgroundColor = '#f8fafc';
+        }
+    }, [isDarkMode]);
+
     // Ürün verisi geldiğinde formu doldur
     useEffect(() => {
         if (product) {
@@ -84,8 +99,10 @@ const EditProduct: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+    
     const isMobile = windowWidth < 640;
     const isTablet = windowWidth < 1024;
+    
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         if (name === 'stockQuantity') {
@@ -243,17 +260,18 @@ const EditProduct: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: '400px',
-                gap: '1rem'
+                gap: '1rem',
+                backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc'
             }}>
                 <div style={{
                     width: '40px',
                     height: '40px',
-                    border: '3px solid #e2e8f0',
+                    border: `3px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`,
                     borderTopColor: '#0ea5e9',
                     borderRadius: '50%',
                     animation: 'spin 1s linear infinite'
                 }} />
-                <p style={{ color: '#475569' }}>Ürün bilgileri yükleniyor...</p>
+                <p style={{ color: isDarkMode ? '#94a3b8' : '#475569' }}>Ürün bilgileri yükleniyor...</p>
             </div>
         );
     }
@@ -267,9 +285,10 @@ const EditProduct: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: '400px',
-                gap: '1rem'
+                gap: '1rem',
+                backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc'
             }}>
-                <h2 style={{ fontSize: '1.5rem', color: '#0f172a' }}>😕 Ürün Bulunamadı!</h2>
+                <h2 style={{ fontSize: '1.5rem', color: isDarkMode ? '#e2e8f0' : '#0f172a' }}>😕 Ürün Bulunamadı!</h2>
                 <button
                     onClick={() => navigate('/admin/products')}
                     style={{
@@ -290,8 +309,8 @@ const EditProduct: React.FC = () => {
     return (
         <div style={{
             minHeight: '100vh',
-            backgroundColor: '#f8fafc',
-            color: '#0f172a'
+            backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
+            color: isDarkMode ? '#e2e8f0' : '#0f172a'
         }}>
             <div style={{
                 maxWidth: '1400px',
@@ -320,7 +339,7 @@ const EditProduct: React.FC = () => {
                         <span className="material-icons" style={{ fontSize: '1rem' }}>dashboard</span>
                         Dashboard
                     </span>
-                    <span style={{ color: '#cbd5e1' }}>/</span>
+                    <span style={{ color: isDarkMode ? '#475569' : '#cbd5e1' }}>/</span>
                     <span
                         onClick={() => navigate('/admin/products')}
                         style={{
@@ -334,7 +353,7 @@ const EditProduct: React.FC = () => {
                         <span className="material-icons" style={{ fontSize: '1rem' }}>inventory_2</span>
                         Dijital Ürünler
                     </span>
-                    <span style={{ color: '#cbd5e1' }}>/</span>
+                    <span style={{ color: isDarkMode ? '#475569' : '#cbd5e1' }}>/</span>
                     <span style={{
                         color: '#0ea5e9',
                         fontWeight: 600,
@@ -360,7 +379,7 @@ const EditProduct: React.FC = () => {
                         <h1 style={{
                             fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
                             fontWeight: 700,
-                            color: '#0f172a',
+                            color: isDarkMode ? '#f1f5f9' : '#0f172a',
                             margin: '0 0 0.5rem 0',
                             display: 'flex',
                             alignItems: 'center',
@@ -369,7 +388,7 @@ const EditProduct: React.FC = () => {
                             <span>✏️</span> Ürünü Düzenle
                         </h1>
                         <p style={{
-                            color: '#475569',
+                            color: isDarkMode ? '#94a3b8' : '#475569',
                             margin: 0,
                             fontSize: 'clamp(0.875rem, 3vw, 0.95rem)'
                         }}>
@@ -386,10 +405,10 @@ const EditProduct: React.FC = () => {
                             onClick={() => navigate(`/products/view/${product.id}`)}
                             style={{
                                 padding: '0.75rem 1.5rem',
-                                background: '#ffffff',
-                                border: '1px solid #e2e8f0',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                 borderRadius: '10px',
-                                color: '#475569',
+                                color: isDarkMode ? '#e2e8f0' : '#475569',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -428,6 +447,29 @@ const EditProduct: React.FC = () => {
                             </span>
                             {updateProduct.isPending ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
                         </button>
+                        <button
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            style={{
+                                padding: '0.75rem 1.5rem',
+                                background: isDarkMode ? '#334155' : '#f1f5f9',
+                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
+                                borderRadius: '10px',
+                                color: isDarkMode ? '#f1f5f9' : '#475569',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                fontSize: '0.875rem',
+                                fontWeight: 500,
+                                width: isMobile ? '100%' : 'auto'
+                            }}
+                        >
+                            <span className="material-icons" style={{ fontSize: '1.25rem' }}>
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                            {isDarkMode ? 'Açık Mod' : 'Koyu Mod'}
+                        </button>
                     </div>
                 </div>
 
@@ -442,11 +484,11 @@ const EditProduct: React.FC = () => {
                         <div>
                             {/* Görsel Galerisi */}
                             <div style={{
-                                background: '#ffffff',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
                                 borderRadius: '16px',
                                 padding: '1.5rem',
                                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                border: '1px solid #e2e8f0',
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                 marginBottom: '1.5rem'
                             }}>
                                 <div style={{
@@ -460,7 +502,7 @@ const EditProduct: React.FC = () => {
                                     <h2 style={{
                                         fontSize: '1.125rem',
                                         fontWeight: 600,
-                                        color: '#0f172a',
+                                        color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '0.5rem',
@@ -473,8 +515,8 @@ const EditProduct: React.FC = () => {
                                         htmlFor="image-upload-header"
                                         style={{
                                             padding: '0.5rem 1rem',
-                                            background: '#f8fafc',
-                                            border: '1px solid #e2e8f0',
+                                            background: isDarkMode ? '#334155' : '#f8fafc',
+                                            border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                             borderRadius: '8px',
                                             cursor: 'pointer',
                                             display: 'flex',
@@ -482,6 +524,7 @@ const EditProduct: React.FC = () => {
                                             justifyContent: 'center',
                                             gap: '0.5rem',
                                             fontSize: '0.875rem',
+                                            color: isDarkMode ? '#e2e8f0' : '#475569',
                                             width: isMobile ? '100%' : 'auto'
                                         }}
                                     >
@@ -499,7 +542,7 @@ const EditProduct: React.FC = () => {
                                                 <div style={{
                                                     width: '16px',
                                                     height: '16px',
-                                                    border: '2px solid #e2e8f0',
+                                                    border: `2px solid ${isDarkMode ? '#475569' : '#e2e8f0'}`,
                                                     borderTopColor: '#0ea5e9',
                                                     borderRadius: '50%',
                                                     animation: 'spin 1s linear infinite'
@@ -528,7 +571,7 @@ const EditProduct: React.FC = () => {
                                                 aspectRatio: '1',
                                                 borderRadius: '12px',
                                                 overflow: 'hidden',
-                                                border: formData.featureImageUrl === img ? '2px solid #0ea5e9' : '1px solid #e2e8f0',
+                                                border: formData.featureImageUrl === img ? '2px solid #0ea5e9' : (isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0'),
                                                 boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                                             }}
                                         >
@@ -618,17 +661,17 @@ const EditProduct: React.FC = () => {
 
                             {/* Temel Bilgiler */}
                             <div style={{
-                                background: '#ffffff',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
                                 borderRadius: '16px',
                                 padding: '1.5rem',
                                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                border: '1px solid #e2e8f0',
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                 marginBottom: '1.5rem'
                             }}>
                                 <h2 style={{
                                     fontSize: '1.125rem',
                                     fontWeight: 600,
-                                    color: '#0f172a',
+                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                     marginBottom: '1.5rem',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -649,7 +692,7 @@ const EditProduct: React.FC = () => {
                                             marginBottom: '0.5rem',
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                         }}>Ürün Adı *</label>
                                         <input
                                             type="text"
@@ -661,11 +704,12 @@ const EditProduct: React.FC = () => {
                                             style={{
                                                 width: '100%',
                                                 padding: '0.75rem 1rem',
-                                                background: '#f8fafc',
-                                                border: '1px solid #e2e8f0',
+                                                background: isDarkMode ? '#334155' : '#f8fafc',
+                                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                                 borderRadius: '10px',
                                                 fontSize: '0.95rem',
-                                                outline: 'none'
+                                                outline: 'none',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                             }}
                                         />
                                     </div>
@@ -675,7 +719,7 @@ const EditProduct: React.FC = () => {
                                             marginBottom: '0.5rem',
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                         }}>Kategori</label>
                                         <select
                                             name="primaryCategory"
@@ -684,11 +728,12 @@ const EditProduct: React.FC = () => {
                                             style={{
                                                 width: '100%',
                                                 padding: '0.75rem 1rem',
-                                                background: '#f8fafc',
-                                                border: '1px solid #e2e8f0',
+                                                background: isDarkMode ? '#334155' : '#f8fafc',
+                                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                                 borderRadius: '10px',
                                                 fontSize: '0.95rem',
-                                                outline: 'none'
+                                                outline: 'none',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                             }}
                                         >
                                             <option value="">Seçiniz</option>
@@ -708,7 +753,7 @@ const EditProduct: React.FC = () => {
                                         marginBottom: '0.5rem',
                                         fontSize: '0.875rem',
                                         fontWeight: 500,
-                                        color: '#0f172a'
+                                        color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                     }}>Açıklama</label>
                                     <textarea
                                         name="description"
@@ -719,12 +764,13 @@ const EditProduct: React.FC = () => {
                                         style={{
                                             width: '100%',
                                             padding: '0.75rem 1rem',
-                                            background: '#f8fafc',
-                                            border: '1px solid #e2e8f0',
+                                            background: isDarkMode ? '#334155' : '#f8fafc',
+                                            border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                             borderRadius: '10px',
                                             fontSize: '0.95rem',
                                             outline: 'none',
-                                            resize: 'vertical'
+                                            resize: 'vertical',
+                                            color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                         }}
                                     />
                                 </div>
@@ -732,17 +778,17 @@ const EditProduct: React.FC = () => {
 
                             {/* Fiyat Bilgileri */}
                             <div style={{
-                                background: '#ffffff',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
                                 borderRadius: '16px',
                                 padding: '1.5rem',
                                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                border: '1px solid #e2e8f0',
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                 marginBottom: '1.5rem'
                             }}>
                                 <h2 style={{
                                     fontSize: '1.125rem',
                                     fontWeight: 600,
-                                    color: '#0f172a',
+                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                     marginBottom: '1.5rem',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -762,7 +808,7 @@ const EditProduct: React.FC = () => {
                                             marginBottom: '0.5rem',
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                         }}>Fiyat (TL) *</label>
                                         <input
                                             type="number"
@@ -775,11 +821,12 @@ const EditProduct: React.FC = () => {
                                             style={{
                                                 width: '100%',
                                                 padding: '0.75rem 1rem',
-                                                background: '#f8fafc',
-                                                border: '1px solid #e2e8f0',
+                                                background: isDarkMode ? '#334155' : '#f8fafc',
+                                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                                 borderRadius: '10px',
                                                 fontSize: '0.95rem',
-                                                outline: 'none'
+                                                outline: 'none',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                             }}
                                         />
                                     </div>
@@ -789,7 +836,7 @@ const EditProduct: React.FC = () => {
                                             marginBottom: '0.5rem',
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                         }}>İndirimli Fiyat</label>
                                         <input
                                             type="number"
@@ -802,11 +849,12 @@ const EditProduct: React.FC = () => {
                                             style={{
                                                 width: '100%',
                                                 padding: '0.75rem 1rem',
-                                                background: '#f8fafc',
-                                                border: '1px solid #e2e8f0',
+                                                background: isDarkMode ? '#334155' : '#f8fafc',
+                                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                                 borderRadius: '10px',
                                                 fontSize: '0.95rem',
-                                                outline: 'none'
+                                                outline: 'none',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                             }}
                                         />
                                     </div>
@@ -815,17 +863,17 @@ const EditProduct: React.FC = () => {
 
                             {/* Stok ve Envanter */}
                             <div style={{
-                                background: '#ffffff',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
                                 borderRadius: '16px',
                                 padding: '1.5rem',
                                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                border: '1px solid #e2e8f0',
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                 marginBottom: '1.5rem'
                             }}>
                                 <h2 style={{
                                     fontSize: '1.125rem',
                                     fontWeight: 600,
-                                    color: '#0f172a',
+                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                     marginBottom: '1.5rem',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -845,7 +893,7 @@ const EditProduct: React.FC = () => {
                                             marginBottom: '0.5rem',
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                         }}>SKU</label>
                                         <input
                                             type="text"
@@ -856,11 +904,12 @@ const EditProduct: React.FC = () => {
                                             style={{
                                                 width: '100%',
                                                 padding: '0.75rem 1rem',
-                                                background: '#f8fafc',
-                                                border: '1px solid #e2e8f0',
+                                                background: isDarkMode ? '#334155' : '#f8fafc',
+                                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                                 borderRadius: '10px',
                                                 fontSize: '0.95rem',
-                                                outline: 'none'
+                                                outline: 'none',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                             }}
                                         />
                                     </div>
@@ -870,7 +919,7 @@ const EditProduct: React.FC = () => {
                                             marginBottom: '0.5rem',
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                         }}>Barkod</label>
                                         <input
                                             type="text"
@@ -881,11 +930,12 @@ const EditProduct: React.FC = () => {
                                             style={{
                                                 width: '100%',
                                                 padding: '0.75rem 1rem',
-                                                background: '#f8fafc',
-                                                border: '1px solid #e2e8f0',
+                                                background: isDarkMode ? '#334155' : '#f8fafc',
+                                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                                 borderRadius: '10px',
                                                 fontSize: '0.95rem',
-                                                outline: 'none'
+                                                outline: 'none',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                             }}
                                         />
                                     </div>
@@ -895,7 +945,7 @@ const EditProduct: React.FC = () => {
                                             marginBottom: '0.5rem',
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                         }}>Stok Miktarı</label>
                                         <input
                                             type="number"
@@ -906,11 +956,12 @@ const EditProduct: React.FC = () => {
                                             style={{
                                                 width: '100%',
                                                 padding: '0.75rem 1rem',
-                                                background: '#f8fafc',
-                                                border: '1px solid #e2e8f0',
+                                                background: isDarkMode ? '#334155' : '#f8fafc',
+                                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                                 borderRadius: '10px',
                                                 fontSize: '0.95rem',
-                                                outline: 'none'
+                                                outline: 'none',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                             }}
                                         />
                                     </div>
@@ -922,17 +973,17 @@ const EditProduct: React.FC = () => {
                         <div>
                             {/* Ürün Durumu */}
                             <div style={{
-                                background: '#ffffff',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
                                 borderRadius: '16px',
                                 padding: '1.5rem',
                                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                border: '1px solid #e2e8f0',
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                 marginBottom: '1.5rem'
                             }}>
                                 <h2 style={{
                                     fontSize: '1.125rem',
                                     fontWeight: 600,
-                                    color: '#0f172a',
+                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                     marginBottom: '1.5rem',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -947,7 +998,7 @@ const EditProduct: React.FC = () => {
                                         marginBottom: '0.5rem',
                                         fontSize: '0.875rem',
                                         fontWeight: 500,
-                                        color: '#0f172a'
+                                        color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                     }}>Durum</label>
                                     <select
                                         name="status"
@@ -956,11 +1007,12 @@ const EditProduct: React.FC = () => {
                                         style={{
                                             width: '100%',
                                             padding: '0.75rem 1rem',
-                                            background: '#f8fafc',
-                                            border: '1px solid #e2e8f0',
+                                            background: isDarkMode ? '#334155' : '#f8fafc',
+                                            border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                             borderRadius: '10px',
                                             fontSize: '0.95rem',
-                                            outline: 'none'
+                                            outline: 'none',
+                                            color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                         }}
                                     >
                                         <option value="draft">📝 Taslak</option>
@@ -970,9 +1022,9 @@ const EditProduct: React.FC = () => {
                                     <div style={{
                                         marginTop: '1rem',
                                         padding: '0.75rem 1rem',
-                                        backgroundColor: '#f1f5f9',
+                                        background: isDarkMode ? '#0f172a' : '#f1f5f9',
                                         borderRadius: '8px',
-                                        color: '#334155',
+                                        color: isDarkMode ? '#94a3b8' : '#334155',
                                         fontSize: '0.9rem'
                                     }}>
                                         <span className="material-icons" style={{ fontSize: '1rem', verticalAlign: 'middle', marginRight: '4px' }}>info</span>
@@ -985,17 +1037,17 @@ const EditProduct: React.FC = () => {
 
                             {/* Etiketler */}
                             <div style={{
-                                background: '#ffffff',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
                                 borderRadius: '16px',
                                 padding: '1.5rem',
                                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                border: '1px solid #e2e8f0',
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                 marginBottom: '1.5rem'
                             }}>
                                 <h2 style={{
                                     fontSize: '1.125rem',
                                     fontWeight: 600,
-                                    color: '#0f172a',
+                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                     marginBottom: '1.5rem',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1019,12 +1071,13 @@ const EditProduct: React.FC = () => {
                                         style={{
                                             flex: 1,
                                             padding: '0.75rem 1rem',
-                                            background: '#f8fafc',
-                                            border: '1px solid #e2e8f0',
+                                            background: isDarkMode ? '#334155' : '#f8fafc',
+                                            border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                             borderRadius: '10px',
                                             fontSize: '0.95rem',
                                             outline: 'none',
-                                            width: isMobile ? '100%' : 'auto'
+                                            width: isMobile ? '100%' : 'auto',
+                                            color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                         }}
                                     />
                                     <button
@@ -1056,10 +1109,11 @@ const EditProduct: React.FC = () => {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '0.25rem',
-                                                background: '#f1f5f9',
+                                                background: isDarkMode ? '#334155' : '#f1f5f9',
                                                 padding: '0.5rem 0.75rem',
                                                 borderRadius: '8px',
-                                                fontSize: '0.875rem'
+                                                fontSize: '0.875rem',
+                                                color: isDarkMode ? '#e2e8f0' : '#0f172a'
                                             }}
                                         >
                                             #{tag}
@@ -1071,7 +1125,7 @@ const EditProduct: React.FC = () => {
                                                     border: 'none',
                                                     cursor: 'pointer',
                                                     fontSize: '1rem',
-                                                    color: '#64748b',
+                                                    color: isDarkMode ? '#94a3b8' : '#64748b',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     padding: '0'
@@ -1086,16 +1140,16 @@ const EditProduct: React.FC = () => {
 
                             {/* Kısa Açıklama */}
                             <div style={{
-                                background: '#ffffff',
+                                background: isDarkMode ? '#1e293b' : '#ffffff',
                                 borderRadius: '16px',
                                 padding: '1.5rem',
                                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                border: '1px solid #e2e8f0'
+                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                             }}>
                                 <h2 style={{
                                     fontSize: '1.125rem',
                                     fontWeight: 600,
-                                    color: '#0f172a',
+                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                     marginBottom: '1.5rem',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1114,12 +1168,13 @@ const EditProduct: React.FC = () => {
                                         style={{
                                             width: '100%',
                                             padding: '0.75rem 1rem',
-                                            background: '#f8fafc',
-                                            border: '1px solid #e2e8f0',
+                                            background: isDarkMode ? '#334155' : '#f8fafc',
+                                            border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                             borderRadius: '10px',
                                             fontSize: '0.95rem',
                                             outline: 'none',
-                                            resize: 'vertical'
+                                            resize: 'vertical',
+                                            color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                         }}
                                     />
                                 </div>
@@ -1148,7 +1203,7 @@ const EditProduct: React.FC = () => {
                     >
                         <div
                             style={{
-                                background: 'white',
+                                background: isDarkMode ? '#1e293b' : 'white',
                                 borderRadius: '16px',
                                 padding: '2rem',
                                 maxWidth: '400px',
@@ -1159,7 +1214,7 @@ const EditProduct: React.FC = () => {
                             <h3 style={{
                                 fontSize: '1.25rem',
                                 marginBottom: '1rem',
-                                color: '#0f172a',
+                                color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.5rem'
@@ -1169,7 +1224,7 @@ const EditProduct: React.FC = () => {
                             </h3>
                             <p style={{
                                 marginBottom: '1.5rem',
-                                color: '#475569'
+                                color: isDarkMode ? '#94a3b8' : '#475569'
                             }}>Bu görseli silmek istediğinize emin misiniz?</p>
                             <div style={{
                                 display: 'flex',
@@ -1181,11 +1236,11 @@ const EditProduct: React.FC = () => {
                                     onClick={() => setShowDeleteModal(false)}
                                     style={{
                                         padding: '0.75rem 1.5rem',
-                                        background: '#f1f5f9',
+                                        background: isDarkMode ? '#334155' : '#f1f5f9',
                                         border: 'none',
                                         borderRadius: '10px',
                                         cursor: 'pointer',
-                                        color: '#475569',
+                                        color: isDarkMode ? '#e2e8f0' : '#475569',
                                         fontWeight: 500,
                                         width: isMobile ? '100%' : 'auto'
                                     }}
@@ -1212,6 +1267,8 @@ const EditProduct: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Success Modal */}
             <Dialog
                 open={showSuccessModal}
                 onClose={() => setShowSuccessModal(false)}
@@ -1220,14 +1277,15 @@ const EditProduct: React.FC = () => {
                         borderRadius: '20px',
                         padding: '8px',
                         maxWidth: '400px',
-                        width: '90%'
+                        width: '90%',
+                        backgroundColor: isDarkMode ? '#1e293b' : '#ffffff'
                     }
                 }}
             >
                 <DialogTitle style={{
                     fontSize: '1.5rem',
                     fontWeight: 600,
-                    color: '#0f172a',
+                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
@@ -1247,8 +1305,8 @@ const EditProduct: React.FC = () => {
                     Başarıyla Kaydedildi!
                 </DialogTitle>
                 <DialogContent style={{ padding: '8px 24px 16px 24px' }}>
-                    <DialogContentText style={{ color: '#475569', fontSize: '1rem' }}>
-                        <strong>"{updatedProductName}"</strong> ürünü başarıyla güncellendi.
+                    <DialogContentText style={{ color: isDarkMode ? '#94a3b8' : '#475569', fontSize: '1rem' }}>
+                        <strong style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>"{updatedProductName}"</strong> ürünü başarıyla güncellendi.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions style={{
@@ -1282,8 +1340,8 @@ const EditProduct: React.FC = () => {
                             navigate('/admin/products');
                         }}
                         style={{
-                            backgroundColor: '#f1f5f9',
-                            color: '#334155',
+                            backgroundColor: isDarkMode ? '#334155' : '#f1f5f9',
+                            color: isDarkMode ? '#e2e8f0' : '#334155',
                             fontWeight: 500,
                             textTransform: 'none',
                             fontSize: '0.95rem',
@@ -1307,14 +1365,15 @@ const EditProduct: React.FC = () => {
                         borderRadius: '20px',
                         padding: '8px',
                         maxWidth: '400px',
-                        width: '90%'
+                        width: '90%',
+                        backgroundColor: isDarkMode ? '#1e293b' : '#ffffff'
                     }
                 }}
             >
                 <DialogTitle style={{
                     fontSize: '1.5rem',
                     fontWeight: 600,
-                    color: '#0f172a',
+                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
@@ -1334,7 +1393,7 @@ const EditProduct: React.FC = () => {
                     Hata Oluştu!
                 </DialogTitle>
                 <DialogContent style={{ padding: '8px 24px 16px 24px' }}>
-                    <DialogContentText style={{ color: '#475569', fontSize: '1rem' }}>
+                    <DialogContentText style={{ color: isDarkMode ? '#94a3b8' : '#475569', fontSize: '1rem' }}>
                         {errorMessage}
                     </DialogContentText>
                 </DialogContent>
