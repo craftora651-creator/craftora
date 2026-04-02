@@ -488,7 +488,7 @@ export const usePublishProduct = (productId: string) => {
         status: string;
         requires_approval: boolean;
         is_approved: boolean;
-      }>(`/products/${productId}/publish`);
+      }>(`/api/products/${productId}/publish`);
     },
     onSuccess: (response) => {
       // Update product cache
@@ -536,7 +536,7 @@ export const useArchiveProduct = (productId: string) => {
         product_id: string;
         product_name: string;
         status: string;
-      }>(`/products/${productId}/archive`);
+      }>(`/api/products/${productId}/archive`);
     },
     onSuccess: (response) => {
       // Update product cache

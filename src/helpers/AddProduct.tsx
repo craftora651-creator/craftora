@@ -19,7 +19,6 @@ import { AxiosError } from 'axios';
 import SuccessModal from "../.paket/SuccessModal"
 import './AddProduct.css';
 
-// ===== TİP TANIMLAMALARI =====
 interface ValidationErrorItem {
   loc: (string | number)[];
   msg: string;
@@ -33,15 +32,12 @@ interface FastAPIErrorResponse {
 }
 
 const AddBook: React.FC = () => {
-  // ===== 1️⃣ TÜM HOOK'LAR EN ÜSTTE =====
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { data: currentUser, isLoading: userLoading } = useCurrentUser();
   const { data: shops, isLoading: shopsLoading } = useMyShops();
   const uploadFile = useUploadFile();
   const createProduct = useCreateProduct();
-
-  // ===== 2️⃣ TÜM USESTATE'LER =====
   const [formData, setFormData] = useState({
     urunAdi: '',
     aciklama: '',
@@ -49,7 +45,7 @@ const AddBook: React.FC = () => {
     kategori: 'Roman' as string,
     fiyat: '',
     indirimliFiyat: '',
-    stokMiktari: '0',           // 👈 Varsayılan 0 (sınırsız)
+    stokMiktari: '0',
     tags: '',
     sku: '',
     barcode: '',
@@ -65,8 +61,6 @@ const AddBook: React.FC = () => {
   const [stokInputMode, setStokInputMode] = useState<'select' | 'input'>('select');
   const [isUploading, setIsUploading] = useState(false);
   const isLoading = uploadFile.isPending || createProduct.isPending || isUploading || userLoading || shopsLoading;
-
-  // ===== 3️⃣ TÜM USEEFFECT'LER =====
   useEffect(() => {
     const draftData: Partial<ProductCreateRequest> = {
       name: formData.urunAdi,
@@ -80,7 +74,6 @@ const AddBook: React.FC = () => {
     };
     dispatch(saveFormDraft(draftData));
   }, [formData, dispatch]);
-
   useEffect(() => {
     if (!userLoading && !shopsLoading) {
       if (!currentUser) {
@@ -90,17 +83,11 @@ const AddBook: React.FC = () => {
       }
     }
   }, [currentUser, shops, userLoading, shopsLoading, navigate]);
-
-  // ===== 4️⃣ LOADING KONTROLÜ =====
   if (userLoading || shopsLoading) {
     return <div className="loading-container">Yükleniyor...</div>;
   }
-
-  // ===== 5️⃣ VERİLER HAZIR, FONKSİYONLAR =====
   const shopId = shops?.[0]?.id;
   const userId = currentUser?.id;
-
-  // 📁 Dosya tipini otomatik belirle
   const getFileType = (filename: string): FileType => {
     const ext = filename.split('.').pop()?.toLowerCase();
     switch (ext) {
@@ -134,9 +121,6 @@ const AddBook: React.FC = () => {
       default: return FileType.OTHER;
     }
   };
-
-  // Görsel yükleme fonksiyonu
-  // Görsel yükleme fonksiyonu
   const uploadCoverImages = async (files: File[]): Promise<string[]> => {
     if (!userId) {
       throw new Error("UserId bulunamadı");
@@ -1333,10 +1317,15 @@ const AddBook: React.FC = () => {
           setFormData({
             urunAdi: '',
             aciklama: '',
+            kisaAciklama: '',      // ✅ eklendi
             kategori: 'Roman',
             fiyat: '',
             indirimliFiyat: '',
+            stokMiktari: '',       // ✅ eklendi
             tags: '',
+            sku: '',               // ✅ eklendi
+            barcode: '',           // ✅ eklendi
+            urunDurumu: ''         // ✅ eklendi
           });
           setSelectedFile(null);
           setCoverImages([]);

@@ -27,7 +27,9 @@ export interface StoreTheme {
   updated_at: string;
 }
 
+// GENİŞLETİLMİŞ ThemeSettings - Tüm mağaza ayarlarını içerir
 export interface ThemeSettings {
+  // ===== TEMA GÖRÜNÜM AYARLARI =====
   colors: {
     primary: string;
     accent: string;
@@ -44,6 +46,60 @@ export interface ThemeSettings {
   };
   customCss: string;
   customJs: string;
+  
+  // ===== MAĞAZA BİLGİLERİ =====
+  shop_name?: string;
+  shop_description?: string;
+  shop_rating?: string;
+  
+  // ===== HERO BÖLÜMÜ =====
+  hero_title?: string;
+  hero_subtitle?: string;
+  hero_button_text?: string;
+  hero_button2_text?: string;
+  
+  // ===== İSTATİSTİKLER =====
+  stats?: Array<{ value: string; label: string }>;
+  
+  // ===== NEDEN CRAFTORA? ÖZELLİKLERİ =====
+  features?: Array<{ icon: string; title: string; description: string }>;
+  
+  // ===== FOOTER =====
+  footer_about?: string;
+  
+  // ===== MEDYA =====
+  logo_url?: string;
+  banner_url?: string;
+  
+  // ===== POPÜLER ÜRÜNLER =====
+  selected_products?: Array<{
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    image: string;
+    category: string;
+    rating: number;
+    sales: number;
+  }>;
+  
+  // ===== BLOG YAZILARI =====
+  blog_posts?: Array<{
+    id: number;
+    title: string;
+    content: string;
+    image: string;
+    date: string;
+    author: string;
+  }>;
+  
+  // ===== HAKKIMIZDA SAYFASI =====
+  about_content?: {
+    title: string;
+    description: string;
+    mainText: string;
+    visionText: string;
+  };
 }
 
 export interface ActiveThemeResponse {
@@ -264,9 +320,6 @@ export interface UploadMediaRequest {
 }
 
 // ==================== UI STATE ====================
-// src/types/theme.ts
-
-// ==================== UI STATE ====================
 export interface UIState {
   isEditMode: boolean;
   activeSectionId: number | null;
@@ -280,4 +333,3 @@ export interface UIState {
   setError: (error: string | null) => void;
   clearError: () => void;
 }
-

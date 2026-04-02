@@ -9,38 +9,17 @@ export default defineConfig({
     tailwindcss()
   ],
   define: {
-    'process.env': {} // process.env desteği için
+    'process.env': {}
   },
   server: {
-    allowedHosts: [
-    '.loca.lt',
-    '.ngrok-free.dev',
-    '.trycloudflare.com',
-    'localhost',
-    '127.0.0.1'
-  ],
     host: true,
     port: 5173,
     strictPort: true,
     cors: true,
     hmr: {
-      host: 'darwin-visibility-comp-suitable.trycloudflare.com',
-      protocol: 'wss',
-      clientPort: 443
+      host: 'localhost',
+      protocol: 'ws',
+      port: 5173
     }
-  },
-  preview: {
-    allowedHosts: [
-      'unrhythmical-unsawed-pat.ngrok-free.dev',
-      'darwin-visibility-comp-suitable.trycloudflare.com',
-      '.ngrok-free.dev',
-      '.trycloudflare.com',
-      'localhost',
-      '127.0.0.1'
-    ],
-    host: true,
-    port: 5173,
-    strictPort: true,
-    cors: true
   }
 })

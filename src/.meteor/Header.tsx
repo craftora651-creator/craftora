@@ -205,10 +205,21 @@ const Header: React.FC = () => {
                           </div>
 
                           <div className="pxMenuItem" onClick={() => {
+                            // Önce kullanıcının mağazası var mı kontrol et
                             if (shops && shops.length > 0) {
+                              // Zaten mağazası varsa direkt admin panele git
                               navigate('/admin');
                             } else {
-                              navigate('/admin-onboarding');
+                              // Mağazası yoksa ödeme yapıp yapmadığını kontrol et
+                              const hasPaid = localStorage.getItem('has_paid') === 'true';
+
+                              if (hasPaid) {
+                                // Ödeme yapmış ama mağaza kurmamış -> onboarding'e git
+                                navigate('/admin-onboarding');
+                              } else {
+                                // Ödeme yapmamış -> payment sayfasına git
+                                navigate('/payment');
+                              }
                             }
                           }}>
                             <span className="material-icons-outlined">store</span>

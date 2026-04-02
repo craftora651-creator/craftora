@@ -34,7 +34,6 @@ import {
   selectSourceDistribution,
   selectDeviceDistribution,
   selectTopProducts,
-  selectChartData,
   selectRanking,
   selectTrafficSources
 } from '../redux/analyticsSlice';
@@ -67,7 +66,6 @@ const Analytics: React.FC = () => {
   const sources = useSelector(selectSourceDistribution);
   const devices = useSelector(selectDeviceDistribution);
   const topProducts = useSelector(selectTopProducts);
-  const chartData = useSelector(selectChartData);
   const ranking = useSelector(selectRanking);
   const trafficSources = useSelector(selectTrafficSources);
 
@@ -78,13 +76,13 @@ const Analytics: React.FC = () => {
   // Verileri yenile
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await dispatch(fetchAllAnalytics(selectedPeriod as any));
+    await dispatch(fetchAllAnalytics(selectedPeriod));
     setIsRefreshing(false);
   };
 
   // Period değişince verileri güncelle
   useEffect(() => {
-    dispatch(fetchAllAnalytics(selectedPeriod as any));
+    dispatch(fetchAllAnalytics(selectedPeriod));
   }, [selectedPeriod, dispatch]);
 
   // Renk paleti
@@ -481,7 +479,7 @@ const Analytics: React.FC = () => {
                       dataKey="value"
                       label
                     >
-                      {Object.keys(sources || {}).map((key, index) => (
+                      {Object.keys(sources || {}).map((key) => (
                         <Cell key={key} fill={COLORS[key as keyof typeof COLORS] || COLORS.primary} />
                       ))}
                     </Pie>

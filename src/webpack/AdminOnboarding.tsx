@@ -11,6 +11,16 @@ import { AxiosError } from 'axios'; // ✅ Bunu ekle!
 
 // ==================== TİP TANIMLARI (admin.types olmadan) ====================
 
+
+// AdminOnboarding.tsx'in en üstüne, import'lardan sonra ekle:
+interface ShopCreateResponse {
+  id: string;
+  shop_name: string;
+  slug: string;
+  status: string;
+  created_at: string;
+}
+
 // 📍 Adres tipi
 interface ShopAddress {
   street: string;
@@ -210,7 +220,13 @@ const handleComplete = async () => {
     console.log('📤 Gönderilen shop data:', shopData);
 
     // 4️⃣ FastAPI'ye gönder
-    const response = await apiClient.post('/api/shops/', shopData);
+    const response = await apiClient.post<ShopCreateResponse>('/api/shops/', shopData);
+    if (response && response.id) {
+      localStorage.setItem('shop_id', response.id);
+      console.log('✅ Shop ID kaydedildi:', response.id);
+    } else {
+      console.error('❌ Shop ID alınamadı! Response:', response);
+    }
     
     console.log('✅ Mağaza oluşturuldu:', response);
     alert('🎉 Mağazanız başarıyla oluşturuldu!');

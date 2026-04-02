@@ -200,6 +200,7 @@ export interface ProductCreateRequest {
   base_price: number;
   product_type: "physical" | "digital" | "service";
   shop_id: string;
+  currency: Currency;
   
   // ===== OPSİYONEL ALANLAR =====
   description?: string;

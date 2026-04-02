@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';  // useEffect'i KALDIR!
-import { useMyProducts, useBulkDeleteProducts } from '../server/FastAPI/product.hooks';
+import { useState, useEffect } from 'react';  
+import { useMyProducts, useBulkDeleteProducts, useDeleteProduct } from '../server/FastAPI/product.hooks';
 import { useNavigate } from 'react-router-dom';
-import { useDeleteProduct } from '../server/FastAPI/product.hooks';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 

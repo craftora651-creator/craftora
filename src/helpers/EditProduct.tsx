@@ -6,6 +6,7 @@ import { useUploadFile } from '../server/Gin/upload.hooks';
 import { FilePurpose, type UploadResponse } from '../types/upload.types';
 import { ProductStatus } from '../types/product.types';
 import type { ProductUpdateRequest } from '../types/product.types';
+import { isAxiosError } from 'axios';
 import {
     Dialog,
     DialogTitle,
@@ -14,6 +15,7 @@ import {
     DialogActions,
     Button
 } from '@mui/material';
+
 
 const EditProduct: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -82,18 +84,11 @@ const EditProduct: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
     const isMobile = windowWidth < 640;
     const isTablet = windowWidth < 1024;
-
-    // Input değişiklikleri
-    // Input değişiklikleri
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-
-        // stockQuantity için özel işlem
         if (name === 'stockQuantity') {
-            // Sadece sayı girişine izin ver
             const numericValue = value.replace(/[^0-9]/g, '');
             setFormData(prev => ({
                 ...prev,
@@ -104,7 +99,6 @@ const EditProduct: React.FC = () => {
         }
     };
 
-    // Tag ekle
     const handleAddTag = () => {
         if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
             setFormData(prev => ({
@@ -115,7 +109,6 @@ const EditProduct: React.FC = () => {
         }
     };
 
-    // Tag sil
     const handleDeleteTag = (tagToDelete: string) => {
         setFormData(prev => ({
             ...prev,
@@ -123,7 +116,6 @@ const EditProduct: React.FC = () => {
         }));
     };
 
-    // Enter ile tag ekle
     const handleTagKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -135,10 +127,8 @@ const EditProduct: React.FC = () => {
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files || files.length === 0 || !userId) return;
-
         const MAX_IMAGES = 10;
         const currentCount = formData.imageGallery.length;
-
         if (currentCount >= MAX_IMAGES) {
             alert(`❌ En fazla ${MAX_IMAGES} görsel yükleyebilirsiniz! (Şu an: ${currentCount})`);
             return;
@@ -150,29 +140,24 @@ const EditProduct: React.FC = () => {
         if (files.length > remainingSlots) {
             alert(`⚠️ Sadece ${remainingSlots} görsel yüklenebilir. ${files.length - remainingSlots} görsel dikkate alınmadı.`);
         }
-
         setIsUploading(true);
         try {
             const uploadedUrls: string[] = [];
-
             for (const file of filesToUpload) {
                 const result = await uploadFile.mutateAsync({
                     file,
                     userId,
                     purpose: FilePurpose.PRODUCT_COVER
                 }) as UploadResponse;
-
                 if (result?.file?.s3_url) {
                     uploadedUrls.push(String(result.file.s3_url));
                 }
             }
-
             setFormData(prev => ({
                 ...prev,
                 imageGallery: [...prev.imageGallery, ...uploadedUrls],
                 featureImageUrl: prev.featureImageUrl || uploadedUrls[0] || '',
             }));
-
             alert(`✅ ${uploadedUrls.length} görsel yüklendi! (${formData.imageGallery.length + uploadedUrls.length}/${MAX_IMAGES})`);
         } catch (error) {
             console.error('❌ Görsel yükleme hatası:', error);
@@ -182,44 +167,35 @@ const EditProduct: React.FC = () => {
         }
     };
 
-    // Öne çıkan görsel ayarla
     const handleSetFeatured = (imageUrl: string) => {
         setFormData(prev => ({ ...prev, featureImageUrl: imageUrl }));
     };
 
-    // Görsel silme onayı
     const handleDeleteClick = (imageUrl: string) => {
         setImageToDelete(imageUrl);
         setShowDeleteModal(true);
     };
 
-    // Görsel sil
     const handleConfirmDelete = () => {
         if (!imageToDelete) return;
-
         setFormData(prev => ({
             ...prev,
             imageGallery: prev.imageGallery.filter(img => img !== imageToDelete),
             featureImageUrl: prev.featureImageUrl === imageToDelete ? '' : prev.featureImageUrl,
         }));
-
         setShowDeleteModal(false);
         setImageToDelete(null);
     };
 
-    // Form submit
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         try {
             const basePrice = formData.basePrice ? parseFloat(formData.basePrice) : undefined;
             const comparePrice = formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : undefined;
-
             let status: ProductStatus | undefined;
             if (formData.status === 'draft') status = ProductStatus.DRAFT;
             else if (formData.status === 'published') status = ProductStatus.PUBLISHED;
             else if (formData.status === 'archived') status = ProductStatus.ARCHIVED;
-
             const updateData: ProductUpdateRequest = {
                 ...(formData.name && { name: formData.name }),
                 ...(formData.description && { description: formData.description }),
@@ -235,27 +211,24 @@ const EditProduct: React.FC = () => {
                 ...(formData.featureImageUrl && { feature_image_url: formData.featureImageUrl }),
                 ...(formData.imageGallery.length > 0 && { image_gallery: formData.imageGallery }),
             };
-
             console.log('📦 Gönderilen veri:', updateData);
-
             await updateProduct.mutateAsync(updateData);
-
-            // ✅ Başarı modalı
             setUpdatedProductName(formData.name || product?.name || 'Ürün');
             setShowSuccessModal(true);
 
         } catch (error) {
             console.error('❌ Güncelleme hatası:', error);
-
-            // ❌ Hata mesajını hazırla
-            let message = 'Ürün güncellenirken hata oluştu!';
-
-            if (error && typeof error === 'object' && 'response' in error) {
-                const axiosError = error as any;
-                message = axiosError.response?.data?.detail || 'Bilinmeyen hata';
+            let message = 'Bilinmeyen hata';
+            if (isAxiosError(error)) {
+                if (error.response?.data) {
+                    const responseData = error.response.data as { detail?: string; message?: string };
+                    message = responseData?.detail || responseData?.message || error.message;
+                } else {
+                    message = error.message || 'Bağlantı hatası';
+                }
+            } else if (error instanceof Error) {
+                message = error.message;
             }
-
-            // ❌ Hata modalını aç
             setErrorMessage(message);
             setShowErrorModal(true);
         }

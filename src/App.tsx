@@ -43,6 +43,7 @@ import EnterpriseTheme from './themes/EnterpriseTheme';
 import ThemeEditor from './themes/settings/ThemeEdit';
 import { useCurrentUser } from './server/FastAPI/user.hooks';
 import SellerThemes from './pages/SellerThemes';
+import SellerProducts from './middleware/SellerProducts';
 
 import "./index.css";
 
@@ -259,7 +260,8 @@ function App() {
               <Route path="/medya" element={<Medya />} />
               <Route path="/theme/eco-mart" element={<EcoMartTheme />} />
               <Route path="/cj-import" element={<CJProductImport />} />
-              <Route path='seller-themes' element={<SellerThemes/>} />
+              <Route path='seller-themes' element={<SellerThemes />} />
+              <Route path="/seller-products" element={<SellerProducts />} />
 
               <Route
                 path="/theme/enterprise/*"
