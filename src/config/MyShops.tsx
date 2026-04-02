@@ -149,13 +149,13 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
       setHeroSubtitle(themeData.settings.hero_subtitle || 'En iyi tasarımlar, yazılımlar ve eğitim içerikleri tek bir yerde. Hemen keşfetmeye başla!');
       setHeroButtonText(themeData.settings.hero_button_text || '🚀 Keşfetmeye Başla');
       setHeroButton2Text(themeData.settings.hero_button2_text || '📦 Ürünleri Gör');
-      setFooterAbout(themeData.settings.footer_about || 'Dijital ürünlerin en kalitelisini uygun fiyatlarla sunuyoruz.'); // ✅ YENİ
+      setFooterAbout(themeData.settings.footer_about || 'Dijital ürünlerin en kalitelisini uygun fiyatlarla sunuyoruz.');
       if (themeData.settings.features && Array.isArray(themeData.settings.features)) {
         setFeatures(themeData.settings.features);
       }
-       if (themeData.settings.aboutContent) {
-      setAboutContent(themeData.settings.aboutContent);
-    }
+      if (themeData.settings.about_content) {
+        setAboutContent(themeData.settings.about_content);
+      }
     }
   }, [themeData]);
 
@@ -189,7 +189,7 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
         hero_button2_text: heroButton2Text,
         footer_about: footerAbout,
         features: features,
-        aboutContent: aboutContent,
+        about_content: aboutContent,  // ✅ aboutContent -> about_content
       });
 
       // Diğer ayarları localStorage'a kaydet (geçici)
@@ -295,7 +295,7 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
 
 
 
-  
+
   const handleBlogImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, postId: number) => {
     const file = e.target.files?.[0];
     if (!file) return;
