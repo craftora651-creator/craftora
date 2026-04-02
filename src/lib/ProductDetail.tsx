@@ -9,6 +9,12 @@ const ProductDetail: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [zoomImage, setZoomImage] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    
+    // Dark mode state
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const saved = localStorage.getItem('darkMode');
+        return saved === 'true' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    });
 
     const { data: product, isLoading, error } = useProduct(id || '');
 
@@ -23,15 +29,18 @@ const ProductDetail: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Dark mode'u localStorage'a kaydet ve body bg ayarla
+    useEffect(() => {
+        localStorage.setItem('darkMode', String(isDarkMode));
+        if (isDarkMode) {
+            document.documentElement.style.backgroundColor = '#0f172a';
+        } else {
+            document.documentElement.style.backgroundColor = '#f8fafc';
+        }
+    }, [isDarkMode]);
+
     const isMobile = windowWidth < 768;
     const isTablet = windowWidth >= 768 && windowWidth < 1024;
-
-    // Responsive grid helper
-    const getGridColumns = (desktop: string, tablet: string, mobile: string) => {
-        if (isMobile) return mobile;
-        if (isTablet) return tablet;
-        return desktop;
-    };
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString('tr-TR', {
@@ -55,7 +64,7 @@ const ProductDetail: React.FC = () => {
         return (
             <div style={{
                 minHeight: '100vh',
-                backgroundColor: '#f8fafc',
+                backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center'
@@ -64,13 +73,13 @@ const ProductDetail: React.FC = () => {
                     <div style={{
                         width: 48,
                         height: 48,
-                        border: '3px solid #e2e8f0',
+                        border: `3px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`,
                         borderTopColor: '#0ea5e9',
                         borderRadius: '50%',
                         animation: 'spin 1s linear infinite',
                         margin: '0 auto 1rem'
                     }} />
-                    <p style={{ color: '#475569', fontWeight: 500 }}>Ürün detayları yükleniyor...</p>
+                    <p style={{ color: isDarkMode ? '#94a3b8' : '#475569', fontWeight: 500 }}>Ürün detayları yükleniyor...</p>
                 </div>
             </div>
         );
@@ -80,14 +89,14 @@ const ProductDetail: React.FC = () => {
         return (
             <div style={{
                 minHeight: '100vh',
-                backgroundColor: '#f8fafc',
+                backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 padding: '2rem'
             }}>
                 <div style={{
-                    background: 'white',
+                    background: isDarkMode ? '#1e293b' : 'white',
                     padding: '3rem',
                     borderRadius: '24px',
                     boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
@@ -103,11 +112,11 @@ const ProductDetail: React.FC = () => {
                     <h2 style={{
                         fontSize: '1.5rem',
                         fontWeight: 600,
-                        color: '#0f172a',
+                        color: isDarkMode ? '#f1f5f9' : '#0f172a',
                         marginBottom: '0.5rem'
                     }}>Ürün Bulunamadı</h2>
                     <p style={{
-                        color: '#64748b',
+                        color: isDarkMode ? '#94a3b8' : '#64748b',
                         marginBottom: '2rem'
                     }}>Ürün silinmiş veya mevcut değil</p>
                     <button
@@ -134,19 +143,23 @@ const ProductDetail: React.FC = () => {
     }
 
     return (
-        <div className="product-detail-page"
-         style={{
+        <div style={{
             minHeight: '100vh',
-            backgroundColor: '#f8fafc',
+            backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
             padding: isMobile ? '1rem' : '2rem'
         }}>
+            <style>{`
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
             <div style={{
                 maxWidth: '1400px',
                 margin: '0 auto'
             }}>
-                {/* Breadcrumb - Sadece desktop */}
-                {/* Breadcrumb - Sadece desktop */}
-                <div className="desktop-only" style={{
+                {/* Breadcrumb */}
+                <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
@@ -167,7 +180,7 @@ const ProductDetail: React.FC = () => {
                         <span className="material-icons-round" style={{ fontSize: '1rem' }}>dashboard</span>
                         Dashboard
                     </span>
-                    <span style={{ color: '#cbd5e1' }}>/</span>
+                    <span style={{ color: isDarkMode ? '#475569' : '#cbd5e1' }}>/</span>
                     <span
                         onClick={() => navigate('/admin/products')}
                         style={{
@@ -181,7 +194,7 @@ const ProductDetail: React.FC = () => {
                         <span className="material-icons-round" style={{ fontSize: '1rem' }}>inventory_2</span>
                         Ürünler
                     </span>
-                    <span style={{ color: '#cbd5e1' }}>/</span>
+                    <span style={{ color: isDarkMode ? '#475569' : '#cbd5e1' }}>/</span>
                     <span style={{
                         color: '#0ea5e9',
                         fontWeight: 600,
@@ -207,12 +220,12 @@ const ProductDetail: React.FC = () => {
                         <h1 style={{
                             fontSize: 'clamp(1.5rem, 5vw, 1.875rem)',
                             fontWeight: 600,
-                            color: '#0f172a',
+                            color: isDarkMode ? '#f1f5f9' : '#0f172a',
                             margin: '0 0 0.25rem 0'
                         }}>{product.name}</h1>
-                        <p className="product-meta" style={{
+                        <p style={{
                             fontSize: 'clamp(0.75rem, 4vw, 0.875rem)',
-                            color: '#64748b',
+                            color: isDarkMode ? '#94a3b8' : '#64748b',
                             margin: 0,
                             display: 'flex',
                             alignItems: 'center',
@@ -224,7 +237,7 @@ const ProductDetail: React.FC = () => {
                             <span>Oluşturulma: {formatDate(product.created_at)}</span>
                         </p>
                     </div>
-                    <div className="header-actions" style={{
+                    <div style={{
                         display: 'flex',
                         gap: '0.75rem',
                         width: isMobile ? '100%' : 'auto',
@@ -251,27 +264,47 @@ const ProductDetail: React.FC = () => {
                             onMouseLeave={(e) => e.currentTarget.style.background = '#0ea5e9'}
                         >
                             <span className="material-icons-round" style={{ fontSize: '1.25rem' }}>edit</span>
-                            <span className="action-text">Düzenle</span>
+                            <span>Düzenle</span>
                         </button>
-
-
+                        <button
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            style={{
+                                padding: '0.625rem 1.25rem',
+                                background: isDarkMode ? '#334155' : '#f1f5f9',
+                                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
+                                borderRadius: '12px',
+                                color: isDarkMode ? '#f1f5f9' : '#475569',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                fontSize: '0.875rem',
+                                fontWeight: 500,
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            <span className="material-icons-round" style={{ fontSize: '1.25rem' }}>
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                            <span>{isDarkMode ? 'Açık Mod' : 'Koyu Mod'}</span>
+                        </button>
                     </div>
                 </div>
 
                 {/* Main Grid */}
-                <div className="product-detail-grid" style={{
+                <div style={{
                     display: 'grid',
                     gridTemplateColumns: isMobile ? '1fr' : (isTablet ? '1fr' : '1fr 1.2fr'),
                     gap: '2rem'
                 }}>
                     {/* Sol Kolon - Görsel Galeri */}
                     <div>
-                        <div className="sticky-column" style={{
-                            background: 'white',
+                        <div style={{
+                            background: isDarkMode ? '#1e293b' : 'white',
                             borderRadius: '24px',
                             padding: '1.5rem',
                             boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                            border: '1px solid #e2e8f0',
+                            border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                             position: isMobile ? 'relative' : 'sticky',
                             top: '2rem'
                         }}>
@@ -282,7 +315,7 @@ const ProductDetail: React.FC = () => {
                                     borderRadius: '16px',
                                     overflow: 'hidden',
                                     marginBottom: '1.5rem',
-                                    backgroundColor: '#f8fafc',
+                                    backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
                                     cursor: zoomImage ? 'zoom-out' : 'zoom-in',
                                     transition: 'all 0.3s'
                                 }}
@@ -307,7 +340,7 @@ const ProductDetail: React.FC = () => {
                                         flexDirection: 'column',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#94a3b8'
+                                        color: isDarkMode ? '#64748b' : '#94a3b8'
                                     }}>
                                         <span className="material-icons-round" style={{ fontSize: '4rem', marginBottom: '1rem' }}>image</span>
                                         <span>Görsel Yok</span>
@@ -327,16 +360,16 @@ const ProductDetail: React.FC = () => {
                                         <span style={{
                                             fontSize: '0.875rem',
                                             fontWeight: 500,
-                                            color: '#0f172a'
+                                            color: isDarkMode ? '#f1f5f9' : '#0f172a'
                                         }}>Ürün Görselleri</span>
                                         <span style={{
                                             fontSize: '0.75rem',
-                                            color: '#64748b'
+                                            color: isDarkMode ? '#94a3b8' : '#64748b'
                                         }}>
                                             {product.image_gallery?.length ? product.image_gallery.length + (product.feature_image_url ? 1 : 0) : 1} görsel
                                         </span>
                                     </div>
-                                    <div className="thumbnail-grid" style={{
+                                    <div style={{
                                         display: 'grid',
                                         gridTemplateColumns: isMobile ? 'repeat(4, 1fr)' : (isTablet ? 'repeat(5, 1fr)' : 'repeat(auto-fill, minmax(80px, 1fr))'),
                                         gap: '0.75rem'
@@ -349,7 +382,7 @@ const ProductDetail: React.FC = () => {
                                                     borderRadius: '10px',
                                                     overflow: 'hidden',
                                                     cursor: 'pointer',
-                                                    border: !selectedImage ? '2px solid #0ea5e9' : '1px solid #e2e8f0',
+                                                    border: !selectedImage ? '2px solid #0ea5e9' : (isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0'),
                                                     position: 'relative',
                                                     transition: 'all 0.2s'
                                                 }}
@@ -389,7 +422,7 @@ const ProductDetail: React.FC = () => {
                                                     borderRadius: '10px',
                                                     overflow: 'hidden',
                                                     cursor: 'pointer',
-                                                    border: selectedImage === img ? '2px solid #0ea5e9' : '1px solid #e2e8f0',
+                                                    border: selectedImage === img ? '2px solid #0ea5e9' : (isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0'),
                                                     position: 'relative',
                                                     transition: 'all 0.2s'
                                                 }}
@@ -428,32 +461,32 @@ const ProductDetail: React.FC = () => {
                             <div style={{
                                 marginTop: '1.5rem',
                                 padding: '1.5rem',
-                                background: '#f8fafc',
+                                background: isDarkMode ? '#0f172a' : '#f8fafc',
                                 borderRadius: '16px'
                             }}>
                                 <h3 style={{
                                     fontSize: '0.875rem',
                                     fontWeight: 600,
-                                    color: '#0f172a',
+                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                     margin: '0 0 1rem 0',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem'
                                 }}>
-                                    <span className="material-icons-round" style={{ fontSize: '1.25rem', color: '#64748b' }}>bolt</span>
+                                    <span className="material-icons-round" style={{ fontSize: '1.25rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>bolt</span>
                                     Hızlı İşlemler
                                 </h3>
-                                <div className="quick-actions" style={{
+                                <div style={{
                                     display: 'grid',
                                     gridTemplateColumns: '1fr 1fr',
                                     gap: '0.75rem'
                                 }}>
                                     <button style={{
                                         padding: '0.75rem',
-                                        background: 'white',
-                                        border: '1px solid #e2e8f0',
+                                        background: isDarkMode ? '#1e293b' : 'white',
+                                        border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                         borderRadius: '12px',
-                                        color: '#475569',
+                                        color: isDarkMode ? '#e2e8f0' : '#475569',
                                         cursor: 'pointer',
                                         fontSize: '0.875rem',
                                         display: 'flex',
@@ -463,22 +496,22 @@ const ProductDetail: React.FC = () => {
                                         transition: 'all 0.2s'
                                     }}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.background = '#f8fafc';
-                                            e.currentTarget.style.borderColor = '#cbd5e1';
+                                            e.currentTarget.style.background = isDarkMode ? '#334155' : '#f8fafc';
+                                            e.currentTarget.style.borderColor = isDarkMode ? '#64748b' : '#cbd5e1';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = 'white';
-                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.background = isDarkMode ? '#1e293b' : 'white';
+                                            e.currentTarget.style.borderColor = isDarkMode ? '#475569' : '#e2e8f0';
                                         }}>
                                         <span className="material-icons-round" style={{ fontSize: '1.25rem' }}>content_copy</span>
                                         Kopyala
                                     </button>
                                     <button style={{
                                         padding: '0.75rem',
-                                        background: 'white',
-                                        border: '1px solid #e2e8f0',
+                                        background: isDarkMode ? '#1e293b' : 'white',
+                                        border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
                                         borderRadius: '12px',
-                                        color: '#475569',
+                                        color: isDarkMode ? '#e2e8f0' : '#475569',
                                         cursor: 'pointer',
                                         fontSize: '0.875rem',
                                         display: 'flex',
@@ -488,12 +521,12 @@ const ProductDetail: React.FC = () => {
                                         transition: 'all 0.2s'
                                     }}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.background = '#f8fafc';
-                                            e.currentTarget.style.borderColor = '#cbd5e1';
+                                            e.currentTarget.style.background = isDarkMode ? '#334155' : '#f8fafc';
+                                            e.currentTarget.style.borderColor = isDarkMode ? '#64748b' : '#cbd5e1';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = 'white';
-                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.background = isDarkMode ? '#1e293b' : 'white';
+                                            e.currentTarget.style.borderColor = isDarkMode ? '#475569' : '#e2e8f0';
                                         }}>
                                         <span className="material-icons-round" style={{ fontSize: '1.25rem' }}>archive</span>
                                         Arşivle
@@ -506,14 +539,14 @@ const ProductDetail: React.FC = () => {
                     {/* Sağ Kolon - Ürün Bilgileri */}
                     <div>
                         <div style={{
-                            background: 'white',
+                            background: isDarkMode ? '#1e293b' : 'white',
                             borderRadius: '24px',
                             padding: '2rem',
                             boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                            border: '1px solid #e2e8f0'
+                            border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                         }}>
                             {/* Status Badges */}
-                            <div className="status-badges" style={{
+                            <div style={{
                                 display: 'flex',
                                 gap: '0.75rem',
                                 marginBottom: '1.5rem',
@@ -521,7 +554,7 @@ const ProductDetail: React.FC = () => {
                             }}>
                                 <span style={{
                                     padding: '0.375rem 1rem',
-                                    background: product.status === 'published' ? '#10b98115' : '#f59e0b15',
+                                    background: product.status === 'published' ? (isDarkMode ? '#10b98120' : '#10b98115') : (isDarkMode ? '#f59e0b20' : '#f59e0b15'),
                                     color: product.status === 'published' ? '#10b981' : '#f59e0b',
                                     borderRadius: '30px',
                                     fontSize: '0.75rem',
@@ -537,7 +570,7 @@ const ProductDetail: React.FC = () => {
                                 </span>
                                 <span style={{
                                     padding: '0.375rem 1rem',
-                                    background: product.product_type === 'digital' ? '#8b5cf615' : '#f9731615',
+                                    background: product.product_type === 'digital' ? (isDarkMode ? '#8b5cf620' : '#8b5cf615') : (isDarkMode ? '#f9731620' : '#f9731615'),
                                     color: product.product_type === 'digital' ? '#8b5cf6' : '#f97316',
                                     borderRadius: '30px',
                                     fontSize: '0.75rem',
@@ -554,7 +587,7 @@ const ProductDetail: React.FC = () => {
                                 {product.is_featured && (
                                     <span style={{
                                         padding: '0.375rem 1rem',
-                                        background: '#8b5cf615',
+                                        background: isDarkMode ? '#8b5cf620' : '#8b5cf615',
                                         color: '#8b5cf6',
                                         borderRadius: '30px',
                                         fontSize: '0.75rem',
@@ -570,7 +603,7 @@ const ProductDetail: React.FC = () => {
                             </div>
 
                             {/* Fiyat Bilgileri */}
-                            <div className="price-card" style={{
+                            <div style={{
                                 marginBottom: '2rem',
                                 padding: '1.5rem',
                                 background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
@@ -583,15 +616,12 @@ const ProductDetail: React.FC = () => {
                                     gap: '1rem',
                                     marginBottom: '0.5rem'
                                 }}>
-                                    {/* İndirimli fiyat (varsa compare_at_price, yoksa base_price) */}
                                     <span style={{
                                         fontSize: '2.5rem',
                                         fontWeight: 700
                                     }}>
                                         {formatCurrency(product.compare_at_price || product.base_price)}
                                     </span>
-
-                                    {/* Normal fiyat (eğer compare_at_price varsa base_price'ı çiz) */}
                                     {product.compare_at_price && (
                                         <span style={{
                                             fontSize: '1.25rem',
@@ -602,8 +632,6 @@ const ProductDetail: React.FC = () => {
                                         </span>
                                     )}
                                 </div>
-
-                                {/* İndirim oranı */}
                                 {product.compare_at_price && (
                                     <div style={{
                                         display: 'flex',
@@ -621,7 +649,7 @@ const ProductDetail: React.FC = () => {
                             </div>
 
                             {/* Detaylı Bilgi Kartları */}
-                            <div className="info-cards" style={{
+                            <div style={{
                                 display: 'grid',
                                 gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
                                 gap: '1rem',
@@ -629,10 +657,10 @@ const ProductDetail: React.FC = () => {
                             }}>
                                 <div style={{
                                     padding: '1rem',
-                                    background: '#f8fafc',
+                                    background: isDarkMode ? '#0f172a' : '#f8fafc',
                                     borderRadius: '12px'
                                 }}>
-                                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>Stok Durumu</div>
+                                    <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.25rem' }}>Stok Durumu</div>
                                     <div style={{
                                         fontSize: '1.125rem',
                                         fontWeight: 600,
@@ -649,63 +677,63 @@ const ProductDetail: React.FC = () => {
                                 </div>
                                 <div style={{
                                     padding: '1rem',
-                                    background: '#f8fafc',
+                                    background: isDarkMode ? '#0f172a' : '#f8fafc',
                                     borderRadius: '12px'
                                 }}>
-                                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>Kategori</div>
+                                    <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.25rem' }}>Kategori</div>
                                     <div style={{
                                         fontSize: '1rem',
                                         fontWeight: 600,
-                                        color: '#0f172a',
+                                        color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '0.5rem'
                                     }}>
-                                        <span className="material-icons-round" style={{ fontSize: '1.25rem', color: '#64748b' }}>folder</span>
+                                        <span className="material-icons-round" style={{ fontSize: '1.25rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>folder</span>
                                         {product.primary_category || 'Kategorisiz'}
                                     </div>
                                 </div>
                                 <div style={{
                                     padding: '1rem',
-                                    background: '#f8fafc',
+                                    background: isDarkMode ? '#0f172a' : '#f8fafc',
                                     borderRadius: '12px'
                                 }}>
-                                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>SKU</div>
+                                    <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.25rem' }}>SKU</div>
                                     <div style={{
                                         fontSize: '1rem',
                                         fontWeight: 600,
-                                        color: '#0f172a',
+                                        color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '0.5rem'
                                     }}>
-                                        <span className="material-icons-round" style={{ fontSize: '1.25rem', color: '#64748b' }}>qr_code_scanner</span>
+                                        <span className="material-icons-round" style={{ fontSize: '1.25rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>qr_code_scanner</span>
                                         {product.sku || '-'}
                                     </div>
                                 </div>
                                 <div style={{
                                     padding: '1rem',
-                                    background: '#f8fafc',
+                                    background: isDarkMode ? '#0f172a' : '#f8fafc',
                                     borderRadius: '12px'
                                 }}>
-                                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>Barkod</div>
+                                    <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.25rem' }}>Barkod</div>
                                     <div style={{
                                         fontSize: '1rem',
                                         fontWeight: 600,
-                                        color: '#0f172a',
+                                        color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '0.5rem'
                                     }}>
-                                        <span className="material-icons-round" style={{ fontSize: '1.25rem', color: '#64748b' }}>tag</span> {/* tag icon */}
+                                        <span className="material-icons-round" style={{ fontSize: '1.25rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>tag</span>
                                         {product.barcode ? product.barcode.replace(/[<>]/g, '').trim() : '-'}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Tab Menü */}
-                            <div className="tab-menu" style={{
-                                borderBottom: '1px solid #e2e8f0',
+                            <div style={{
+                                borderBottom: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`,
                                 marginBottom: '1.5rem',
                                 overflowX: 'auto',
                                 whiteSpace: 'nowrap'
@@ -726,7 +754,7 @@ const ProductDetail: React.FC = () => {
                                                 background: 'none',
                                                 border: 'none',
                                                 borderBottom: activeTab === tab.id ? '2px solid #0ea5e9' : '2px solid transparent',
-                                                color: activeTab === tab.id ? '#0ea5e9' : '#64748b',
+                                                color: activeTab === tab.id ? '#0ea5e9' : (isDarkMode ? '#94a3b8' : '#64748b'),
                                                 fontSize: '0.875rem',
                                                 fontWeight: 500,
                                                 cursor: 'pointer',
@@ -745,52 +773,50 @@ const ProductDetail: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Tab İçerikleri - Bu kısım aynen devam ediyor */}
+                            {/* Tab İçerikleri */}
                             <div>
                                 {/* Detaylar Tab */}
                                 {activeTab === 'details' && (
                                     <div>
-                                        {/* Açıklama */}
                                         {product.description && (
                                             <div style={{ marginBottom: '2rem' }}>
                                                 <h3 style={{
                                                     fontSize: '1rem',
                                                     fontWeight: 600,
-                                                    color: '#0f172a',
+                                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                                     marginBottom: '1rem',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     gap: '0.5rem'
                                                 }}>
-                                                    <span className="material-icons-round" style={{ color: '#64748b' }}>description</span>
+                                                    <span className="material-icons-round" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>description</span>
                                                     Ürün Açıklaması
                                                 </h3>
                                                 <div style={{
                                                     fontSize: '0.9375rem',
-                                                    color: '#475569',
+                                                    color: isDarkMode ? '#cbd5e1' : '#475569',
                                                     lineHeight: '1.7',
-                                                    background: '#f8fafc',
+                                                    background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                     padding: '1.5rem',
                                                     borderRadius: '12px',
-                                                    border: '1px solid #e2e8f0'
+                                                    border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                                 }}>
                                                     {product.description}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Teknik Detaylar */}
                                         <div style={{ marginBottom: '2rem' }}>
                                             <h3 style={{
                                                 fontSize: '1rem',
                                                 fontWeight: 600,
-                                                color: '#0f172a',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                                 marginBottom: '1rem',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '0.5rem'
                                             }}>
-                                                <span className="material-icons-round" style={{ color: '#64748b' }}>engineering</span>
+                                                <span className="material-icons-round" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>engineering</span>
                                                 Teknik Detaylar
                                             </h3>
                                             <div style={{
@@ -801,61 +827,60 @@ const ProductDetail: React.FC = () => {
                                                 {product.weight && (
                                                     <div style={{
                                                         padding: '0.75rem',
-                                                        background: '#f8fafc',
+                                                        background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                         borderRadius: '8px',
-                                                        border: '1px solid #e2e8f0'
+                                                        border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                                     }}>
-                                                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Ağırlık</div>
-                                                        <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#0f172a' }}>{product.weight} kg</div>
+                                                        <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>Ağırlık</div>
+                                                        <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>{product.weight} kg</div>
                                                     </div>
                                                 )}
                                                 {product.dimensions && (
                                                     <>
                                                         <div style={{
                                                             padding: '0.75rem',
-                                                            background: '#f8fafc',
+                                                            background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                             borderRadius: '8px',
-                                                            border: '1px solid #e2e8f0'
+                                                            border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                                         }}>
-                                                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Uzunluk</div>
-                                                            <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#0f172a' }}>{product.dimensions.length} cm</div>
+                                                            <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>Uzunluk</div>
+                                                            <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>{product.dimensions.length} cm</div>
                                                         </div>
                                                         <div style={{
                                                             padding: '0.75rem',
-                                                            background: '#f8fafc',
+                                                            background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                             borderRadius: '8px',
-                                                            border: '1px solid #e2e8f0'
+                                                            border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                                         }}>
-                                                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Genişlik</div>
-                                                            <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#0f172a' }}>{product.dimensions.width} cm</div>
+                                                            <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>Genişlik</div>
+                                                            <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>{product.dimensions.width} cm</div>
                                                         </div>
                                                         <div style={{
                                                             padding: '0.75rem',
-                                                            background: '#f8fafc',
+                                                            background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                             borderRadius: '8px',
-                                                            border: '1px solid #e2e8f0'
+                                                            border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                                         }}>
-                                                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Yükseklik</div>
-                                                            <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#0f172a' }}>{product.dimensions.height} cm</div>
+                                                            <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>Yükseklik</div>
+                                                            <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>{product.dimensions.height} cm</div>
                                                         </div>
                                                     </>
                                                 )}
                                             </div>
                                         </div>
 
-                                        {/* Etiketler */}
                                         {product.tags && product.tags.length > 0 && (
                                             <div>
                                                 <h3 style={{
                                                     fontSize: '1rem',
                                                     fontWeight: 600,
-                                                    color: '#0f172a',
+                                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                                     marginBottom: '1rem',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     gap: '0.5rem'
                                                 }}>
-                                                    <span className="material-icons-round" style={{ color: '#64748b' }}>local_offer</span>
+                                                    <span className="material-icons-round" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>local_offer</span>
                                                     Etiketler
                                                 </h3>
                                                 <div style={{
@@ -866,12 +891,12 @@ const ProductDetail: React.FC = () => {
                                                     {product.tags.map(tag => (
                                                         <span key={tag} style={{
                                                             padding: '0.375rem 1rem',
-                                                            background: '#f1f5f9',
-                                                            color: '#475569',
+                                                            background: isDarkMode ? '#0f172a' : '#f1f5f9',
+                                                            color: isDarkMode ? '#cbd5e1' : '#475569',
                                                             borderRadius: '30px',
                                                             fontSize: '0.8125rem',
                                                             fontWeight: 500,
-                                                            border: '1px solid #e2e8f0'
+                                                            border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                                         }}>
                                                             #{tag}
                                                         </span>
@@ -892,29 +917,31 @@ const ProductDetail: React.FC = () => {
                                                     alignItems: 'center',
                                                     justifyContent: 'space-between',
                                                     padding: '1.25rem',
-                                                    background: '#f8fafc',
+                                                    background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                     borderRadius: '12px',
-                                                    border: '1px solid #e2e8f0'
+                                                    border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                                                    flexWrap: 'wrap',
+                                                    gap: '1rem'
                                                 }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                                         <div style={{
                                                             width: '48px',
                                                             height: '48px',
-                                                            background: '#e2e8f0',
+                                                            background: isDarkMode ? '#334155' : '#e2e8f0',
                                                             borderRadius: '12px',
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
-                                                            color: '#64748b'
+                                                            color: isDarkMode ? '#94a3b8' : '#64748b'
                                                         }}>
                                                             <span className="material-icons-round" style={{ fontSize: '1.75rem' }}>insert_drive_file</span>
                                                         </div>
                                                         <div>
-                                                            <div style={{ fontSize: '1rem', fontWeight: 600, color: '#0f172a' }}>
+                                                            <div style={{ fontSize: '1rem', fontWeight: 600, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>
                                                                 {product.file_name || 'Dosya adı belirtilmemiş'}
                                                             </div>
                                                             {product.file_size && (
-                                                                <div style={{ fontSize: '0.8125rem', color: '#64748b' }}>
+                                                                <div style={{ fontSize: '0.8125rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>
                                                                     {(product.file_size / 1024 / 1024).toFixed(2)} MB • {product.file_type || 'Bilinmeyen tip'}
                                                                 </div>
                                                             )}
@@ -948,7 +975,7 @@ const ProductDetail: React.FC = () => {
                                                 </div>
                                                 <p style={{
                                                     fontSize: '0.8125rem',
-                                                    color: '#64748b',
+                                                    color: isDarkMode ? '#94a3b8' : '#64748b',
                                                     marginTop: '0.75rem',
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -962,15 +989,15 @@ const ProductDetail: React.FC = () => {
                                             <div style={{
                                                 padding: '2rem',
                                                 textAlign: 'center',
-                                                background: '#f8fafc',
+                                                background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                 borderRadius: '12px',
-                                                border: '1px solid #e2e8f0'
+                                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                             }}>
-                                                <span className="material-icons-round" style={{ fontSize: '3rem', color: '#94a3b8', marginBottom: '1rem' }}>inventory</span>
-                                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#0f172a', marginBottom: '0.25rem' }}>
+                                                <span className="material-icons-round" style={{ fontSize: '3rem', color: isDarkMode ? '#64748b' : '#94a3b8', marginBottom: '1rem' }}>inventory</span>
+                                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: isDarkMode ? '#f1f5f9' : '#0f172a', marginBottom: '0.25rem' }}>
                                                     Fiziksel Ürün
                                                 </h3>
-                                                <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                                                <p style={{ fontSize: '0.875rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>
                                                     Bu ürün fiziksel olduğu için dosya bulunmuyor.
                                                 </p>
                                             </div>
@@ -981,7 +1008,6 @@ const ProductDetail: React.FC = () => {
                                 {/* İstatistikler Tab */}
                                 {activeTab === 'stats' && (
                                     <div>
-                                        {/* Ana Metrikler */}
                                         <div style={{
                                             display: 'grid',
                                             gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
@@ -996,12 +1022,12 @@ const ProductDetail: React.FC = () => {
                                             ].map((stat, index) => (
                                                 <div key={index} style={{
                                                     padding: '1.25rem',
-                                                    background: '#f8fafc',
+                                                    background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                     borderRadius: '12px',
-                                                    border: '1px solid #e2e8f0'
+                                                    border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                                 }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                                                        <span className="material-icons-round" style={{ color: '#64748b' }}>{stat.icon}</span>
+                                                        <span className="material-icons-round" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>{stat.icon}</span>
                                                         <span style={{
                                                             fontSize: '0.75rem',
                                                             color: '#10b981',
@@ -1010,35 +1036,34 @@ const ProductDetail: React.FC = () => {
                                                             borderRadius: '20px'
                                                         }}>{stat.change}</span>
                                                     </div>
-                                                    <div style={{ fontSize: '1.5rem', fontWeight: 600, color: '#0f172a', marginBottom: '0.25rem' }}>{stat.value}</div>
-                                                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{stat.label}</div>
+                                                    <div style={{ fontSize: '1.5rem', fontWeight: 600, color: isDarkMode ? '#f1f5f9' : '#0f172a', marginBottom: '0.25rem' }}>{stat.value}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>{stat.label}</div>
                                                 </div>
                                             ))}
                                         </div>
 
-                                        {/* Son Siparişler */}
                                         <div>
                                             <h3 style={{
                                                 fontSize: '1rem',
                                                 fontWeight: 600,
-                                                color: '#0f172a',
+                                                color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                                 marginBottom: '1rem',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '0.5rem'
                                             }}>
-                                                <span className="material-icons-round" style={{ color: '#64748b' }}>receipt</span>
+                                                <span className="material-icons-round" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>receipt</span>
                                                 Son Siparişler
                                             </h3>
                                             <div style={{
-                                                background: '#f8fafc',
+                                                background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                 borderRadius: '12px',
-                                                border: '1px solid #e2e8f0',
+                                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                                 overflow: 'hidden'
                                             }}>
                                                 <div style={{
                                                     padding: '1rem',
-                                                    borderBottom: '1px solid #e2e8f0',
+                                                    borderBottom: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                                     display: 'grid',
                                                     gridTemplateColumns: 'auto 1fr auto',
                                                     gap: '1rem',
@@ -1046,14 +1071,14 @@ const ProductDetail: React.FC = () => {
                                                 }}>
                                                     <span className="material-icons-round" style={{ color: '#10b981' }}>check_circle</span>
                                                     <div>
-                                                        <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#0f172a' }}>#SIP-2024-001</div>
-                                                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>2 gün önce</div>
+                                                        <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>#SIP-2024-001</div>
+                                                        <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>2 gün önce</div>
                                                     </div>
-                                                    <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#0f172a' }}>₺1.299</div>
+                                                    <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>₺1.299</div>
                                                 </div>
                                                 <div style={{
                                                     padding: '1rem',
-                                                    borderBottom: '1px solid #e2e8f0',
+                                                    borderBottom: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
                                                     display: 'grid',
                                                     gridTemplateColumns: 'auto 1fr auto',
                                                     gap: '1rem',
@@ -1061,10 +1086,10 @@ const ProductDetail: React.FC = () => {
                                                 }}>
                                                     <span className="material-icons-round" style={{ color: '#f59e0b' }}>pending</span>
                                                     <div>
-                                                        <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#0f172a' }}>#SIP-2024-002</div>
-                                                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>5 gün önce</div>
+                                                        <div style={{ fontSize: '0.9375rem', fontWeight: 500, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>#SIP-2024-002</div>
+                                                        <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>5 gün önce</div>
                                                     </div>
-                                                    <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#0f172a' }}>₺899</div>
+                                                    <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>₺899</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1076,52 +1101,52 @@ const ProductDetail: React.FC = () => {
                                     <div>
                                         <div style={{
                                             padding: '1.5rem',
-                                            background: '#f8fafc',
+                                            background: isDarkMode ? '#0f172a' : '#f8fafc',
                                             borderRadius: '12px',
-                                            border: '1px solid #e2e8f0'
+                                            border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                         }}>
                                             <div style={{ marginBottom: '1.5rem' }}>
-                                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.5rem' }}>SEO Başlığı</div>
+                                                <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.5rem' }}>SEO Başlığı</div>
                                                 <div style={{
                                                     fontSize: '1rem',
                                                     fontWeight: 500,
-                                                    color: '#0f172a',
+                                                    color: isDarkMode ? '#f1f5f9' : '#0f172a',
                                                     padding: '0.75rem',
-                                                    background: 'white',
+                                                    background: isDarkMode ? '#1e293b' : 'white',
                                                     borderRadius: '8px',
-                                                    border: '1px solid #e2e8f0'
+                                                    border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0'
                                                 }}>
                                                     {product.seo_title || product.name}
                                                 </div>
                                             </div>
                                             <div style={{ marginBottom: '1.5rem' }}>
-                                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.5rem' }}>Meta Açıklama</div>
+                                                <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.5rem' }}>Meta Açıklama</div>
                                                 <div style={{
                                                     fontSize: '0.875rem',
-                                                    color: '#475569',
+                                                    color: isDarkMode ? '#cbd5e1' : '#475569',
                                                     padding: '0.75rem',
-                                                    background: 'white',
+                                                    background: isDarkMode ? '#1e293b' : 'white',
                                                     borderRadius: '8px',
-                                                    border: '1px solid #e2e8f0'
+                                                    border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0'
                                                 }}>
                                                     {product.meta_description || product.description?.substring(0, 160) || 'Meta açıklama bulunmuyor.'}
                                                 </div>
                                             </div>
                                             <div style={{ marginBottom: '1.5rem' }}>
-                                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.5rem' }}>SEO URL</div>
+                                                <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.5rem' }}>SEO URL</div>
                                                 <div style={{
                                                     fontSize: '0.875rem',
                                                     color: '#0ea5e9',
                                                     padding: '0.75rem',
-                                                    background: 'white',
+                                                    background: isDarkMode ? '#1e293b' : 'white',
                                                     borderRadius: '8px',
-                                                    border: '1px solid #e2e8f0'
+                                                    border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0'
                                                 }}>
                                                     /{product.slug || 'urun'}/{product.id}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.5rem' }}>Anahtar Kelimeler</div>
+                                                <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '0.5rem' }}>Anahtar Kelimeler</div>
                                                 <div style={{
                                                     display: 'flex',
                                                     flexWrap: 'wrap',
@@ -1130,11 +1155,11 @@ const ProductDetail: React.FC = () => {
                                                     {(product.seo_keywords || ['ürün', 'e-ticaret', 'satılık']).map((keyword, index) => (
                                                         <span key={index} style={{
                                                             padding: '0.375rem 1rem',
-                                                            background: 'white',
-                                                            color: '#475569',
+                                                            background: isDarkMode ? '#1e293b' : 'white',
+                                                            color: isDarkMode ? '#cbd5e1' : '#475569',
                                                             borderRadius: '30px',
                                                             fontSize: '0.8125rem',
-                                                            border: '1px solid #e2e8f0'
+                                                            border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0'
                                                         }}>
                                                             {keyword}
                                                         </span>
@@ -1150,45 +1175,45 @@ const ProductDetail: React.FC = () => {
                                     <div>
                                         {product.variants && product.variants.length > 0 ? (
                                             <div style={{
-                                                background: '#f8fafc',
+                                                background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                 borderRadius: '12px',
-                                                border: '1px solid #e2e8f0',
-                                                overflow: 'hidden'
+                                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                                                overflow: 'auto'
                                             }}>
                                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                                     <thead>
-                                                        <tr style={{ background: '#f1f5f9' }}>
-                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Varyant</th>
-                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>SKU</th>
-                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Fiyat</th>
-                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Stok</th>
+                                                        <tr style={{ background: isDarkMode ? '#1e293b' : '#f1f5f9' }}>
+                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: isDarkMode ? '#cbd5e1' : '#475569' }}>Varyant</th>
+                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: isDarkMode ? '#cbd5e1' : '#475569' }}>SKU</th>
+                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: isDarkMode ? '#cbd5e1' : '#475569' }}>Fiyat</th>
+                                                            <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: isDarkMode ? '#cbd5e1' : '#475569' }}>Stok</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {product.variants.map((variant, index) => (
-                                                            <tr key={index} style={{ borderTop: '1px solid #e2e8f0' }}>
-                                                                <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#0f172a' }}>{variant.name}</td>
-                                                                <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#64748b' }}>{variant.sku}</td>
-                                                                <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>{formatCurrency(variant.price)}</td>
+                                                            <tr key={index} style={{ borderTop: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}` }}>
+                                                                <td style={{ padding: '1rem', fontSize: '0.875rem', color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>{variant.name}</td>
+                                                                <td style={{ padding: '1rem', fontSize: '0.875rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>{variant.sku}</td>
+                                                                <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: 600, color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>{formatCurrency(variant.price)}</td>
                                                                 <td style={{ padding: '1rem', fontSize: '0.875rem', color: variant.stock > 0 ? '#10b981' : '#ef4444' }}>{variant.stock}</td>
-                                                            </tr>
+                                                             </tr>
                                                         ))}
                                                     </tbody>
-                                                </table>
+                                                 </table>
                                             </div>
                                         ) : (
                                             <div style={{
                                                 padding: '2rem',
                                                 textAlign: 'center',
-                                                background: '#f8fafc',
+                                                background: isDarkMode ? '#0f172a' : '#f8fafc',
                                                 borderRadius: '12px',
-                                                border: '1px solid #e2e8f0'
+                                                border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0'
                                             }}>
-                                                <span className="material-icons-round" style={{ fontSize: '3rem', color: '#94a3b8', marginBottom: '1rem' }}>layers</span>
-                                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#0f172a', marginBottom: '0.25rem' }}>
+                                                <span className="material-icons-round" style={{ fontSize: '3rem', color: isDarkMode ? '#64748b' : '#94a3b8', marginBottom: '1rem' }}>layers</span>
+                                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: isDarkMode ? '#f1f5f9' : '#0f172a', marginBottom: '0.25rem' }}>
                                                     Varyant Bulunmuyor
                                                 </h3>
-                                                <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                                                <p style={{ fontSize: '0.875rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>
                                                     Bu ürün için henüz varyant eklenmemiş.
                                                 </p>
                                             </div>
@@ -1199,7 +1224,6 @@ const ProductDetail: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );
