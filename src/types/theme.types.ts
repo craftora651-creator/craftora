@@ -66,6 +66,7 @@ export interface ThemeSettings {
   
   // ===== FOOTER =====
   footer_about?: string;
+  show_why_section?: boolean;
   
   // ===== MEDYA =====
   logo_url?: string;

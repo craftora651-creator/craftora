@@ -80,6 +80,7 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
   const [showAllProductsModal, setShowAllProductsModal] = useState(false);
   const [modalSearchTerm, setModalSearchTerm] = useState('');
   const [modalSelectedCategory, setModalSelectedCategory] = useState('all');
+  const [showWhySection, setShowWhySection] = useState(true);
 
   // Backend'den ürünleri çek
   const { data: sellerProducts, isLoading: loadingProducts, error: productsError } = useMyProducts(selectedShopId, undefined, {
@@ -131,6 +132,14 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
     visionText: 'Dijital ürünler dünyasında Türkiye\'nin lider platformu olmak.'
   });
 
+
+  // Theme data geldiğinde showWhySection'ı güncelle (diğer useEffect'lerin yanına)
+useEffect(() => {
+  if (themeData?.settings?.show_why_section !== undefined) {
+    setShowWhySection(themeData.settings.show_why_section);
+  }
+}, [themeData]);
+
   // ========== 10. SHOP DATA GELDİĞİNDE STATE'LERİ GÜNCELLE ==========
   useEffect(() => {
     if (shopData) {
@@ -178,41 +187,47 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
 
   // ========== 12. HANDLER FUNCTIONS ==========
   const handleSaveAll = async () => {
-    console.log('💾 Kaydediliyor...');
+  console.log('💾 Kaydediliyor...');
+  console.log('📦 selectedProducts gönderiliyor:', selectedProducts);
+  console.log('📦 selectedProducts DETAIL:', JSON.stringify(selectedProducts, null, 2));
 
-    try {
-      // Hero bölümünü theme settings'e kaydet
-      await updateThemeSettings.mutateAsync({
-        hero_title: heroTitle,
-        hero_subtitle: heroSubtitle,
-        hero_button_text: heroButtonText,
-        hero_button2_text: heroButton2Text,
-        footer_about: footerAbout,
-        features: features,
-        about_content: aboutContent,  // ✅ aboutContent -> about_content
-      });
+  try {
+    // Tüm ayarları backend'e kaydet
+    await updateThemeSettings.mutateAsync({
+      hero_title: heroTitle,
+      hero_subtitle: heroSubtitle,
+      hero_button_text: heroButtonText,
+      hero_button2_text: heroButton2Text,
+      footer_about: footerAbout,
+      features: features,
+      about_content: aboutContent,
+      selected_products: selectedProducts,
+      show_why_section: showWhySection,
+      blog_posts: blogPosts,
+    });
+    console.log('🎨 themeData?.settings?.blog_posts:', themeData?.settings?.blog_posts);
 
-      // Diğer ayarları localStorage'a kaydet (geçici)
-      const dataToSaveLocal = {
-        magzaAdi,
-        magzaAciklama,
-        selectedProducts,
-        features,
-        footerAbout,
-        blogPosts,
-        aboutContent,
-        logoPreview,
-        bannerPreview
-      };
-      localStorage.setItem('craftora_shop_settings', JSON.stringify(dataToSaveLocal));
+    // Diğer ayarları localStorage'a kaydet (yedek)
+    const dataToSaveLocal = {
+      magzaAdi,
+      magzaAciklama,
+      selectedProducts,
+      features,
+      footerAbout,
+      blogPosts,
+      aboutContent,
+      logoPreview,
+      bannerPreview
+    };
+    localStorage.setItem('craftora_shop_settings', JSON.stringify(dataToSaveLocal));
 
-      console.log('✅ Kaydedildi:', dataToSaveLocal);
-      alert('✅ Tüm ayarlar kaydedildi!');
-    } catch (error) {
-      console.error('❌ Kaydetme hatası:', error);
-      alert('❌ Kaydedilirken hata oluştu!');
-    }
-  };
+    console.log('✅ Kaydedildi:', dataToSaveLocal);
+    alert('✅ Tüm ayarlar kaydedildi!');
+  } catch (error) {
+    console.error('❌ Kaydetme hatası:', error);
+    alert('❌ Kaydedilirken hata oluştu!');
+  }
+};
 
   const handleViewShop = () => {
     window.location.href = '/seller-themes';
@@ -1166,102 +1181,139 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
 
         {/* ========== NEDEN CRAFTORA? SEKMESİ ========== */}
         {aktifSekme === 'neden' && (
-          <div>
-            <h3 style={{
-              fontSize: 20,
-              fontWeight: 600,
-              color: colors.text,
-              marginBottom: 24,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8
-            }}>
-              <span style={{ color: '#0ea5e9' }}>✨</span>
-              Neden Craftora? Bölümü
-            </h3>
-            <p style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 24 }}>
-              Her bir özelliğin iconunu, başlığını ve açıklamasını düzenleyin.
-            </p>
+  <div>
+    {/* BAŞLIK VE BUTON YAN YANA */}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <h3 style={{
+        fontSize: 20,
+        fontWeight: 600,
+        color: colors.text,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        margin: 0
+      }}>
+        <span style={{ color: '#0ea5e9' }}>✨</span>
+        Neden {magzaAdi || 'Craftora'}? Bölümü
+      </h3>
+      <button
+        onClick={() => setShowWhySection(!showWhySection)}
+        style={{
+          padding: '6px 16px',
+          backgroundColor: showWhySection ? '#ef4444' : '#10b981',
+          color: 'white',
+          border: 'none',
+          borderRadius: 30,
+          cursor: 'pointer',
+          fontSize: 13,
+          fontWeight: 500,
+          transition: 'all 0.2s'
+        }}
+      >
+        {showWhySection ? '🔒 Bölümü Gizle' : '👁️ Bölümü Göster'}
+      </button>
+    </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {features.map((feature, index) => (
-                <div key={index} style={{
-                  backgroundColor: colors.bg,
-                  borderRadius: 16,
-                  padding: 20,
-                  border: `1px solid ${colors.border}`
-                }}>
-                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ fontSize: 12, color: colors.textSecondary, display: 'block', marginBottom: 4 }}>İkon</label>
-                      <select
-                        value={feature.icon}
-                        onChange={(e) => {
-                          const newFeatures = [...features];
-                          newFeatures[index].icon = e.target.value;
-                          setFeatures(newFeatures);
-                        }}
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          backgroundColor: colors.surface,
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 12,
-                          color: colors.text,
-                          fontSize: 14
-                        }}
-                      >
-                        {iconOptions.map(opt => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div style={{ flex: 2 }}>
-                      <label style={{ fontSize: 12, color: colors.textSecondary, display: 'block', marginBottom: 4 }}>Başlık</label>
-                      <input
-                        type="text"
-                        value={feature.title}
-                        onChange={(e) => {
-                          const newFeatures = [...features];
-                          newFeatures[index].title = e.target.value;
-                          setFeatures(newFeatures);
-                        }}
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          backgroundColor: colors.surface,
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 12,
-                          color: colors.text
-                        }}
-                      />
-                    </div>
-                    <div style={{ flex: 3 }}>
-                      <label style={{ fontSize: 12, color: colors.textSecondary, display: 'block', marginBottom: 4 }}>Açıklama</label>
-                      <input
-                        type="text"
-                        value={feature.description}
-                        onChange={(e) => {
-                          const newFeatures = [...features];
-                          newFeatures[index].description = e.target.value;
-                          setFeatures(newFeatures);
-                        }}
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          backgroundColor: colors.surface,
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 12,
-                          color: colors.text
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
+    <p style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 24 }}>
+      Her bir özelliğin iconunu, başlığını ve açıklamasını düzenleyin.
+    </p>
+
+    {/* showWhySection true ise GÖSTER */}
+    {showWhySection && (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {features.map((feature, index) => (
+          <div key={index} style={{
+            backgroundColor: colors.bg,
+            borderRadius: 16,
+            padding: 20,
+            border: `1px solid ${colors.border}`
+          }}>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 12, color: colors.textSecondary, display: 'block', marginBottom: 4 }}>İkon</label>
+                <select
+                  value={feature.icon}
+                  onChange={(e) => {
+                    const newFeatures = [...features];
+                    newFeatures[index].icon = e.target.value;
+                    setFeatures(newFeatures);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 12,
+                    color: colors.text,
+                    fontSize: 14
+                  }}
+                >
+                  {iconOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ flex: 2 }}>
+                <label style={{ fontSize: 12, color: colors.textSecondary, display: 'block', marginBottom: 4 }}>Başlık</label>
+                <input
+                  type="text"
+                  value={feature.title}
+                  onChange={(e) => {
+                    const newFeatures = [...features];
+                    newFeatures[index].title = e.target.value;
+                    setFeatures(newFeatures);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 12,
+                    color: colors.text
+                  }}
+                />
+              </div>
+              <div style={{ flex: 3 }}>
+                <label style={{ fontSize: 12, color: colors.textSecondary, display: 'block', marginBottom: 4 }}>Açıklama</label>
+                <input
+                  type="text"
+                  value={feature.description}
+                  onChange={(e) => {
+                    const newFeatures = [...features];
+                    newFeatures[index].description = e.target.value;
+                    setFeatures(newFeatures);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 12,
+                    color: colors.text
+                  }}
+                />
+              </div>
             </div>
           </div>
-        )}
+        ))}
+      </div>
+    )}
+
+    {/* showWhySection false ise MESAJ GÖSTER */}
+    {!showWhySection && (
+      <div style={{
+        backgroundColor: colors.bg,
+        borderRadius: 16,
+        padding: 40,
+        textAlign: 'center',
+        border: `1px dashed ${colors.border}`,
+        color: colors.textSecondary
+      }}>
+        👁️ Bu bölüm şu anda gizli. Tekrar göstermek için yukarıdaki butona tıklayın.
+      </div>
+    )}
+  </div>
+)}
 
         {/* ========== BLOG SEKMESİ ========== */}
         {aktifSekme === 'blog' && (
