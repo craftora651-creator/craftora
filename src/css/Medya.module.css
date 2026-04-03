@@ -614,7 +614,7 @@
   }
   
   .productInfo {
-    bottom: 200px;
+    bottom: 180px;
   }
   
   .actionBar {
@@ -622,7 +622,7 @@
   }
   
   .bottomButtons {
-    bottom: 80px;
+    bottom: 100px;
   }
 }
 
