@@ -178,16 +178,16 @@ const Medya: React.FC = () => {
 
     return (
         <div className={`${styles.container} ${isDarkMode ? styles.containerDark : styles.containerLight}`}>
-            
+
             {/* ===== ARAMA ICONU VE DARK MODE ===== */}
             <div className={styles.topActions}>
-                <button 
+                <button
                     className={`${styles.searchBtn} ${searchActive ? styles.searchBtnActive : ''}`}
                     onClick={toggleSearch}
                 >
                     <FaSearch />
                 </button>
-                <button 
+                <button
                     className={styles.darkModeBtn}
                     onClick={toggleDarkMode}
                 >
@@ -216,7 +216,7 @@ const Medya: React.FC = () => {
             )}
 
             {/* ===== TIKTOK TARZI VİDEO KAYDIRMA ALANI ===== */}
-            <div 
+            <div
                 className={styles.videoContainer}
                 ref={containerRef}
                 onTouchStart={handleTouchStart}
@@ -224,7 +224,7 @@ const Medya: React.FC = () => {
                 onTouchEnd={handleTouchEnd}
             >
                 {videoData.map((video, index) => (
-                    <div 
+                    <div
                         key={video.id}
                         className={`${styles.videoSlide} ${index === currentVideoIndex ? styles.videoSlideActive : ''}`}
                         style={{
@@ -232,7 +232,7 @@ const Medya: React.FC = () => {
                         }}
                     >
                         {/* Video Arkaplan */}
-                        <div 
+                        <div
                             className={styles.videoBackground}
                             style={{
                                 backgroundImage: `url(${video.image})`,
@@ -252,7 +252,7 @@ const Medya: React.FC = () => {
                             <div className={styles.priceContainer}>
                                 <span className={styles.currentPrice}>${video.price}.00</span>
                                 <span className={styles.originalPrice}>${video.originalPrice}.00</span>
-                                <span className={styles.discountBadge}>-{Math.round((1 - video.price/video.originalPrice) * 100)}%</span>
+                                <span className={styles.discountBadge}>-{Math.round((1 - video.price / video.originalPrice) * 100)}%</span>
                             </div>
 
                             <div className={styles.audioInfo}>
@@ -306,18 +306,13 @@ const Medya: React.FC = () => {
 
                         {/* Alt Butonlar - Buy Now + Ürüne Git (Sidebar'ın üstünde) */}
                         <div className={styles.bottomButtons}>
-                            <div className={styles.buySection}>
-                                <button className={styles.buyNowBtn}>
-                                    <FaShoppingBag />
-                                    BUY NOW
-                                </button>
-                                <button className={styles.goToProductBtn}>
-                                    Ürüne Git
-                                    <FaChevronRight />
-                                </button>
-                            </div>
-                            <button className={styles.shareBtn}>
-                                <FaShare />
+                            <button className={styles.buyNowBtn}>
+                                <FaShoppingBag />
+                                BUY NOW
+                            </button>
+                            <button className={styles.goToProductBtn}>
+                                Ürüne Git
+                                <FaChevronRight />
                             </button>
                         </div>
                     </div>
@@ -329,7 +324,7 @@ const Medya: React.FC = () => {
                 <div className={styles.bottomLogo}>
                     CRAFT<span>ORA</span>
                 </div>
-                
+
                 <div className={styles.bottomNavItems}>
                     {bottomNavItems.map((item) => (
                         <div
