@@ -3,6 +3,9 @@ import SellerProducts from '../middleware/SellerProducts';
 import SellerProductDetail from '../middleware/SellerProductDetail';
 import { useActiveTheme } from '../server/Gin/theme.hook';
 import { useMyShops } from '../server/FastAPI/shop.hooks';
+import { useCurrentUser } from '../server/FastAPI/user.hooks';
+import { useCart, useAddToCart, useRemoveFromCart, useClearCart } from '../server/FastAPI/cart.hooks';
+
 
 interface SellerThemesProps {
   colors?: {
@@ -37,7 +40,6 @@ const SellerThemes = ({ colors = {
   const [userEmail, setUserEmail] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [cartCount, setCartCount] = useState(2);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -53,6 +55,10 @@ const SellerThemes = ({ colors = {
     tiktok: 'https://tiktok.com',
     facebook: 'https://facebook.com'
   });
+  // SellerThemes.tsx - state'lerin olduğu yere ekle
+  const [showCartModal, setShowCartModal] = useState(false);
+
+
   const [shopDescription, setShopDescription] = useState('Dijital Ürünler Marketi');
   const [stats, setStats] = useState([
     { value: '500+', label: 'Ürün' },
@@ -102,6 +108,42 @@ const SellerThemes = ({ colors = {
     }
   ]);
   // State'lerin olduğu yere ekle
+  const { data: cartData, isLoading: cartLoading, refetch: refetchCart } = useCart();
+  const addToCartMutation = useAddToCart();
+  const removeFromCartMutation = useRemoveFromCart('');
+  const clearCartMutation = useClearCart();
+
+  // Sepet verilerinden hesaplama
+  const cartItems = cartData?.items || [];
+  const cartCount = cartData?.item_count || 0;
+  const cartTotal = cartData?.total || 0;
+
+  const handleAddToCart = (product: any, quantity: number = 1) => {
+    if (!isLoggedIn) {
+      alert('Satın almak için lütfen giriş yapın!');
+      window.location.href = '/login';
+      return;
+    }
+
+    addToCartMutation.mutate({
+      product_id: product.id,
+      quantity: quantity,
+      product_variant_id: null,
+      metadata: {}
+    }, {
+      onSuccess: (data) => {
+        console.log('Sepet güncellendi:', data);
+        refetchCart(); // Sepeti yenile
+        alert(`${product.name} (${quantity} adet) sepete eklendi!`);
+      },
+      onError: (error) => {
+        console.error('Sepet hatası:', error);
+      }
+    });
+  };
+  console.log('cartData:', cartData);
+console.log('cartItems:', cartItems);
+
 
   // Dark mode tema renkleri
   const darkColors = {
@@ -113,6 +155,20 @@ const SellerThemes = ({ colors = {
   };
 
   // State'lerin olduğu yere ekle
+  const { data: userData, isLoading: userLoading } = useCurrentUser(); // ✅ userError kaldırıldı
+  useEffect(() => {
+    if (userData) {
+      setIsLoggedIn(true);
+      // ✅ UserResponse'da full_name var, name yok
+      setUserName(userData.full_name || userData.email?.split('@')[0] || 'Kullanıcı');
+      setUserEmail(userData.email);
+      console.log('👤 Kullanıcı bilgileri:', userData);
+    } else if (!userLoading && !userData) {
+      setIsLoggedIn(false);
+      setUserName('');
+      setUserEmail('');
+    }
+  }, [userData, userLoading]); // ✅ setIsLoggedIn, setUserEmail, setUserName gerekmez (stable functions)
 
 
   const currentColors = isDarkMode ? darkColors : colors;
@@ -137,7 +193,7 @@ const SellerThemes = ({ colors = {
     }
   }, [themeData]);
 
-  
+
   const [aboutContent, setAboutContent] = useState({
     title: 'Hakkımızda',
     description: 'Dijital ürünlerin en kalitelisini uygun fiyatlarla sunuyoruz',
@@ -199,14 +255,26 @@ const SellerThemes = ({ colors = {
     }
   }, []);
 
+  // Sepete ekleme fonksiyonu (handleAddToCart zaten var, onu kullan)
+  // handleAddToCartWithQuantity fonksiyonunu düzelt:
   const handleAddToCartWithQuantity = (product: any, quantity: number) => {
     if (!isLoggedIn) {
       alert('Satın almak için lütfen giriş yapın!');
       window.location.href = '/login';
       return;
     }
-    alert(`${product.name} (${quantity} adet) sepete eklendi!`);
-    setCartCount(prev => prev + quantity);
+
+    addToCartMutation.mutate({
+      product_id: product.id,
+      quantity: quantity,
+      product_variant_id: null,
+      metadata: {}
+    }, {
+      onSuccess: () => {
+        refetchCart();
+        alert(`${product.name} (${quantity} adet) sepete eklendi!`);
+      }
+    });
   };
 
   // Ekran boyutunu takip et
@@ -250,16 +318,6 @@ const SellerThemes = ({ colors = {
     setShowUserMenu(false);
   };
 
-  // Sepete ekle
-  const handleAddToCart = (product: any) => {
-    if (!isLoggedIn) {
-      alert('Satın almak için lütfen giriş yapın!');
-      window.location.href = '/login';
-      return;
-    }
-    alert(`${product.name} sepete eklendi!`);
-    setCartCount(prev => prev + 1);
-  };
 
   // Dark mode toggle
   const toggleDarkMode = () => {
@@ -282,6 +340,99 @@ const SellerThemes = ({ colors = {
   const openProductDetail = (product: any) => {
     setSelectedProduct(product);
     setShowProductDetail(true);
+  };
+
+  // Sepet Modal Component (return'den önce veya sonra)
+  const CartModal = () => {
+    const totalPrice = cartItems.reduce((total, item) => total + (item.line_total || 0), 0);
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }} onClick={() => setShowCartModal(false)}>
+        <div style={{
+          backgroundColor: currentColors.surface,
+          borderRadius: 24,
+          width: '90%',
+          maxWidth: 500,
+          maxHeight: '80vh',
+          overflow: 'auto',
+          padding: 24
+        }} onClick={(e) => e.stopPropagation()}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 'bold', color: currentColors.text }}>🛒 Sepetim</h2>
+            <button onClick={() => setShowCartModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: currentColors.text }}>✕</button>
+          </div>
+
+          {cartLoading ? (
+            <div style={{ textAlign: 'center', padding: 40, color: currentColors.textSecondary }}>Yükleniyor...</div>
+          ) : cartItems.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 40, color: currentColors.textSecondary }}>
+              🛒 Sepetiniz boş
+            </div>
+          ) : (
+            <>
+              {cartItems.map((item: any) => (
+                <div key={item.product_id} style={{ display: 'flex', gap: 16, padding: 12, borderBottom: `1px solid ${currentColors.border}` }}>
+                  <img
+                    src={item.product_image || 'https://placehold.co/400x300/0ea5e9/white?text=Product'}
+                    alt={item.product_name}
+                    style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 8 }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, color: currentColors.text }}>{item.product_name}</div>
+                    <div style={{ fontSize: 14, color: currentColors.textSecondary }}>
+                      ${item.unit_price} x {item.quantity}
+                    </div>
+                  </div>
+                  <div style={{ fontWeight: 'bold', color: '#0ea5e9' }}>
+                    ${item.line_total?.toFixed(2) || (item.unit_price * item.quantity).toFixed(2)}
+                  </div>
+                </div>
+              ))}
+
+              <div style={{ marginTop: 20, paddingTop: 20, borderTop: `1px solid ${currentColors.border}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <span style={{ fontWeight: 600, color: currentColors.text }}>Toplam:</span>
+                  <span style={{ fontSize: 20, fontWeight: 'bold', color: '#0ea5e9' }}>
+                    ${totalPrice.toFixed(2)}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    alert(`Toplam ${totalPrice.toFixed(2)} $ ödenecek. Satın alma işlemi tamamlandı!`);
+                    clearCartMutation.mutate();
+                    setShowCartModal(false);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    backgroundColor: '#0ea5e9',
+                    border: 'none',
+                    borderRadius: 40,
+                    color: 'white',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  🚀 Satın Al (${totalPrice.toFixed(2)})
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
   };
 
   // Home Page Content
@@ -370,34 +521,23 @@ const SellerThemes = ({ colors = {
               {heroSubtitle}
             </p>
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              <button style={{
-                backgroundColor: '#0ea5e9',
-                color: 'white',
-                padding: '14px 32px',
-                borderRadius: 40,
-                border: 'none',
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: 'pointer',
-                boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
-              }}>
-                {heroButtonText}
-              </button>
               <button
                 onClick={() => setCurrentPage('products')}
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  backdropFilter: 'blur(10px)',
+                  backgroundColor: '#0ea5e9',
                   color: 'white',
                   padding: '14px 32px',
                   borderRadius: 40,
-                  border: '1px solid white',
+                  border: 'none',
                   fontSize: 16,
                   fontWeight: 600,
-                  cursor: 'pointer'
-                }}>
-                {heroButton2Text}
+                  cursor: 'pointer',
+                  boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
+                }}
+              >
+                {heroButtonText}
               </button>
+              {/* ✅ "Ürünleri Gör" butonu KALDIRILDI */}
             </div>
           </div>
 
@@ -760,6 +900,7 @@ const SellerThemes = ({ colors = {
     }}>
       {/* HEADER */}
       <header style={{
+
         position: 'sticky',
         top: 0,
         zIndex: 100,
@@ -840,47 +981,174 @@ const SellerThemes = ({ colors = {
 
           {/* Sağ Bölüm */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Arama Kutusu - Sadece Desktop */}
             {!isMobile && (
               <div style={{ position: 'relative' }}>
-                <input type="text" placeholder="Ürün ara..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ padding: '8px 16px 8px 36px', borderRadius: 30, border: `1px solid ${currentColors.border}`, backgroundColor: currentColors.bg, width: isTablet ? 150 : 200, outline: 'none', fontSize: 14, color: currentColors.text }} />
+                <input
+                  type="text"
+                  placeholder="Ürün ara..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    padding: '8px 16px 8px 36px',
+                    borderRadius: 30,
+                    border: `1px solid ${currentColors.border}`,
+                    backgroundColor: currentColors.bg,
+                    width: isTablet ? 150 : 200,
+                    outline: 'none',
+                    fontSize: 14,
+                    color: currentColors.text
+                  }}
+                />
                 <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 16 }}>🔍</span>
               </div>
             )}
-            <button style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', fontSize: 24, padding: 4 }}>
+
+            {/* Sepet Butonu */}
+            <button
+              onClick={() => setShowCartModal(true)}
+              style={{
+                position: 'relative',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 24,
+                padding: 4
+              }}
+            >
               🛒
-              {cartCount > 0 && <span style={{ position: 'absolute', top: -4, right: -4, backgroundColor: '#ef4444', color: 'white', fontSize: 10, fontWeight: 'bold', borderRadius: '50%', width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cartCount}</span>}
+              {cartCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: -4,
+                  right: -4,
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  fontSize: 10,
+                  fontWeight: 'bold',
+                  borderRadius: '50%',
+                  width: 18,
+                  height: 18,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {cartCount}
+                </span>
+              )}
             </button>
-            <button onClick={toggleDarkMode} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: 4, color: currentColors.text }}>{isDarkMode ? '☀️' : '🌙'}</button>
+
+            {/* Dark Mode Butonu */}
+            <button
+              onClick={toggleDarkMode}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 20,
+                padding: 4,
+                color: currentColors.text
+              }}
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
+
+            {/* Kullanıcı Menüsü - Sadece Desktop */}
             {!isMobile && (
               <div style={{ position: 'relative' }}>
-                <button onClick={() => setShowUserMenu(!showUserMenu)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 24, padding: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: 24,
+                    padding: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8
+                  }}
+                >
                   👤
                   {isLoggedIn && <span style={{ fontSize: 12, color: currentColors.textSecondary }}>{userName}</span>}
                 </button>
+
                 {showUserMenu && (
-                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, backgroundColor: currentColors.surface, border: `1px solid ${currentColors.border}`, borderRadius: 12, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', minWidth: 200, zIndex: 50, overflow: 'hidden' }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: 8,
+                    backgroundColor: currentColors.surface,
+                    border: `1px solid ${currentColors.border}`,
+                    borderRadius: 12,
+                    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+                    minWidth: 200,
+                    zIndex: 50,
+                    overflow: 'hidden'
+                  }}>
                     {isLoggedIn ? (
                       <>
                         <div style={{ padding: '12px 16px', borderBottom: `1px solid ${currentColors.border}`, backgroundColor: currentColors.bg }}>
                           <div style={{ fontWeight: 600, color: currentColors.text }}>{userName}</div>
                           <div style={{ fontSize: 12, color: currentColors.textSecondary }}>{userEmail}</div>
                         </div>
-                        <button onClick={() => alert('Hesabım')} style={{ width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14 }}>📋 Hesabım</button>
-                        <button onClick={() => alert('Siparişlerim')} style={{ width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14 }}>📦 Siparişlerim</button>
-                        <button onClick={handleLogout} style={{ width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 14, borderTop: `1px solid ${currentColors.border}` }}>🚪 Çıkış Yap</button>
+                        <button
+                          onClick={() => alert('Hesabım')}
+                          style={{ width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14 }}
+                        >
+                          📋 Hesabım
+                        </button>
+                        <button
+                          onClick={() => alert('Siparişlerim')}
+                          style={{ width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14 }}
+                        >
+                          📦 Siparişlerim
+                        </button>
+                        <button
+                          onClick={handleLogout}
+                          style={{ width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 14, borderTop: `1px solid ${currentColors.border}` }}
+                        >
+                          🚪 Çıkış Yap
+                        </button>
                       </>
                     ) : (
                       <>
-                        <button onClick={handleLogin} style={{ width: '100%', padding: '12px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14, fontWeight: 500 }}>🔑 Giriş Yap</button>
-                        <button onClick={() => alert('Kayıt')} style={{ width: '100%', padding: '12px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14 }}>📝 Kayıt Ol</button>
+                        <button
+                          onClick={handleLogin}
+                          style={{ width: '100%', padding: '12px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14, fontWeight: 500 }}
+                        >
+                          🔑 Giriş Yap
+                        </button>
+                        <button
+                          onClick={() => alert('Kayıt')}
+                          style={{ width: '100%', padding: '12px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: currentColors.text, fontSize: 14 }}
+                        >
+                          📝 Kayıt Ol
+                        </button>
                       </>
                     )}
                   </div>
                 )}
               </div>
             )}
+
+            {/* Mobile Menu Butonu */}
             {(isMobile || isTablet) && (
-              <button className="menu-button" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 28, padding: 4, color: currentColors.text }}>☰</button>
+              <button
+                className="menu-button"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 28,
+                  padding: 4,
+                  color: currentColors.text
+                }}
+              >
+                ☰
+              </button>
             )}
           </div>
         </div>
@@ -997,6 +1265,7 @@ const SellerThemes = ({ colors = {
             </div>
           </div>
         )}
+        {showCartModal && <CartModal />}
       </header>
 
       {/* MAIN CONTENT - Sayfa içeriği currentPage'e göre değişir */}

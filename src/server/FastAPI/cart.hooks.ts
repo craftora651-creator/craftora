@@ -23,7 +23,7 @@ export const useCart = (options?: {
   return useQuery<CartResponse, Error>({
     queryKey: ["cart", "current"],
     queryFn: async () => {
-      return await apiClient.get<CartResponse>("/carts/my");
+      return await apiClient.get<CartResponse>("/api/carts/my");
     },
     enabled: options?.enabled ?? true,
     staleTime: options?.staleTime ?? 30 * 1000, // 30 saniye
@@ -50,7 +50,7 @@ export const useCheckoutPreview = (
         params.append("shipping_address", JSON.stringify(shippingAddress));
       }
 
-      const url = `/carts/checkout/preview${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/api/carts/checkout/preview${params.toString() ? `?${params.toString()}` : ""}`;
       return await apiClient.get<CartCheckoutPreview>(url);
     },
     enabled: options?.enabled ?? true,
@@ -68,7 +68,7 @@ export const useAddToCart = () => {
 
   return useMutation<CartResponse, Error, CartItemAdd>({
     mutationFn: async (itemData: CartItemAdd) => {
-      return await apiClient.post<CartResponse>("/carts/items", itemData);
+      return await apiClient.post<CartResponse>("/api/carts/items", itemData);
     },
     onSuccess: (updatedCart) => {
       // Update cart cache
@@ -96,7 +96,7 @@ export const useUpdateCartItem = (productId: string) => {
 
   return useMutation<CartResponse, Error, CartItemUpdate>({
     mutationFn: async (itemUpdate: CartItemUpdate) => {
-      return await apiClient.put<CartResponse>(`/carts/items/${productId}`, itemUpdate);
+      return await apiClient.put<CartResponse>(`/api/carts/items/${productId}`, itemUpdate);
     },
     onSuccess: (updatedCart) => {
       // Update cart cache
@@ -121,7 +121,7 @@ export const useRemoveFromCart = (productId: string) => {
 
   return useMutation<CartResponse, Error>({
     mutationFn: async () => {
-      return await apiClient.delete<CartResponse>(`/carts/items/${productId}`);
+      return await apiClient.delete<CartResponse>(`/api/carts/items/${productId}`);
     },
     onSuccess: (updatedCart) => {
       // Update cart cache
@@ -149,7 +149,7 @@ export const useClearCart = () => {
 
   return useMutation<CartResponse, Error>({
     mutationFn: async () => {
-      return await apiClient.delete<CartResponse>("/carts");
+      return await apiClient.delete<CartResponse>("/api/carts");
     },
     onSuccess: (clearedCart) => {
       // Update cart cache
@@ -187,7 +187,7 @@ export const useMergeCarts = () => {
         message: string;
         merged_items: number;
         totals: Record<string, number>;
-      }>("/carts/merge", { guest_cart: guestCart });
+      }>("/api/carts/merge", { guest_cart: guestCart });
     },
     onSuccess: (data) => {
       // Invalidate cart cache to reload merged cart
@@ -209,7 +209,7 @@ export const useApplyCoupon = () => {
 
   return useMutation<CartResponse, Error, { couponCode: string }>({
     mutationFn: async ({ couponCode }) => {
-      return await apiClient.post<CartResponse>("/carts/coupon", { coupon_code: couponCode });
+      return await apiClient.post<CartResponse>("/api/carts/coupon", { coupon_code: couponCode });
     },
     onSuccess: (updatedCart) => {
       // Update cart cache
@@ -234,7 +234,7 @@ export const useRemoveCoupon = () => {
 
   return useMutation<CartResponse, Error>({
     mutationFn: async () => {
-      return await apiClient.delete<CartResponse>("/carts/coupon");
+      return await apiClient.delete<CartResponse>("/api/carts/coupon");
     },
     onSuccess: (updatedCart) => {
       // Update cart cache
@@ -259,7 +259,7 @@ export const useRemoveCoupon = () => {
 export const useEstimateCart = () => {
   return useMutation<CartEstimateResponse, Error, CartEstimateRequest>({
     mutationFn: async (estimateRequest: CartEstimateRequest) => {
-      return await apiClient.post<CartEstimateResponse>("/carts/estimate", estimateRequest);
+      return await apiClient.post<CartEstimateResponse>("/api/carts/estimate", estimateRequest);
     },
     onError: (error) => {
       console.error("Error estimating cart:", error);
@@ -285,7 +285,7 @@ export const useStartCheckout = () => {
         checkout_url: string;
         payment_intent_id?: string;
         requires_action?: boolean;
-      }>("/carts/checkout/start", checkoutParams);
+      }>("/api/carts/checkout/start", checkoutParams);
     },
     onSuccess: (data) => {
       // Invalidate cart cache (cart will be converted)
@@ -317,7 +317,7 @@ export const useRecoverCart = () => {
 
   return useMutation<CartResponse, Error, { recoveryToken: string; email?: string }>({
     mutationFn: async ({ recoveryToken, email }) => {
-      return await apiClient.post<CartResponse>("/carts/recover", {
+      return await apiClient.post<CartResponse>("/api/carts/recover", {
         recovery_token: recoveryToken,
         email,
       });

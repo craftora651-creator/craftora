@@ -16,7 +16,7 @@ import { ProductType, Currency, FileType, ProductStatus } from '../types/product
 import { FilePurpose, type UploadResponse } from '../types/upload.types';
 import './AddProduct.css';
 import { AxiosError } from 'axios';
-import SuccessModal from "../.paket/SuccessModal"
+import SuccessModal from "../.paket/SuccessModal";
 import './AddProduct.css';
 
 interface ValidationErrorItem {
@@ -38,6 +38,13 @@ const AddBook: React.FC = () => {
   const { data: shops, isLoading: shopsLoading } = useMyShops();
   const uploadFile = useUploadFile();
   const createProduct = useCreateProduct();
+
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
+
   const [formData, setFormData] = useState({
     urunAdi: '',
     aciklama: '',
@@ -61,6 +68,17 @@ const AddBook: React.FC = () => {
   const [stokInputMode, setStokInputMode] = useState<'select' | 'input'>('select');
   const [isUploading, setIsUploading] = useState(false);
   const isLoading = uploadFile.isPending || createProduct.isPending || isUploading || userLoading || shopsLoading;
+
+  // Dark mode'u localStorage'a kaydet ve body bg ayarla
+  useEffect(() => {
+    localStorage.setItem('darkMode', String(isDarkMode));
+    if (isDarkMode) {
+      document.documentElement.style.backgroundColor = '#0f172a';
+    } else {
+      document.documentElement.style.backgroundColor = '#f8fafc';
+    }
+  }, [isDarkMode]);
+
   useEffect(() => {
     const draftData: Partial<ProductCreateRequest> = {
       name: formData.urunAdi,
@@ -74,6 +92,7 @@ const AddBook: React.FC = () => {
     };
     dispatch(saveFormDraft(draftData));
   }, [formData, dispatch]);
+
   useEffect(() => {
     if (!userLoading && !shopsLoading) {
       if (!currentUser) {
@@ -83,11 +102,25 @@ const AddBook: React.FC = () => {
       }
     }
   }, [currentUser, shops, userLoading, shopsLoading, navigate]);
+
   if (userLoading || shopsLoading) {
-    return <div className="loading-container">Yükleniyor...</div>;
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: isDarkMode ? '#e2e8f0' : '#0f172a'
+      }}>
+        Yükleniyor...
+      </div>
+    );
   }
+
   const shopId = shops?.[0]?.id;
   const userId = currentUser?.id;
+
   const getFileType = (filename: string): FileType => {
     const ext = filename.split('.').pop()?.toLowerCase();
     switch (ext) {
@@ -121,6 +154,7 @@ const AddBook: React.FC = () => {
       default: return FileType.OTHER;
     }
   };
+
   const uploadCoverImages = async (files: File[]): Promise<string[]> => {
     if (!userId) {
       throw new Error("UserId bulunamadı");
@@ -132,7 +166,7 @@ const AddBook: React.FC = () => {
       try {
         const result = await uploadFile.mutateAsync({
           file,
-          userId, // artık TS biliyor bunun string olduğunu
+          userId,
           purpose: FilePurpose.PRODUCT_COVER
         }) as UploadResponse;
 
@@ -175,7 +209,6 @@ const AddBook: React.FC = () => {
     const value = e.target.value;
     setStokDegeri(value);
 
-    // stokMiktari'ni da güncelle
     if (value === 'sınırsız') {
       setFormData(prev => ({ ...prev, stokMiktari: '0' }));
     } else {
@@ -240,15 +273,12 @@ const AddBook: React.FC = () => {
       }
       console.log('🔍 İndirimli fiyat (ham):', formData.indirimliFiyat);
       console.log('🔍 İndirimli fiyat (parse):', formData.indirimliFiyat ? parseFloat(formData.indirimliFiyat) : undefined);
-      // status'ü ProductStatus enum'ına çevir
-      console.log('🔍 Status (enum):', status);  // Debug için
-      // status'ü ProductStatus enum'ına çevir
+
       const statusValue =
         formData.urunDurumu === 'draft' ? ProductStatus.DRAFT :
           formData.urunDurumu === 'published' ? ProductStatus.PUBLISHED :
             ProductStatus.ARCHIVED;
 
-      // productData'yı oluştur
       const productData: ProductCreateRequest = {
         name: formData.urunAdi,
         sku: formData.sku || undefined,
@@ -270,42 +300,24 @@ const AddBook: React.FC = () => {
         image_gallery: coverImageUrls,
         feature_image_url: coverImageUrls.length > 0 ? coverImageUrls[0] : undefined,
         fulfillment_type: 'auto',
-
-        // 🟢🟢🟢 STATUS - statusValue değişkenini kullan! 🟢🟢🟢
         status: statusValue,
       };
 
-      // Kontrol et
       console.log('📦 GÖNDERİLEN STATUS:', productData.status);
       console.log('📦 TÜM VERİ:', JSON.stringify(productData, null, 2));
 
-
-      // 📦 Gönderilen veriyi kontrol et
-      console.log('📦 Gönderilen productData:', {
-        name: productData.name,
-        base_price: productData.base_price,
-        compare_at_price: productData.compare_at_price,
-        sku: productData.sku,
-        barcode: productData.barcode,
-        tags: productData.tags,
-        image_gallery: productData.image_gallery?.length
-      });
-
       const result = await createProduct.mutateAsync(productData) as ProductResponse;
       console.log('✅ Ürün kaydedildi:', result);
-      console.log('📦 Gönderilen productData (tam):', JSON.stringify(productData, null, 2));
 
       if (!result) {
         throw new Error("urun olusturuldu ama response bos");
       }
 
-      // ✅ BAŞARILI DURUM - Modal'ı aç
       setCreatedProduct(result);
       setIsModalError(false);
       setModalError('');
       setSuccessModalOpen(true);
 
-      // Dispatch işlemleri
       dispatch(setSelectedProduct(result));
       dispatch(clearFormDraft());
 
@@ -315,7 +327,7 @@ const AddBook: React.FC = () => {
 
       if (error instanceof AxiosError && error.response) {
         console.log('📄 Hata durumu:', error.response.status);
-        console.log('📄 Hata detayı:', error.response.data);  // 👈
+        console.log('📄 Hata detayı:', error.response.data);
         const responseData = error.response.data as FastAPIErrorResponse;
         if (error.response.status === 422) {
           if (typeof responseData.detail === 'string') {
@@ -349,12 +361,24 @@ const AddBook: React.FC = () => {
     }
   };
 
+  // Styles for dark mode
+  const bgColor = isDarkMode ? '#0f172a' : '#f8fafc';
+  const textColor = isDarkMode ? '#f1f5f9' : '#0f172a';
+  const textSecondary = isDarkMode ? '#94a3b8' : '#475569';
+  const cardBg = isDarkMode ? '#1e293b' : '#ffffff';
+  const cardBorder = isDarkMode ? '#334155' : '#e2e8f0';
+  const inputBg = isDarkMode ? '#334155' : '#f8fafc';
+  const inputBorder = isDarkMode ? '#475569' : '#e2e8f0';
+  const infoBg = isDarkMode ? '#0f172a' : '#f1f5f9';
+  const infoBorder = isDarkMode ? '#334155' : '#e2e8f0';
+  const dividerColor = isDarkMode ? '#334155' : '#e2e8f0';
+
   return (
     <>
       <div className="add-product-page" style={{
         minHeight: '100vh',
-        backgroundColor: '#f8fafc',  // ☀️ LIGHT TEMA
-        color: '#0f172a'
+        backgroundColor: bgColor,
+        color: textColor
       }}>
         <div className="add-product-container" style={{
           maxWidth: 1400,
@@ -365,7 +389,7 @@ const AddBook: React.FC = () => {
           }
         }}>
 
-          {/* Breadcrumbs - Sade, light renkler */}
+          {/* Header with Dark Mode Toggle */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -381,28 +405,34 @@ const AddBook: React.FC = () => {
               fontSize: '0.875rem',
               flexWrap: 'wrap'
             }}>
-              <a href="/dashboard" style={{
-                color: '#475569',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem'
-              }}>
+              <span
+                onClick={() => navigate('/dashboard')}
+                style={{
+                  color: '#0ea5e9',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem'
+                }}
+              >
                 <span className="material-icons" style={{ fontSize: '1rem' }}>dashboard</span>
                 Dashboard
-              </a>
-              <span style={{ color: '#cbd5e1' }}>/</span>
-              <a href="/products" style={{
-                color: '#475569',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem'
-              }}>
+              </span>
+              <span style={{ color: isDarkMode ? '#475569' : '#cbd5e1' }}>/</span>
+              <span
+                onClick={() => navigate('/products')}
+                style={{
+                  color: '#0ea5e9',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem'
+                }}
+              >
                 <span className="material-icons" style={{ fontSize: '1rem' }}>inventory_2</span>
                 Dijital Ürünler
-              </a>
-              <span style={{ color: '#cbd5e1' }}>/</span>
+              </span>
+              <span style={{ color: isDarkMode ? '#475569' : '#cbd5e1' }}>/</span>
               <span style={{
                 color: '#0ea5e9',
                 fontWeight: 600,
@@ -414,6 +444,30 @@ const AddBook: React.FC = () => {
                 Yeni Dijital Ürün Ekle
               </span>
             </div>
+
+            {/* Dark Mode Toggle Button */}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              style={{
+                padding: '0.625rem 1.25rem',
+                background: isDarkMode ? '#334155' : '#f1f5f9',
+                border: isDarkMode ? '1px solid #475569' : '1px solid #e2e8f0',
+                borderRadius: '12px',
+                color: isDarkMode ? '#f1f5f9' : '#475569',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                transition: 'all 0.2s'
+              }}
+            >
+              <span className="material-icons" style={{ fontSize: '1.25rem' }}>
+                {isDarkMode ? 'light_mode' : 'dark_mode'}
+              </span>
+              {isDarkMode ? 'Açık Mod' : 'Koyu Mod'}
+            </button>
           </div>
 
           {/* ===== HEADER ===== */}
@@ -429,11 +483,11 @@ const AddBook: React.FC = () => {
               <h1 style={{
                 fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
                 fontWeight: 700,
-                color: '#0f172a',
+                color: textColor,
                 margin: '0 0 0.5rem 0'
               }}>Yeni Dijital Ürün Ekle</h1>
               <p style={{
-                color: '#475569',
+                color: textSecondary,
                 margin: 0,
                 fontSize: 'clamp(0.875rem, 3vw, 0.95rem)'
               }}>Sisteme yeni bir dijital ürün tanımlayın ve dosyasını yükleyin.</p>
@@ -454,10 +508,10 @@ const AddBook: React.FC = () => {
                 disabled={isLoading}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  border: '1px solid #e2e8f0',
+                  border: `1px solid ${cardBorder}`,
                   borderRadius: 10,
-                  background: '#ffffff',
-                  color: '#475569',
+                  background: cardBg,
+                  color: textSecondary,
                   fontSize: '0.875rem',
                   fontWeight: 500,
                   cursor: isLoading ? 'not-allowed' : 'pointer',
@@ -497,11 +551,11 @@ const AddBook: React.FC = () => {
 
           {/* ===== FORM CARD ===== */}
           <div style={{
-            background: '#ffffff',
+            background: cardBg,
             borderRadius: 16,
             padding: '1.5rem',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e2e8f0',
+            border: `1px solid ${cardBorder}`,
             marginBottom: '2rem'
           }}>
             <div style={{
@@ -510,7 +564,7 @@ const AddBook: React.FC = () => {
               <h2 style={{
                 fontSize: '1.125rem',
                 fontWeight: 600,
-                color: '#0f172a',
+                color: textColor,
                 margin: 0,
                 display: 'flex',
                 alignItems: 'center',
@@ -535,7 +589,7 @@ const AddBook: React.FC = () => {
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#0f172a'
+                    color: textColor
                   }}>Ürün Adı *</label>
                   <input
                     type="text"
@@ -548,10 +602,10 @@ const AddBook: React.FC = () => {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: inputBg,
+                      border: `1px solid ${inputBorder}`,
                       borderRadius: 10,
-                      color: '#0f172a',
+                      color: textColor,
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
@@ -563,7 +617,7 @@ const AddBook: React.FC = () => {
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#0f172a'
+                    color: textColor
                   }}>Kategori *</label>
                   <select
                     name="kategori"
@@ -574,10 +628,10 @@ const AddBook: React.FC = () => {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: inputBg,
+                      border: `1px solid ${inputBorder}`,
                       borderRadius: 10,
-                      color: '#0f172a',
+                      color: textColor,
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
@@ -599,7 +653,7 @@ const AddBook: React.FC = () => {
                   marginBottom: '0.5rem',
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  color: '#0f172a'
+                  color: textColor
                 }}>Ürün Açıklaması</label>
                 <textarea
                   name="aciklama"
@@ -611,10 +665,10 @@ const AddBook: React.FC = () => {
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
+                    background: inputBg,
+                    border: `1px solid ${inputBorder}`,
                     borderRadius: 10,
-                    color: '#0f172a',
+                    color: textColor,
                     fontSize: '0.95rem',
                     outline: 'none',
                     resize: 'vertical'
@@ -625,9 +679,9 @@ const AddBook: React.FC = () => {
               <div style={{
                 marginBottom: '1.5rem',
                 padding: '1rem',
-                backgroundColor: '#f1f5f9',
+                backgroundColor: infoBg,
                 borderRadius: '12px',
-                border: '1px solid #e2e8f0'
+                border: `1px solid ${infoBorder}`
               }}>
                 <div style={{
                   display: 'flex',
@@ -641,7 +695,7 @@ const AddBook: React.FC = () => {
                       marginBottom: '0.5rem',
                       fontSize: '0.875rem',
                       fontWeight: 600,
-                      color: '#0f172a'
+                      color: textColor
                     }}>
                       Ürün Durumu
                     </label>
@@ -653,10 +707,10 @@ const AddBook: React.FC = () => {
                       style={{
                         width: '100%',
                         padding: '0.75rem 1rem',
-                        background: '#ffffff',
-                        border: '1px solid #cbd5e1',
+                        background: cardBg,
+                        border: `1px solid ${inputBorder}`,
                         borderRadius: 8,
-                        color: '#0f172a',
+                        color: textColor,
                         fontSize: '0.95rem',
                         outline: 'none',
                         cursor: isLoading ? 'not-allowed' : 'pointer'
@@ -670,9 +724,9 @@ const AddBook: React.FC = () => {
 
                   <div style={{
                     padding: '0.75rem 1rem',
-                    backgroundColor: '#e2e8f0',
+                    backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0',
                     borderRadius: '8px',
-                    color: '#334155',
+                    color: isDarkMode ? '#cbd5e1' : '#334155',
                     fontSize: '0.9rem',
                     maxWidth: '300px'
                   }}>
@@ -697,7 +751,7 @@ const AddBook: React.FC = () => {
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#0f172a'
+                    color: textColor
                   }}>Fiyat (TL) *</label>
                   <input
                     type="number"
@@ -712,10 +766,10 @@ const AddBook: React.FC = () => {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: inputBg,
+                      border: `1px solid ${inputBorder}`,
                       borderRadius: 10,
-                      color: '#0f172a',
+                      color: textColor,
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
@@ -727,7 +781,7 @@ const AddBook: React.FC = () => {
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#0f172a'
+                    color: textColor
                   }}>İndirimli Fiyat</label>
                   <input
                     type="number"
@@ -741,10 +795,10 @@ const AddBook: React.FC = () => {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: inputBg,
+                      border: `1px solid ${inputBorder}`,
                       borderRadius: 10,
-                      color: '#0f172a',
+                      color: textColor,
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
@@ -756,7 +810,7 @@ const AddBook: React.FC = () => {
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#0f172a'
+                    color: textColor
                   }}>Etiketler</label>
                   <input
                     type="text"
@@ -768,10 +822,10 @@ const AddBook: React.FC = () => {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: inputBg,
+                      border: `1px solid ${inputBorder}`,
                       borderRadius: 10,
-                      color: '#0f172a',
+                      color: textColor,
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
@@ -780,13 +834,13 @@ const AddBook: React.FC = () => {
               </div>
 
               {/* Stok Durumu */}
-              <div>
+              <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{
                   display: 'block',
                   marginBottom: '0.5rem',
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  color: '#0f172a'
+                  color: textColor
                 }}>Stok Durumu</label>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {stokInputMode === 'select' ? (
@@ -798,10 +852,10 @@ const AddBook: React.FC = () => {
                         style={{
                           flex: 1,
                           padding: '0.75rem 1rem',
-                          background: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          background: inputBg,
+                          border: `1px solid ${inputBorder}`,
                           borderRadius: 10,
-                          color: '#0f172a',
+                          color: textColor,
                           fontSize: '0.95rem',
                           outline: 'none'
                         }}
@@ -817,10 +871,10 @@ const AddBook: React.FC = () => {
                         disabled={isLoading}
                         style={{
                           padding: '0.75rem',
-                          background: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          background: inputBg,
+                          border: `1px solid ${inputBorder}`,
                           borderRadius: 10,
-                          color: '#475569',
+                          color: textSecondary,
                           cursor: isLoading ? 'not-allowed' : 'pointer',
                           display: 'flex',
                           alignItems: 'center',
@@ -842,10 +896,10 @@ const AddBook: React.FC = () => {
                         style={{
                           flex: 1,
                           padding: '0.75rem 1rem',
-                          background: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          background: inputBg,
+                          border: `1px solid ${inputBorder}`,
                           borderRadius: 10,
-                          color: '#0f172a',
+                          color: textColor,
                           fontSize: '0.95rem',
                           outline: 'none'
                         }}
@@ -859,10 +913,10 @@ const AddBook: React.FC = () => {
                         disabled={isLoading}
                         style={{
                           padding: '0.75rem',
-                          background: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          background: inputBg,
+                          border: `1px solid ${inputBorder}`,
                           borderRadius: 10,
-                          color: '#475569',
+                          color: textSecondary,
                           cursor: isLoading ? 'not-allowed' : 'pointer',
                           display: 'flex',
                           alignItems: 'center',
@@ -875,113 +929,112 @@ const AddBook: React.FC = () => {
                   )}
                 </div>
               </div>
+
+              {/* SKU + Barkod + Kısa Açıklama */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                gap: '1rem',
-                marginTop: '1.5rem'  // Üstteki stoktan biraz boşluk
+                gap: '1rem'
               }}>
-                {/* SKU (Ürün Kodu) */}
                 <div>
                   <label style={{
                     display: 'block',
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#0f172a'
+                    color: textColor
                   }}>
                     Ürün Kodu (SKU)
                   </label>
                   <input
                     type="text"
                     name="sku"
-                    value={formData.sku}  // 👈 state'te tanımla
+                    value={formData.sku}
                     onChange={handleInputChange}
                     placeholder="Örn: URUN-001"
                     disabled={isLoading}
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: inputBg,
+                      border: `1px solid ${inputBorder}`,
                       borderRadius: 10,
-                      color: '#0f172a',
+                      color: textColor,
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
                   />
                 </div>
 
-                {/* Barkod Numarası */}
                 <div>
                   <label style={{
                     display: 'block',
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#0f172a'
+                    color: textColor
                   }}>
                     Barkod Numarası
                   </label>
                   <input
                     type="text"
                     name="barcode"
-                    value={formData.barcode}  // 👈 state'te tanımla
+                    value={formData.barcode}
                     onChange={handleInputChange}
                     placeholder="Örn: 8691234567890"
                     disabled={isLoading}
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: inputBg,
+                      border: `1px solid ${inputBorder}`,
                       borderRadius: 10,
-                      color: '#0f172a',
+                      color: textColor,
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
                   />
                 </div>
-                {/* Kısa Açıklama - ŞU AN YOK! EKLE! */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    color: '#0f172a'
-                  }}>Kısa Açıklama</label>
-                  <textarea
-                    name="kisaAciklama"
-                    value={formData.kisaAciklama}
-                    onChange={handleInputChange}
-                    placeholder="Ürün özeti (max 300 karakter)"
-                    rows={3}
-                    disabled={isLoading}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: 10,
-                      color: '#0f172a',
-                      fontSize: '0.95rem',
-                      outline: 'none',
-                      resize: 'vertical'
-                    }}
-                  />
-                </div>
+              </div>
+
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: textColor
+                }}>Kısa Açıklama</label>
+                <textarea
+                  name="kisaAciklama"
+                  value={formData.kisaAciklama}
+                  onChange={handleInputChange}
+                  placeholder="Ürün özeti (max 300 karakter)"
+                  rows={3}
+                  disabled={isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: inputBg,
+                    border: `1px solid ${inputBorder}`,
+                    borderRadius: 10,
+                    color: textColor,
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    resize: 'vertical'
+                  }}
+                />
               </div>
             </form>
           </div>
 
           {/* ===== DOSYA YÜKLEME CARD ===== */}
           <div style={{
-            background: '#ffffff',
+            background: cardBg,
             borderRadius: 16,
             padding: '1.5rem',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e2e8f0',
+            border: `1px solid ${cardBorder}`,
             marginBottom: '2rem'
           }}>
             <div style={{
@@ -990,7 +1043,7 @@ const AddBook: React.FC = () => {
               <h2 style={{
                 fontSize: '1.125rem',
                 fontWeight: 600,
-                color: '#0f172a',
+                color: textColor,
                 margin: 0,
                 display: 'flex',
                 alignItems: 'center',
@@ -1007,12 +1060,12 @@ const AddBook: React.FC = () => {
                 marginBottom: '1rem',
                 fontSize: '0.875rem',
                 fontWeight: 500,
-                color: '#0f172a',
+                color: textColor,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                <span className="material-icons" style={{ fontSize: '1rem', color: '#64748b' }}>collections</span>
+                <span className="material-icons" style={{ fontSize: '1rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>collections</span>
                 Ürün Görselleri
               </p>
               <div style={{
@@ -1026,7 +1079,7 @@ const AddBook: React.FC = () => {
                     aspectRatio: '1',
                     borderRadius: 12,
                     overflow: 'hidden',
-                    border: '2px solid #e2e8f0',
+                    border: `2px solid ${cardBorder}`,
                     boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                   }}>
                     <img
@@ -1049,8 +1102,8 @@ const AddBook: React.FC = () => {
                         width: 24,
                         height: 24,
                         borderRadius: '50%',
-                        background: '#ffffff',
-                        border: '1px solid #e2e8f0',
+                        background: cardBg,
+                        border: `1px solid ${cardBorder}`,
                         color: '#ef4444',
                         cursor: isLoading ? 'not-allowed' : 'pointer',
                         display: 'flex',
@@ -1087,7 +1140,7 @@ const AddBook: React.FC = () => {
                     onClick={() => !isLoading && document.getElementById('cover-upload')?.click()}
                     style={{
                       aspectRatio: '1',
-                      border: '2px dashed #e2e8f0',
+                      border: `2px dashed ${cardBorder}`,
                       borderRadius: 12,
                       display: 'flex',
                       flexDirection: 'column',
@@ -1095,8 +1148,8 @@ const AddBook: React.FC = () => {
                       justifyContent: 'center',
                       cursor: isLoading ? 'not-allowed' : 'pointer',
                       opacity: isLoading ? 0.5 : 1,
-                      background: '#f8fafc',
-                      color: '#64748b'
+                      background: inputBg,
+                      color: textSecondary
                     }}
                   >
                     <input
@@ -1110,7 +1163,7 @@ const AddBook: React.FC = () => {
                     />
                     <span className="material-icons" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>add_photo_alternate</span>
                     <p style={{ margin: 0, fontSize: '0.875rem' }}>Görsel Ekle</p>
-                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>{coverImages.length}/5</p>
+                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: isDarkMode ? '#64748b' : '#94a3b8' }}>{coverImages.length}/5</p>
                   </div>
                 )}
               </div>
@@ -1122,25 +1175,25 @@ const AddBook: React.FC = () => {
                 marginBottom: '1rem',
                 fontSize: '0.875rem',
                 fontWeight: 500,
-                color: '#0f172a',
+                color: textColor,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                <span className="material-icons" style={{ fontSize: '1rem', color: '#64748b' }}>insert_drive_file</span>
+                <span className="material-icons" style={{ fontSize: '1rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>insert_drive_file</span>
                 Ürün Dosyası *
               </p>
               <div
                 onClick={() => !isLoading && document.getElementById('product-upload')?.click()}
                 style={{
-                  border: '2px dashed #e2e8f0',
+                  border: `2px dashed ${cardBorder}`,
                   borderRadius: 12,
                   padding: '2rem',
                   textAlign: 'center',
                   cursor: isLoading ? 'not-allowed' : 'pointer',
                   opacity: isLoading ? 0.5 : 1,
-                  background: '#f8fafc',
-                  color: '#475569'
+                  background: inputBg,
+                  color: textSecondary
                 }}
               >
                 <input
@@ -1159,13 +1212,13 @@ const AddBook: React.FC = () => {
                     }}>check_circle</span>
                     <p style={{
                       margin: '0 0 0.25rem',
-                      color: '#0f172a',
+                      color: textColor,
                       fontWeight: 500
                     }}>{selectedFile.name}</p>
                     <p style={{
                       margin: 0,
                       fontSize: '0.875rem',
-                      color: '#64748b'
+                      color: textSecondary
                     }}>
                       {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>
@@ -1189,13 +1242,13 @@ const AddBook: React.FC = () => {
                     <span className="material-icons" style={{ fontSize: '3rem', marginBottom: '1rem' }}>cloud_upload</span>
                     <p style={{
                       margin: '0 0 0.25rem',
-                      color: '#0f172a',
+                      color: textColor,
                       fontWeight: 500
                     }}>Dosya Seç</p>
                     <p style={{
                       margin: 0,
                       fontSize: '0.875rem',
-                      color: '#64748b'
+                      color: textSecondary
                     }}>PDF, DOC, MP4, ZIP (Max 100MB)</p>
                   </>
                 )}
@@ -1205,10 +1258,10 @@ const AddBook: React.FC = () => {
 
           {/* ===== DOSYA TİPLERİ BİLGİ KARTI ===== */}
           <div style={{
-            background: '#ffffff',
+            background: cardBg,
             borderRadius: 16,
             padding: '1.5rem',
-            border: '1px solid #e2e8f0',
+            border: `1px solid ${cardBorder}`,
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
             marginBottom: '2rem'
           }}>
@@ -1222,7 +1275,7 @@ const AddBook: React.FC = () => {
               <h3 style={{
                 fontSize: '1rem',
                 fontWeight: 600,
-                color: '#0f172a',
+                color: textColor,
                 margin: 0
               }}>Desteklenen Dosya Tipleri</h3>
             </div>
@@ -1248,12 +1301,12 @@ const AddBook: React.FC = () => {
                   textAlign: 'center',
                   gap: '0.5rem',
                   padding: '1rem',
-                  background: '#f8fafc',
+                  background: inputBg,
                   borderRadius: 10,
-                  border: '1px solid #e2e8f0'
+                  border: `1px solid ${cardBorder}`
                 }}>
                   <span className="material-icons" style={{ fontSize: '2rem', color: item.color }}>{item.icon}</span>
-                  <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#0f172a' }}>{item.text}</span>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 500, color: textColor }}>{item.text}</span>
                 </div>
               ))}
             </div>
@@ -1262,11 +1315,11 @@ const AddBook: React.FC = () => {
           {/* ===== FOOTER ===== */}
           <div style={{
             paddingTop: '2rem',
-            borderTop: '1px solid #e2e8f0',
+            borderTop: `1px solid ${dividerColor}`,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            color: '#64748b',
+            color: textSecondary,
             fontSize: '0.875rem',
             flexWrap: 'wrap',
             gap: '1rem'
@@ -1277,7 +1330,7 @@ const AddBook: React.FC = () => {
             </p>
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
               <a href="#" style={{
-                color: '#64748b',
+                color: textSecondary,
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -1287,7 +1340,7 @@ const AddBook: React.FC = () => {
                 Yardım
               </a>
               <a href="#" style={{
-                color: '#64748b',
+                color: textSecondary,
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -1317,15 +1370,15 @@ const AddBook: React.FC = () => {
           setFormData({
             urunAdi: '',
             aciklama: '',
-            kisaAciklama: '',      // ✅ eklendi
+            kisaAciklama: '',
             kategori: 'Roman',
             fiyat: '',
             indirimliFiyat: '',
-            stokMiktari: '',       // ✅ eklendi
+            stokMiktari: '',
             tags: '',
-            sku: '',               // ✅ eklendi
-            barcode: '',           // ✅ eklendi
-            urunDurumu: ''         // ✅ eklendi
+            sku: '',
+            barcode: '',
+            urunDurumu: ''
           });
           setSelectedFile(null);
           setCoverImages([]);
