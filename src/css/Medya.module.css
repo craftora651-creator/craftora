@@ -193,7 +193,7 @@
 /* ===== ÜRÜN BİLGİLERİ ===== */
 .productInfo {
   position: absolute;
-  bottom: 180px;
+  bottom: calc(180px + env(safe-area-inset-bottom));
   left: 32px;
   z-index: 30;
   max-width: 480px;
@@ -319,7 +319,7 @@
 .actionBar {
   position: absolute;
   right: 20px;
-  bottom: 105px;
+  bottom: calc(105px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -385,7 +385,7 @@
 /* ===== ALT BUTONLAR ===== */
 .bottomButtons {
   position: absolute;
-  bottom: 105px;
+  bottom: calc(105px + env(safe-area-inset-bottom));
   left: 32px;
   display: flex;
   align-items: center;
@@ -441,7 +441,6 @@
 }
 
 /* ===== ALT NAVIGASYON ===== */
-/* ===== ALT NAVIGASYON - DÜZELTİLMİŞ (GERÇEKTEN ORTADA) ===== */
 .bottomNav {
   position: fixed;
   bottom: 0;
@@ -449,9 +448,10 @@
   right: 0;
   display: flex;
   align-items: center;
-  justify-content: center; /* TAM ORTALAMA */
+  justify-content: center;
   gap: 32px;
   padding: 12px 32px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 100;
@@ -561,56 +561,7 @@
   color: white;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1024px) {
-  .bottomNav {
-    padding: 10px 24px;
-  }
-  
-  .bottomLogo {
-    font-size: 20px;
-    min-width: 90px;
-  }
-  
-  .bottomNavItems {
-    gap: 4px;
-    padding: 5px 16px;
-  }
-  
-  .bottomNavItem {
-    padding: 6px 16px;
-  }
-  
-  .bottomNavIcon {
-    font-size: 18px;
-  }
-  
-  .bottomSearchBtn {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-  
-  .productTitle {
-    font-size: 40px;
-  }
-  .bottomButtons{ 
-    bottom: 85px;
-  }
-  
-  .currentPrice {
-    font-size: 36px;
-  }
-  
-  .productInfo {
-    bottom: 160px;
-  }
-  
-  .actionBar {
-    bottom: 105px;
-  }
-}
-
+/* ===== MOBİL ÜST BAR ===== */
 .mobileTopBar {
   display: none;
   position: fixed;
@@ -644,22 +595,72 @@
   font-weight: 800;
 }
 
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .bottomNav {
+    padding: 10px 24px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  
+  .bottomLogo {
+    font-size: 20px;
+    left: 24px;
+  }
+  
+  .bottomNavItems {
+    gap: 4px;
+    padding: 5px 16px;
+  }
+  
+  .bottomNavItem {
+    padding: 6px 16px;
+  }
+  
+  .bottomNavIcon {
+    font-size: 18px;
+  }
+  
+  .bottomSearchBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    right: 24px;
+  }
+  
+  .productTitle {
+    font-size: 40px;
+  }
+  
+  .bottomButtons { 
+    bottom: calc(85px + env(safe-area-inset-bottom));
+  }
+  
+  .currentPrice {
+    font-size: 36px;
+  }
+  
+  .productInfo {
+    bottom: calc(160px + env(safe-area-inset-bottom));
+  }
+  
+  .actionBar {
+    bottom: calc(105px + env(safe-area-inset-bottom));
+  }
+}
 
 @media (max-width: 768px) {
-  /* Normalde soldaki logoyu gizle */
   .bottomLogo {
     display: none;
   }
   
-  /* Mobil üst bar'ı göster */
   .mobileTopBar {
     display: flex;
   }
   
-  /* Alt navigasyon düzenlemesi */
   .bottomNav {
     justify-content: center;
     padding: 8px 16px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
     gap: 0;
   }
   
@@ -688,7 +689,6 @@
     font-size: 16px;
     margin-left: 8px;
   }
-
   
   .productTitle {
     font-size: 32px;
@@ -703,7 +703,7 @@
   }
   
   .productInfo {
-    bottom: 160px;
+    bottom: calc(160px + env(safe-area-inset-bottom));
     left: 20px;
     max-width: 65%;
   }
@@ -718,7 +718,7 @@
   
   .actionBar {
     right: 15px;
-    bottom: 72px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
     gap: 16px;
   }
   
@@ -737,7 +737,7 @@
   }
   
   .bottomButtons {
-    bottom: 85px;
+    bottom: calc(85px + env(safe-area-inset-bottom));
     left: 20px;
   }
   
@@ -755,6 +755,7 @@
 @media (max-width: 480px) {
   .bottomNav {
     padding: 6px 12px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
   }
   
   .bottomLogo {
@@ -808,13 +809,13 @@
   }
   
   .productInfo {
-    bottom: 140px;
+    bottom: calc(140px + env(safe-area-inset-bottom));
     left: 16px;
     max-width: 70%;
   }
   
   .actionBar {
-    bottom: 130px;
+    bottom: calc(130px + env(safe-area-inset-bottom));
     right: 12px;
     gap: 12px;
   }
@@ -834,7 +835,7 @@
   }
   
   .bottomButtons {
-    bottom: 75px;
+    bottom: calc(75px + env(safe-area-inset-bottom));
     left: 16px;
     gap: 10px;
   }
