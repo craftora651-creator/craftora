@@ -1,74 +1,13 @@
 <!DOCTYPE html>
-
-<html lang="tr"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Friendly Assistant Bot</title>
-<!-- Load Tailwind CSS v3 -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<style data-purpose="background-gradient">
-    body {
-      /* Clean, slightly off-white radial gradient to make the 3D render pop */
-      background: radial-gradient(circle, #ffffff 0%, #f3f4f6 100%);
-      overflow: hidden; /* Prevent scrolling as this is a single screen interaction */
-    }
-  </style>
-<style data-purpose="animations">
-    /* Subtle up and down floating animation for the entire robot container */
-    @keyframes floating {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-      100% { transform: translateY(0px); }
-    }
-
-    /* Pulse animation for the speech bubble */
-    @keyframes pulse-soft {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.02); opacity: 0.95; }
-    }
-
-    .animate-float {
-      animation: floating 4s ease-in-out infinite;
-    }
-
-    .animate-bubble {
-      animation: pulse-soft 3s ease-in-out infinite;
-    }
-    
-    /* Speech bubble tail styling */
-    .speech-bubble::after {
-      content: '';
-      position: absolute;
-      left: -15px;
-      top: 50%;
-      transform: translateY(-50%);
-      border-width: 15px 15px 15px 0;
-      border-style: solid;
-      border-color: transparent white transparent transparent;
-      filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.05));
-    }
-  </style>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
-<body class="h-screen w-screen flex items-center justify-center p-4">
-<!-- BEGIN: MainContent -->
-<main class="relative flex flex-col md:flex-row items-center justify-center gap-8 max-w-6xl w-full" data-purpose="interaction-screen">
-<!-- BEGIN: RobotContainer -->
-<div class="relative z-10 animate-float" data-purpose="robot-visual">
-<!-- The very cute 3D robot character provided in the DataStore -->
-<img alt="A very cute, friendly, and tiny 3D robot character, Pixar-style animation aesthetic." class="w-80 h-80 md:w-[500px] md:h-[500px] object-contain drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC58R3DOOe2K3jj4oYLOfgbagKnhQ-svc5KHqiL43f6_AWascAJizu4jQ6utRw2sOz2o_vCVymRxDE1extzXq05ECSYXQHQlq6rqzLeTtXyhDsdnQ5BW7nMH9Iv1orpeD88aVOrOQ_IgyQxlCdbH20SlFH9vYrvYTsry9JU1sRL03ygU91neNtCwN0XrFdPeSpzeuqF5W5Ko98hGWuuIpQT4dInSOUqjArhclV6qIfVsWAlQM20ThtlbIXI5R-_BDuA2k1wH4rEFXrk"/>
-<!-- Subtle shadow beneath the floating robot -->
-<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-32 h-6 bg-black/5 rounded-[100%] blur-xl"></div>
-</div>
-<!-- END: RobotContainer -->
-<!-- BEGIN: SpeechBubble -->
-<div class="relative z-20 animate-bubble" data-purpose="robot-message">
-<div class="speech-bubble bg-white px-8 py-6 rounded-3xl shadow-xl border border-gray-100 max-w-xs text-center md:text-left">
-<p class="text-2xl md:text-3xl font-medium text-gray-800 leading-tight">
-          Hey, sana yardım edeyim mi?
-        </p>
-</div>
-</div>
-<!-- END: SpeechBubble -->
-</main>
-<!-- END: MainContent -->
-</body></html>
+<body style="background-color: yellow;">
+  <h1 style="color: blue;">I am sidra</h1>
+  <p style="color: red;"> I am sidra</p>
+  <p style="font-size: 10px;"> I am sidra</p>
+</body>
+</html>

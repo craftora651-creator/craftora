@@ -167,34 +167,23 @@ const Medya: React.FC = () => {
     const isFollowing = followingStates[currentVideoIndex];
 
     // Alt navigasyon itemları
+    // Alt navigasyon itemları - ARAMA ICONU DA İÇİNDE
     const bottomNavItems = [
         { id: 'home', icon: <FaHome />, label: 'Home' },
         { id: 'reels', icon: <FaPlay />, label: 'Reels' },
         { id: 'competition', icon: <FaTrophy />, label: 'Competition' },
         { id: 'craftoraShop', icon: <FaGem />, label: 'CraftoraShop' },
         { id: 'profile', icon: <FaUser />, label: 'Profile' },
-        { id: 'settings', icon: <FaCog />, label: 'Settings' },
+        { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },  // ARAMA ICONU
     ];
 
     return (
         <div className={`${styles.container} ${isDarkMode ? styles.containerDark : styles.containerLight}`}>
-
-            {/* ===== ARAMA ICONU VE DARK MODE ===== */}
-            <div className={styles.topActions}>
-                <button
-                    className={`${styles.searchBtn} ${searchActive ? styles.searchBtnActive : ''}`}
-                    onClick={toggleSearch}
-                >
-                    <FaSearch />
-                </button>
-                <button
-                    className={styles.darkModeBtn}
-                    onClick={toggleDarkMode}
-                >
-                    {isDarkMode ? '☀️' : '🌙'}
-                </button>
+            <div className={styles.mobileTopBar}>
+            <div className={styles.mobileTopLogo}>
+                CRAFT<span>ORA</span>
             </div>
-
+        </div>
             {/* ===== ARAMA MODALI ===== */}
             {searchActive && (
                 <div className={`${styles.searchModal} ${isDarkMode ? styles.searchModalDark : styles.searchModalLight}`}>
@@ -320,6 +309,10 @@ const Medya: React.FC = () => {
             </div>
 
             {/* ===== ALT NAVIGASYON + CRAFTORA LOGOSU ===== */}
+
+
+            {/* ===== ALT NAVIGASYON + CRAFTORA LOGOSU + ARAMA ===== */}
+            {/* ===== ALT NAVIGASYON ===== */}
             <div className={`${styles.bottomNav} ${isDarkMode ? styles.bottomNavDark : styles.bottomNavLight}`}>
                 <div className={styles.bottomLogo}>
                     CRAFT<span>ORA</span>
@@ -329,16 +322,20 @@ const Medya: React.FC = () => {
                     {bottomNavItems.map((item) => (
                         <div
                             key={item.id}
-                            className={`${styles.bottomNavItem} ${activeNav === item.id ? styles.bottomNavItemActive : ''}`}
-                            onClick={() => setActiveNav(item.id)}
+                            className={`${styles.bottomNavItem} ${activeNav === item.id ? styles.bottomNavItemActive : ''} ${item.isSearch ? styles.bottomNavSearch : ''}`}
+                            onClick={() => {
+                                if (item.isSearch) {
+                                    toggleSearch();
+                                } else {
+                                    setActiveNav(item.id);
+                                }
+                            }}
                         >
                             <span className={styles.bottomNavIcon}>{item.icon}</span>
                             <span className={styles.bottomNavLabel}>{item.label}</span>
                         </div>
                     ))}
                 </div>
-
-                <div className={styles.bottomNavPlaceholder}></div>
             </div>
         </div>
     );

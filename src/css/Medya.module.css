@@ -1,4 +1,4 @@
-/* Medya.module.css - SON KESİN VERSİYON */
+/* Medya.module.css */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 * {
@@ -14,6 +14,7 @@
   --color-glow: rgba(224, 124, 92, 0.4);
 }
 
+/* ===== ANA CONTAINER ===== */
 .container {
   position: fixed;
   top: 0;
@@ -30,75 +31,6 @@
 
 .containerDark {
   background: #0a0a0a;
-}
-
-/* ===== ÜST AKSİYON BUTONLARI ===== */
-.topActions {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 200;
-  display: flex;
-  gap: 12px;
-}
-
-.searchBtn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.searchBtn:hover {
-  background: var(--color-primary);
-  transform: scale(1.1);
-  box-shadow: 0 0 20px var(--color-glow);
-}
-
-.searchBtnActive {
-  background: var(--color-primary);
-}
-
-.darkModeBtn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  color: white;
-}
-
-.darkModeBtn:hover {
-  background: var(--color-primary);
-  transform: scale(1.1);
-  box-shadow: 0 0 20px var(--color-glow);
-}
-
-.containerLight .searchBtn,
-.containerLight .darkModeBtn {
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
-}
-
-.containerLight .searchBtn:hover,
-.containerLight .darkModeBtn:hover {
-  background: var(--color-primary);
 }
 
 /* ===== ARAMA MODALI ===== */
@@ -258,7 +190,7 @@
     rgba(0,0,0,0.7) 100%);
 }
 
-/* ===== ÜRÜN BİLGİLERİ (YUKARIDA) ===== */
+/* ===== ÜRÜN BİLGİLERİ ===== */
 .productInfo {
   position: absolute;
   bottom: 180px;
@@ -387,7 +319,7 @@
 .actionBar {
   position: absolute;
   right: 20px;
-  bottom: 130px;
+  bottom: 105px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -450,14 +382,13 @@
   letter-spacing: 0.5px;
 }
 
-/* ===== ALT BUTONLAR - SIDEBAR'IN ÜSTÜNDE ===== */
+/* ===== ALT BUTONLAR ===== */
 .bottomButtons {
   position: absolute;
-  bottom: 100px;
+  bottom: 105px;
   left: 32px;
   display: flex;
   align-items: center;
-  display: flex;
   gap: 16px;
   z-index: 40;
 }
@@ -510,6 +441,7 @@
 }
 
 /* ===== ALT NAVIGASYON ===== */
+/* ===== ALT NAVIGASYON - DÜZELTİLMİŞ (GERÇEKTEN ORTADA) ===== */
 .bottomNav {
   position: fixed;
   bottom: 0;
@@ -517,7 +449,8 @@
   right: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* TAM ORTALAMA */
+  gap: 32px;
   padding: 12px 32px;
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -525,31 +458,29 @@
   background: rgba(0, 0, 0, 0.85);
 }
 
+/* CRAFTORA Logosu - SOLDA SABİT */
 .bottomLogo {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.5px;
   background: linear-gradient(135deg, #ffffff, var(--color-primary-light));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  position: absolute;
+  left: 32px;
 }
 
-.bottomLogo span {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 800;
-}
-
+/* Navigasyon Itemları - TAM ORTADA */
 .bottomNavItems {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 6px 16px;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px 24px;
   border-radius: 60px;
+  margin: 0 auto;
 }
 
 .bottomNavItem {
@@ -557,23 +488,36 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 8px 20px;
+  gap: 4px;
+  padding: 8px 24px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 40px;
-  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 50px;
+  color: rgba(255, 255, 255, 0.6);
+  position: relative;
 }
 
 .bottomNavItem:hover {
-  background: rgba(224, 124, 92, 0.2);
+  background: rgba(224, 124, 92, 0.15);
   transform: translateY(-2px);
   color: white;
 }
 
 .bottomNavItemActive {
   color: var(--color-primary);
-  background: rgba(224, 124, 92, 0.15);
+  background: rgba(224, 124, 92, 0.12);
+}
+
+.bottomNavItemActive::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 3px;
 }
 
 .bottomNavIcon {
@@ -586,100 +530,195 @@
   letter-spacing: 0.3px;
 }
 
-.bottomNavPlaceholder {
-  width: 100px;
+/* Arama Butonu - SAGDA SABİT */
+.bottomSearchBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(224, 124, 92, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(224, 124, 92, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: absolute;
+  right: 32px;
+}
+
+.bottomSearchBtn:hover {
+  background: var(--color-primary);
+  transform: scale(1.05);
+  color: white;
+  box-shadow: 0 0 15px var(--color-glow);
+}
+
+.bottomSearchBtnActive {
+  background: var(--color-primary);
+  color: white;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
+  .bottomNav {
+    padding: 10px 24px;
+  }
+  
+  .bottomLogo {
+    font-size: 20px;
+    min-width: 90px;
+  }
+  
+  .bottomNavItems {
+    gap: 4px;
+    padding: 5px 16px;
+  }
+  
+  .bottomNavItem {
+    padding: 6px 16px;
+  }
+  
+  .bottomNavIcon {
+    font-size: 18px;
+  }
+  
+  .bottomSearchBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .productTitle {
+    font-size: 40px;
+  }
+  .bottomButtons{ 
+    bottom: 85px;
+  }
+  
+  .currentPrice {
+    font-size: 36px;
+  }
+  
+  .productInfo {
+    bottom: 160px;
+  }
+  
+  .actionBar {
+    bottom: 105px;
+  }
+}
+
+.mobileTopBar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  padding: 16px 20px;
+  justify-content: flex-end;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+}
+
+.mobileTopLogo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff, var(--color-primary-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.mobileTopLogo span {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+}
+
+
+@media (max-width: 768px) {
+  /* Normalde soldaki logoyu gizle */
   .bottomLogo {
     display: none;
   }
   
-  .bottomNavPlaceholder {
-    display: none;
+  /* Mobil üst bar'ı göster */
+  .mobileTopBar {
+    display: flex;
   }
   
+  /* Alt navigasyon düzenlemesi */
   .bottomNav {
     justify-content: center;
-    padding: 10px 16px;
+    padding: 8px 16px;
+    gap: 0;
   }
+  
+  .bottomNavItems {
+    gap: 4px;
+    padding: 4px 12px;
+    margin: 0;
+  }
+  
+  .bottomNavItem {
+    padding: 5px 12px;
+  }
+  
+  .bottomNavIcon {
+    font-size: 16px;
+  }
+  
+  .bottomNavLabel {
+    font-size: 10px;
+  }
+  
+  .bottomSearchBtn {
+    position: static;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    margin-left: 8px;
+  }
+
   
   .productTitle {
-    font-size: 36px;
-  }
-  
-  .currentPrice {
     font-size: 32px;
   }
   
-  .productInfo {
-    bottom: 180px;
+  .currentPrice {
+    font-size: 28px;
   }
   
-  .actionBar {
-    bottom: 200px;
-  }
-  
-  .bottomButtons {
-    bottom: 100px;
-  }
-}
-
-@media (max-width: 768px) {
-  .topActions {
-    top: 15px;
-    right: 15px;
-    gap: 8px;
-  }
-  
-  .searchBtn, .darkModeBtn {
-    width: 42px;
-    height: 42px;
+  .originalPrice {
     font-size: 18px;
   }
   
   .productInfo {
-    bottom: 150px;
-    left: 15px;
+    bottom: 160px;
+    left: 20px;
     max-width: 65%;
-  }
-  
-  .productTitle {
-    font-size: 28px;
-    margin-bottom: 8px;
   }
   
   .productDesc {
     font-size: 12px;
-    margin-bottom: 12px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   
-  .currentPrice {
-    font-size: 26px;
-  }
-  
-  .originalPrice {
-    font-size: 16px;
-  }
-  
-  .discountBadge {
-    font-size: 10px;
-    padding: 3px 8px;
-  }
-  
-  .audioInfo {
-    font-size: 11px;
-    padding: 6px 14px;
-  }
-  
   .actionBar {
     right: 15px;
-    bottom: 110px;
+    bottom: 72px;
     gap: 16px;
   }
   
@@ -698,7 +737,7 @@
   }
   
   .bottomButtons {
-    bottom: 90px;
+    bottom: 85px;
     left: 20px;
   }
   
@@ -711,30 +750,40 @@
     padding: 10px 20px;
     font-size: 12px;
   }
-  
-  .bottomNavItems {
-    gap: 4px;
-    padding: 5px 12px;
-  }
-  
-  .bottomNavItem {
-    padding: 6px 14px;
-  }
-  
-  .bottomNavIcon {
-    font-size: 18px;
-  }
-  
-  .bottomNavLabel {
-    font-size: 10px;
-  }
 }
 
 @media (max-width: 480px) {
-  .productInfo {
-    max-width: 70%;
-    bottom: 120px;
-    left: 16px;
+  .bottomNav {
+    padding: 6px 12px;
+  }
+  
+  .bottomLogo {
+    display: none;
+  }
+  
+  .bottomNavItems {
+    gap: 0px;
+    padding: 4px 8px;
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .bottomNavItem {
+    padding: 4px 8px;
+  }
+  
+  .bottomNavIcon {
+    font-size: 14px;
+  }
+  
+  .bottomNavLabel {
+    font-size: 8px;
+  }
+  
+  .bottomSearchBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
   
   .productTitle {
@@ -746,17 +795,28 @@
   }
   
   .currentPrice {
-    font-size: 24px;
+    font-size: 22px;
   }
   
   .originalPrice {
     font-size: 14px;
   }
   
+  .discountBadge {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+  
+  .productInfo {
+    bottom: 140px;
+    left: 16px;
+    max-width: 70%;
+  }
+  
   .actionBar {
-    gap: 12px;
-    bottom: 170px;
+    bottom: 130px;
     right: 12px;
+    gap: 12px;
   }
   
   .actionCircle {
@@ -774,14 +834,14 @@
   }
   
   .bottomButtons {
-    bottom: 70px;
+    bottom: 75px;
     left: 16px;
     gap: 10px;
   }
   
   .buyNowBtn {
-    padding: 8px 18px;
-    font-size: 12px;
+    padding: 8px 16px;
+    font-size: 11px;
   }
   
   .buyNowBtn svg {
@@ -790,22 +850,10 @@
   
   .goToProductBtn {
     padding: 8px 14px;
-    font-size: 11px;
+    font-size: 10px;
   }
   
   .goToProductBtn svg {
     font-size: 10px;
-  }
-  
-  .bottomNavItem {
-    padding: 5px 10px;
-  }
-  
-  .bottomNavIcon {
-    font-size: 16px;
-  }
-  
-  .bottomNavLabel {
-    font-size: 9px;
   }
 }

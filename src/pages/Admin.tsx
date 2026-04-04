@@ -15,8 +15,10 @@ import AnalyticsDetail from '../lib/AnalyticsDetail';
 import SupplierDetail from '../lib/SupplierDetail';
 import SupplierSettings from '../lib/SupplierSettings';
 import CreateModal from '../.paket/CreateModal';
-import ThemesPage from '../config/ThemesPage';
+import SettingsPage from '../config/Settings';
+import HelpCenter from '../config/HelpCenter';
 import { Chart } from 'chart.js';
+import { useCurrentUser } from '../server/FastAPI/user.hooks';
 
 declare global {
   interface Window {
@@ -104,6 +106,17 @@ const KankamAdminPanel = () => {
   const GoProduct = () => {
     handleOpenCreateModal();
   };
+
+  const navigate = useNavigate();
+  const { data: userData, isLoading: userLoading } = useCurrentUser();
+  const userFullName = userData?.full_name || userData?.email?.split('@')[0] || 'Kullanıcı';
+  const userEmail = userData?.email || '';
+  const handleLogout = () => {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  navigate('/login');
+};
+
 
   return (
     <div style={{
@@ -783,7 +796,7 @@ const KankamAdminPanel = () => {
           scrollbar-color: #0ea5e9 ${colors.bg};
         }
       `}</style>
-      
+
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         {/* Sidebar */}
         <div className="sidebar" style={{
@@ -801,7 +814,7 @@ const KankamAdminPanel = () => {
             : 0,
           zIndex: 1200,
           transition: 'left 0.3s cubic-bezier(0.4,0,0.2,1)',
-          overflowY: 'auto',    
+          overflowY: 'auto',
           overflowX: 'hidden',
         }}>
           {/* Logo */}
@@ -852,8 +865,8 @@ const KankamAdminPanel = () => {
             </div>
             {[
               { id: 'suppliers', icon: 'link', label: 'Tedarikçiler', path: '/admin/suppliers' },
-              { id: 'general', icon: 'settings', label: 'General', path: '/admin/general' },
-              { id: 'help', icon: 'help_outline', label: 'Help Center', path: '/admin/help' }
+              { id: 'settings', icon: 'settings', label: 'Settings', path: '/admin/settings' },
+              { id: 'help', icon: 'help_outline', label: 'Help', path: '/admin/help' }
             ].map(item => (
               <SidebarButton
                 key={item.id}
@@ -866,33 +879,43 @@ const KankamAdminPanel = () => {
             ))}
           </nav>
           {/* Profil */}
-          <div style={{ padding: 24 }}>
-            <div style={{
-              padding: 16,
-              backgroundColor: colors.bg,
-              borderRadius: 16,
-              border: `1px solid ${colors.border}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{
-                  width: 44,
-                  height: 44,
-                  backgroundColor: '#0ea5e9',
-                  borderRadius: 22,
-                  backgroundImage: 'url(https://ui-avatars.com/api/?name=Tom+Cook&background=0ea5e9&color=fff&size=44)',
-                  backgroundSize: 'cover'
-                }} />
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 'bold', color: colors.text }}>Tom Cook</div>
-                  <div style={{ fontSize: 11, color: colors.textSecondary }}>tom@example.com</div>
-                </div>
-              </div>
-              <span className="material-icons-round" style={{ color: colors.textSecondary, fontSize: 20, cursor: 'pointer' }}>logout</span>
-            </div>
-          </div>
+          {/* Profil */}
+<div style={{ padding: 24 }}>
+  <div style={{
+    padding: 16,
+    backgroundColor: colors.bg,
+    borderRadius: 16,
+    border: `1px solid ${colors.border}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{
+        width: 44,
+        height: 44,
+        backgroundColor: '#0ea5e9',
+        borderRadius: 22,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(userFullName)}&background=0ea5e9&color=fff&size=44)`,
+        backgroundSize: 'cover'
+      }} />
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 'bold', color: colors.text }}>{userFullName}</div>
+        <div style={{ fontSize: 11, color: colors.textSecondary }}>{userEmail}</div>
+      </div>
+    </div>
+    <span 
+      className="material-icons-round" 
+      style={{ color: colors.textSecondary, fontSize: 20, cursor: 'pointer' }}
+      onClick={handleLogout}
+    >
+      logout
+    </span>
+  </div>
+</div>
         </div>
         {/* Sidebar Overlay */}
         {isMobileMenuOpen && (
@@ -960,7 +983,7 @@ const KankamAdminPanel = () => {
                 {activeSection === 'orders' && 'Orders'}
                 {activeSection === 'reports' && 'Reports'}
                 {activeSection === 'general' && 'General Settings'}
-                {activeSection === 'help' && 'Help Center'}
+                {activeSection === 'help' && 'Help'}
               </h1>
             </div>
             {/* Header sağ kısım - BUTONLAR */}
@@ -1170,14 +1193,13 @@ const KankamAdminPanel = () => {
                 element={<AnalyticsDetail colors={colors} />}
               />
               {/* 👇 YENİ - Ürün detay */}
-              <Route path="/themes" element={
-                <ThemesPage colors={colors} />
-              } />
+              <Route path="/settings" element={<SettingsPage colors={colors} />} />
 
               {/* 👇 YENİ - Ürün düzenle */}
               <Route path="/products/edit/:id" element={
                 <EditProduct />
               } />
+              <Route path="/help" element={<HelpCenter colors={colors} />} />
               <Route path="/myshops" element={
                 <MyShopsPage colors={colors} />
               } />
