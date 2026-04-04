@@ -72,56 +72,21 @@ const Medya: React.FC = () => {
     const [activeNav, setActiveNav] = useState('home');
     const [touchStart, setTouchStart] = useState(0);
     const [touchEnd, setTouchEnd] = useState(0);
-    
-    // ===== YENİ: Chrome alt bar yüksekliği için state =====
-    const [bottomBarHeight, setBottomBarHeight] = useState(0);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
-
-    // ===== YENİ: Chrome alt bar yüksekliğini hesaplayan useEffect =====
-    useEffect(() => {
-        const calculateBottomBar = () => {
-            // VisualViewport ile gerçek görünür alanı hesapla
-            if (window.visualViewport) {
-                const viewportHeight = window.visualViewport.height;
-                const windowHeight = window.innerHeight;
-                const diff = windowHeight - viewportHeight;
-                if (diff > 0) {
-                    setBottomBarHeight(diff);
-                } else {
-                    // Android Chrome için alternatif hesaplama
-                    const screenHeight = window.screen.height;
-                    const availableHeight = window.innerHeight;
-                    const padding = screenHeight - availableHeight - 80;
-                    setBottomBarHeight(padding > 0 ? padding : 20);
-                }
-            } else {
-                // Fallback
-                setBottomBarHeight(20);
-            }
-        };
-
-        calculateBottomBar();
-        
-        window.addEventListener('resize', calculateBottomBar);
-        window.visualViewport?.addEventListener('resize', calculateBottomBar);
-        
-        return () => {
-            window.removeEventListener('resize', calculateBottomBar);
-            window.visualViewport?.removeEventListener('resize', calculateBottomBar);
-        };
-    }, []);
 
     // Mouse wheel ile kaydırma
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
             if (e.deltaY > 0) {
+                // Aşağı kaydırma - sonraki video
                 if (currentVideoIndex < videoData.length - 1) {
                     setCurrentVideoIndex(currentVideoIndex + 1);
                 }
             } else if (e.deltaY < 0) {
+                // Yukarı kaydırma - önceki video
                 if (currentVideoIndex > 0) {
                     setCurrentVideoIndex(currentVideoIndex - 1);
                 }
@@ -152,11 +117,13 @@ const Medya: React.FC = () => {
         if (!touchStart || !touchEnd) return;
         const diff = touchStart - touchEnd;
         if (diff > 50) {
+            // Yukarı kaydırma - sonraki video
             if (currentVideoIndex < videoData.length - 1) {
                 setCurrentVideoIndex(currentVideoIndex + 1);
             }
         }
         if (diff < -50) {
+            // Aşağı kaydırma - önceki video
             if (currentVideoIndex > 0) {
                 setCurrentVideoIndex(currentVideoIndex - 1);
             }
@@ -199,23 +166,24 @@ const Medya: React.FC = () => {
     const isSaved = savedStates[currentVideoIndex];
     const isFollowing = followingStates[currentVideoIndex];
 
+    // Alt navigasyon itemları
+    // Alt navigasyon itemları - ARAMA ICONU DA İÇİNDE
     const bottomNavItems = [
         { id: 'home', icon: <FaHome />, label: 'Home' },
         { id: 'reels', icon: <FaPlay />, label: 'Reels' },
         { id: 'competition', icon: <FaTrophy />, label: 'Competition' },
         { id: 'craftoraShop', icon: <FaGem />, label: 'CraftoraShop' },
         { id: 'profile', icon: <FaUser />, label: 'Profile' },
-        { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },
+        { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },  // ARAMA ICONU
     ];
 
     return (
         <div className={`${styles.container} ${isDarkMode ? styles.containerDark : styles.containerLight}`}>
             <div className={styles.mobileTopBar}>
-                <div className={styles.mobileTopLogo}>
-                    CRAFT<span>ORA</span>
-                </div>
+            <div className={styles.mobileTopLogo}>
+                CRAFT<span>ORA</span>
             </div>
-            
+        </div>
             {/* ===== ARAMA MODALI ===== */}
             {searchActive && (
                 <div className={`${styles.searchModal} ${isDarkMode ? styles.searchModalDark : styles.searchModalLight}`}>
@@ -252,6 +220,7 @@ const Medya: React.FC = () => {
                             transform: `translateY(${(index - currentVideoIndex) * 100}%)`,
                         }}
                     >
+                        {/* Video Arkaplan */}
                         <div
                             className={styles.videoBackground}
                             style={{
@@ -324,7 +293,7 @@ const Medya: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Alt Butonlar */}
+                        {/* Alt Butonlar - Buy Now + Ürüne Git (Sidebar'ın üstünde) */}
                         <div className={styles.bottomButtons}>
                             <button className={styles.buyNowBtn}>
                                 <FaShoppingBag />
@@ -339,11 +308,12 @@ const Medya: React.FC = () => {
                 ))}
             </div>
 
-            {/* ===== ALT NAVIGASYON - bottomBarHeight state'i ile dinamik padding ===== */}
-            <div 
-                className={`${styles.bottomNav} ${isDarkMode ? styles.bottomNavDark : styles.bottomNavLight}`}
-                style={{ paddingBottom: `${12 + bottomBarHeight}px` }}
-            >
+            {/* ===== ALT NAVIGASYON + CRAFTORA LOGOSU ===== */}
+
+
+            {/* ===== ALT NAVIGASYON + CRAFTORA LOGOSU + ARAMA ===== */}
+            {/* ===== ALT NAVIGASYON ===== */}
+            <div className={`${styles.bottomNav} ${isDarkMode ? styles.bottomNavDark : styles.bottomNavLight}`}>
                 <div className={styles.bottomLogo}>
                     CRAFT<span>ORA</span>
                 </div>
