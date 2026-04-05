@@ -45,6 +45,7 @@ import { useCurrentUser } from './server/FastAPI/user.hooks';
 import SellerThemes from './pages/SellerThemes';
 import SellerProducts from './middleware/SellerProducts';
 import Profile from './pages/Profile';
+import CraftoraShops from './pages/CraftoraShops';
 
 import "./index.css";
 
@@ -264,6 +265,7 @@ function App() {
               <Route path='seller-themes' element={<SellerThemes />} />
               <Route path="/seller-products" element={<SellerProducts />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/craftora-shops" element={<CraftoraShops />} />
 
               <Route
                 path="/theme/enterprise/*"

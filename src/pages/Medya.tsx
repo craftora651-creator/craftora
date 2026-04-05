@@ -308,8 +308,10 @@ const Medya: React.FC = () => {
                             onClick={() => {
                                 if (item.isSearch) {
                                     toggleSearch();
-                                } else if(item.id === 'profile'){
+                                } else if (item.id === 'profile') {
                                     navigate('/profile');
+                                } else if (item.id === 'home') {
+                                    navigate('/craftora-shops');
                                 } else {
                                     setActiveNav(item.id);
                                 }
