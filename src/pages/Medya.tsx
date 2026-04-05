@@ -19,6 +19,7 @@ import {
 import { BsThreeDots } from 'react-icons/bs';
 import { MdVerified } from 'react-icons/md';
 import styles from '../css/Medya.module.css';
+import { useNavigate } from 'react-router-dom';
 
 // Video verileri - TikTok tarzı dikey kaydırma için
 const videoData = [
@@ -67,6 +68,8 @@ const Medya: React.FC = () => {
     const [activeNav, setActiveNav] = useState('home');
     const [touchStart, setTouchStart] = useState(0);
     const [touchEnd, setTouchEnd] = useState(0);
+
+    const navigate = useNavigate();
 
     const containerRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -158,7 +161,8 @@ const Medya: React.FC = () => {
         { id: 'craftoraShop', icon: <FaGem />, label: 'CraftoraShop' },
         { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },  // ARAMA ICONU
         { id: 'competition', icon: <FaTrophy />, label: 'Competition' },
-        { id: 'profile', icon: <FaUser />, label: 'Profile' },
+        // bottomNavItems içinde profile'a onClick ekle
+        { id: 'profile', icon: <FaUser />, label: 'Profile' },  // Profile burada
     ];
 
     return (
@@ -228,7 +232,7 @@ const Medya: React.FC = () => {
                                 <span className={styles.discountBadge}>-{Math.round((1 - video.price / video.originalPrice) * 100)}%</span>
                             </div>
 
-                         
+
                         </div>
 
                         {/* Sağ Aksiyon Butonları */}
@@ -304,6 +308,8 @@ const Medya: React.FC = () => {
                             onClick={() => {
                                 if (item.isSearch) {
                                     toggleSearch();
+                                } else if(item.id === 'profile'){
+                                    navigate('/profile');
                                 } else {
                                     setActiveNav(item.id);
                                 }

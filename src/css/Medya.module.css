@@ -193,7 +193,7 @@
 /* ===== ÜRÜN BİLGİLERİ ===== */
 .productInfo {
   position: absolute;
-  bottom: calc(180px + env(safe-area-inset-bottom));
+  bottom: 160px;
   left: 32px;
   z-index: 30;
   max-width: 480px;
