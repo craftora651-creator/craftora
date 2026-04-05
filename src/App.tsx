@@ -266,6 +266,7 @@ function App() {
               <Route path="/seller-products" element={<SellerProducts />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/craftora-shops" element={<CraftoraShops />} />
+              
 
               <Route
                 path="/theme/enterprise/*"

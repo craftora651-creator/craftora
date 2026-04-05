@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../app/Header';
+import Hero from '../app/Hero';
+import Featured from '../app/Featured'
 
 // Components
 
@@ -48,6 +50,8 @@ const CraftoraShops: React.FC = () => {
       overflowX: 'hidden'
     }}>
       <Header colors={colors} isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
+      <Hero colors={colors} isDarkMode={isDarkMode} />
+      <Featured colors={colors} isDarkMode={isDarkMode} />
     </div>
   );
 };
