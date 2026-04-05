@@ -5,12 +5,8 @@ import {
     FaShare,
     FaPlay,
     FaHome,
-    FaCompass,
-    FaCog,
     FaUser,
     FaRegHeart,
-    FaStar,
-    FaRegStar,
     FaMusic,
     FaShoppingBag,
     FaBookmark,
@@ -33,7 +29,6 @@ const videoData = [
         desc: 'Handcrafted from premium mulberry silk. Featuring a backless design and a fluid silhouette.',
         price: 249,
         originalPrice: 580,
-        audio: 'Original Audio - Premium Boutique',
         likes: '2.5K',
         followers: '12.5K',
     },
@@ -75,18 +70,14 @@ const Medya: React.FC = () => {
 
     const containerRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
-
-    // Mouse wheel ile kaydırma
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
             if (e.deltaY > 0) {
-                // Aşağı kaydırma - sonraki video
                 if (currentVideoIndex < videoData.length - 1) {
                     setCurrentVideoIndex(currentVideoIndex + 1);
                 }
             } else if (e.deltaY < 0) {
-                // Yukarı kaydırma - önceki video
                 if (currentVideoIndex > 0) {
                     setCurrentVideoIndex(currentVideoIndex - 1);
                 }
@@ -104,7 +95,6 @@ const Medya: React.FC = () => {
         };
     }, [currentVideoIndex, videoData.length]);
 
-    // Touch ile kaydırma (mobil için)
     const handleTouchStart = (e: React.TouchEvent) => {
         setTouchStart(e.targetTouches[0].clientY);
     };
@@ -116,24 +106,18 @@ const Medya: React.FC = () => {
     const handleTouchEnd = () => {
         if (!touchStart || !touchEnd) return;
         const diff = touchStart - touchEnd;
-        if (diff > 50) {
-            // Yukarı kaydırma - sonraki video
+
+        if (diff > 30) {
             if (currentVideoIndex < videoData.length - 1) {
                 setCurrentVideoIndex(currentVideoIndex + 1);
             }
-        }
-        if (diff < -50) {
-            // Aşağı kaydırma - önceki video
+        } else if (diff < -30) {
             if (currentVideoIndex > 0) {
                 setCurrentVideoIndex(currentVideoIndex - 1);
             }
         }
         setTouchStart(0);
         setTouchEnd(0);
-    };
-
-    const toggleDarkMode = () => {
-        setIsDarkMode(!isDarkMode);
     };
 
     const toggleSearch = () => {
@@ -171,19 +155,19 @@ const Medya: React.FC = () => {
     const bottomNavItems = [
         { id: 'home', icon: <FaHome />, label: 'Home' },
         { id: 'reels', icon: <FaPlay />, label: 'Reels' },
-        { id: 'competition', icon: <FaTrophy />, label: 'Competition' },
         { id: 'craftoraShop', icon: <FaGem />, label: 'CraftoraShop' },
-        { id: 'profile', icon: <FaUser />, label: 'Profile' },
         { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },  // ARAMA ICONU
+        { id: 'competition', icon: <FaTrophy />, label: 'Competition' },
+        { id: 'profile', icon: <FaUser />, label: 'Profile' },
     ];
 
     return (
         <div className={`${styles.container} ${isDarkMode ? styles.containerDark : styles.containerLight}`}>
             <div className={styles.mobileTopBar}>
-            <div className={styles.mobileTopLogo}>
-                CRAFT<span>ORA</span>
+                <div className={styles.mobileTopLogo}>
+                    CRAFT<span>ORA</span>
+                </div>
             </div>
-        </div>
             {/* ===== ARAMA MODALI ===== */}
             {searchActive && (
                 <div className={`${styles.searchModal} ${isDarkMode ? styles.searchModalDark : styles.searchModalLight}`}>
@@ -244,13 +228,7 @@ const Medya: React.FC = () => {
                                 <span className={styles.discountBadge}>-{Math.round((1 - video.price / video.originalPrice) * 100)}%</span>
                             </div>
 
-                            <div className={styles.audioInfo}>
-                                <span className={styles.audioIcon}>
-                                    <FaMusic />
-                                </span>
-                                <span>{video.audio}</span>
-                                <MdVerified style={{ color: 'var(--color-primary)', marginLeft: '4px' }} />
-                            </div>
+                         
                         </div>
 
                         {/* Sağ Aksiyon Butonları */}

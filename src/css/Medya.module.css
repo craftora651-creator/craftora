@@ -640,7 +640,7 @@
   }
   
   .productInfo {
-    bottom: calc(160px + env(safe-area-inset-bottom));
+    bottom: 140px;
   }
   
   .actionBar {
@@ -703,7 +703,7 @@
   }
   
   .productInfo {
-    bottom: calc(160px + env(safe-area-inset-bottom));
+    bottom: 130px;
     left: 20px;
     max-width: 65%;
   }
@@ -809,7 +809,7 @@
   }
   
   .productInfo {
-    bottom: calc(140px + env(safe-area-inset-bottom));
+    bottom: 120px;
     left: 16px;
     max-width: 70%;
   }
