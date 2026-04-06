@@ -65,7 +65,7 @@ const Medya: React.FC = () => {
     const [likedStates, setLikedStates] = useState<boolean[]>(new Array(videoData.length).fill(false));
     const [savedStates, setSavedStates] = useState<boolean[]>(new Array(videoData.length).fill(false));
     const [followingStates, setFollowingStates] = useState<boolean[]>(new Array(videoData.length).fill(false));
-    const [activeNav, setActiveNav] = useState('home');
+    const [activeNav, setActiveNav] = useState('reels');
     const [touchStart, setTouchStart] = useState(0);
     const [touchEnd, setTouchEnd] = useState(0);
 

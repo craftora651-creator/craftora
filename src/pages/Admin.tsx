@@ -879,43 +879,33 @@ const KankamAdminPanel = () => {
             ))}
           </nav>
           {/* Profil */}
-          {/* Profil */}
-<div style={{ padding: 24 }}>
-  <div style={{
-    padding: 16,
-    backgroundColor: colors.bg,
-    borderRadius: 16,
-    border: `1px solid ${colors.border}`,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <div style={{
-        width: 44,
-        height: 44,
-        backgroundColor: '#0ea5e9',
-        borderRadius: 22,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(userFullName)}&background=0ea5e9&color=fff&size=44)`,
-        backgroundSize: 'cover'
-      }} />
-      <div>
-        <div style={{ fontSize: 14, fontWeight: 'bold', color: colors.text }}>{userFullName}</div>
-        <div style={{ fontSize: 11, color: colors.textSecondary }}>{userEmail}</div>
-      </div>
-    </div>
-    <span 
-      className="material-icons-round" 
-      style={{ color: colors.textSecondary, fontSize: 20, cursor: 'pointer' }}
-      onClick={handleLogout}
-    >
-      logout
-    </span>
-  </div>
-</div>
+          <div style={{ padding: 24 }}>
+            <div style={{
+              padding: 16,
+              backgroundColor: colors.bg,
+              borderRadius: 16,
+              border: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 44,
+                  height: 44,
+                  backgroundColor: '#0ea5e9',
+                  borderRadius: 22,
+                  backgroundImage: 'url(https://ui-avatars.com/api/?name=Tom+Cook&background=0ea5e9&color=fff&size=44)',
+                  backgroundSize: 'cover'
+                }} />
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 'bold', color: colors.text }}>Tom Cook</div>
+                  <div style={{ fontSize: 11, color: colors.textSecondary }}>tom@example.com</div>
+                </div>
+              </div>
+              <span className="material-icons-round" style={{ color: colors.textSecondary, fontSize: 20, cursor: 'pointer' }}>logout</span>
+            </div>
+          </div>
         </div>
         {/* Sidebar Overlay */}
         {isMobileMenuOpen && (
