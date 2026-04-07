@@ -1,0 +1,30 @@
+User 
+- id 
+- email
+- password
+
+Product 
+- id 
+- name 
+- price
+
+Order 
+- id 
+- user_id
+
+OrderItem
+- id
+- order_id
+- product_id
+- quantity
+- price 
+
+Cart 
+- id 
+- user_id
+
+CardItem
+- id 
+- cart_id
+- product_id
+- quantity

@@ -7,7 +7,6 @@ import {
     FaHome,
     FaUser,
     FaRegHeart,
-    FaMusic,
     FaShoppingBag,
     FaBookmark,
     FaRegBookmark,
@@ -17,7 +16,6 @@ import {
     FaChevronRight,
 } from 'react-icons/fa';
 import { BsThreeDots } from 'react-icons/bs';
-import { MdVerified } from 'react-icons/md';
 import styles from '../css/Medya.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -160,8 +158,7 @@ const Medya: React.FC = () => {
         { id: 'reels', icon: <FaPlay />, label: 'Reels' },
         { id: 'craftoraShop', icon: <FaGem />, label: 'CraftoraShop' },
         { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },  // ARAMA ICONU
-        { id: 'competition', icon: <FaTrophy />, label: 'Competition' },
-        // bottomNavItems içinde profile'a onClick ekle
+        { id: 'competition', icon: <FaTrophy />, label: 'Competition', path: '/competition' },
         { id: 'profile', icon: <FaUser />, label: 'Profile' },  // Profile burada
     ];
 
@@ -312,6 +309,8 @@ const Medya: React.FC = () => {
                                     navigate('/profile');
                                 } else if (item.id === 'home') {
                                     navigate('/craftora-shops');
+                                } else if (item.id === 'competition') {  // ✅ BUNU EKLE
+                                    navigate('/competition');
                                 } else {
                                     setActiveNav(item.id);
                                 }

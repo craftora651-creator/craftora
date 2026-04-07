@@ -40,7 +40,7 @@ class ApiClient {
   constructor() {
     // FastAPI client - PORT 9003
     this.fastApiClient = axios.create({
-      baseURL: import.meta.env.VITE_FASTAPI_URL ?? "http://localhost:9004",
+      baseURL: import.meta.env.VITE_FASTAPI_URL ?? "http://localhost:9999",
       timeout: 30000,
       headers: {
         "Content-Type": "application/json",

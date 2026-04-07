@@ -46,6 +46,8 @@ import SellerThemes from './pages/SellerThemes';
 import SellerProducts from './middleware/SellerProducts';
 import Profile from './pages/Profile';
 import CraftoraShops from './pages/CraftoraShops';
+import Competition from './pages/Competition'; // ✅ BUNU EKLE
+import { apiClient } from './api/apiClient';
 
 import "./index.css";
 
@@ -67,6 +69,7 @@ function App() {
     return saved === 'true';
   });
 
+
   useEffect(() => {
     localStorage.setItem('darkMode', String(isDarkMode));
   }, [isDarkMode]);
@@ -76,6 +79,7 @@ function App() {
   if (userLoading) {
     return <div>Yükleniyor...</div>;
   }
+
 
   console.log('🔍 user object:', user);  // ⬅️ EKLE
 
@@ -266,6 +270,7 @@ function App() {
               <Route path="/seller-products" element={<SellerProducts />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/craftora-shops" element={<CraftoraShops />} />
+              <Route path="/competition" element={<Competition />} />
               
 
               <Route

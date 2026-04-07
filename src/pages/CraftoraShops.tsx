@@ -37,7 +37,7 @@ const CraftoraShops: React.FC = () => {
         { id: 'reels', icon: <FaPlay />, label: 'Reels', path: '/medya' },
         { id: 'craftoraShop', icon: <FaGem />, label: 'CraftoraShop', path: '/medya' },
         { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },
-        { id: 'competition', icon: <FaTrophy />, label: 'Competition', path: '/medya' },
+        { id: 'competition', icon: <FaTrophy />, label: 'Competition', path: '/competition' },
         { id: 'profile', icon: <FaUser />, label: 'Profile', path: '/profile' },
     ];
 

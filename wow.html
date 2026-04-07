@@ -1,13 +1,677 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Arteon Stone | Mermer & Seramik Fabrikası - Teknik Üstünlük</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #FDF9F4;
+            font-family: 'Inter', sans-serif;
+            color: #1F1C19;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: #E2D5C8; }
+        ::-webkit-scrollbar-thumb { background: #A47C46; border-radius: 20px; }
+
+        h1, h2, h3, .logo, .hero-title, .section-title, .noto-serif-display {
+            font-family: 'Noto Serif Display', 'Cormorant Garamond', serif;
+        }
+
+        .font-label {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3em;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 44px;
+        }
+
+        /* HEADER - Sade ve güçlü */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: #FCF9F5;
+            border-bottom: 1px solid #E3D8CD;
+            padding: 16px 0;
+            transition: 0.2s;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #8B5A2B;
+        }
+        .logo span { color: #2C2825; font-weight: 500; }
+        .nav-links {
+            display: flex;
+            gap: 44px;
+            list-style: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1F1C19;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        .nav-links a:hover { color: #A47C46; }
+        .menu-icon { display: none; font-size: 1.8rem; cursor: pointer; }
+
+        /* HERO - FABRİKA HİSSİ */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(97deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%), url('https://images.pexels.com/photos/2089698/pexels-photo-2089698.jpeg?auto=compress&cs=tinysrgb&w=1600');
+            background-size: cover;
+            background-position: center 30%;
+            margin-top: 0;
+        }
+        .hero-overlay { width: 100%; padding: 150px 0 120px; }
+        .hero-content { max-width: 720px; animation: fadeUp 0.9s ease; }
+        .hero-title {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            color: #FFF8EF;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
+        }
+        .hero-sub {
+            font-size: 1.1rem;
+            color: #F0E5D8;
+            margin-bottom: 36px;
+            max-width: 550px;
+        }
+        .btn-group { display: flex; gap: 20px; flex-wrap: wrap; }
+        .btn-primary {
+            background: #A47C46;
+            border: none;
+            padding: 14px 38px;
+            font-weight: 700;
+            color: white;
+            border-radius: 0px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .btn-primary:hover { background: #7C5C34; transform: translateY(-2px); }
+        .btn-outline-dark {
+            background: transparent;
+            border: 1.5px solid #FFF2E4;
+            padding: 14px 38px;
+            font-weight: 600;
+            color: #FFF2E4;
+            border-radius: 0px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .btn-outline-dark:hover { background: rgba(255,255,240,0.1); border-color: #A47C46; }
+
+        /* section genel */
+        section { padding: 100px 0; }
+        .section-title {
+            font-size: 3rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #2C2825;
+        }
+
+        /* TEKNİK USTALIK BÖLÜMÜ (THE HEART OF THE FACTORY) */
+        .technical-mastery {
+            background: #F7F2EC;
+        }
+        .mastery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 60px;
+            align-items: center;
+        }
+        .mastery-content {
+            flex: 1.2;
+        }
+        .mastery-badge {
+            font-size: 10px;
+            letter-spacing: 0.5em;
+            color: #A47C46;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .mastery-content h2 {
+            font-size: 3.2rem;
+            font-weight: 400;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+        .mastery-desc {
+            color: #4A423B;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .tech-list {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .tech-item h4 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .tech-item p {
+            color: #6A5F55;
+            font-size: 0.9rem;
+        }
+        .mastery-image {
+            flex: 1;
+            position: relative;
+        }
+        .mastery-image img {
+            width: 100%;
+            border-radius: 0px;
+            filter: grayscale(0.2);
+            transition: 0.4s;
+        }
+        .mastery-image:hover img { filter: grayscale(0); }
+
+        /* GLOBAL LANDMARKS (REFERANSLAR) */
+        .landmarks {
+            background: white;
+        }
+        .landmark-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 30px;
+            margin: 50px 0 70px;
+            opacity: 0.5;
+            transition: all 0.7s;
+        }
+        .landmark-logos:hover { opacity: 0.9; }
+        .logo-item {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #2C2825;
+            font-family: 'Inter', sans-serif;
+        }
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            height: 460px;
+            cursor: pointer;
+            border: 1px solid #E9DFD3;
+        }
+        .project-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1);
+            transition: all 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .project-card:hover img { filter: grayscale(0); transform: scale(1.03); }
+        .project-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+            opacity: 0;
+            transition: 0.5s;
+        }
+        .project-card:hover .project-overlay { opacity: 1; }
+        .project-overlay p:first-child {
+            font-size: 9px;
+            letter-spacing: 0.3em;
+            color: #EEDCC8;
+            margin-bottom: 8px;
+        }
+        .project-overlay h3 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        /* CURATED GALLERY - HARİKA GALERİ */
+        .curated-gallery {
+            background: #FEFBF7;
+            padding: 80px 0;
+        }
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+            padding: 0 20px;
+        }
+        .gallery-header span {
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            color: #A47C46;
+        }
+        .gallery-header h2 {
+            font-size: 3rem;
+            font-weight: 350;
+            margin-top: 12px;
+        }
+        .view-link {
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-bottom: 1px solid #1F1C19;
+            padding-bottom: 8px;
+            text-decoration: none;
+            color: #1F1C19;
+            transition: 0.2s;
+        }
+        .view-link:hover { color: #A47C46; border-color: #A47C46; }
+        .gallery-masonry {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2px;
+        }
+        .gallery-art-item {
+            position: relative;
+            aspect-ratio: 3 / 4;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .gallery-art-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s;
+        }
+        .gallery-art-item:hover img { transform: scale(1.05); }
+        .art-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+            opacity: 0;
+            transition: 0.4s;
+        }
+        .gallery-art-item:hover .art-overlay { opacity: 1; }
+        .art-overlay span {
+            color: rgba(255,255,240,0.8);
+            font-size: 9px;
+            letter-spacing: 0.3em;
+        }
+        .art-overlay h3 {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin: 10px 0;
+        }
+        .art-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,240,0.5);
+            padding: 8px 20px;
+            color: white;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            width: fit-content;
+            transition: 0.2s;
+        }
+        .art-btn:hover { background: white; color: black; border-color: white; }
+
+        /* iletişim */
+        .contact-area {
+            background: #FFFFFF;
+            padding: 60px;
+            border: 1px solid #E3D6CA;
+            margin: 40px 0;
+        }
+        .contact-flex {
+            display: flex;
+            gap: 55px;
+            flex-wrap: wrap;
+        }
+        .contact-info, .contact-form { flex: 1; }
+        .contact-info i { font-size: 1.3rem; color: #A47C46; width: 36px; }
+        .info-line { display: flex; align-items: center; margin-bottom: 28px; gap: 12px; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #DACFC3;
+            background: #FEFCF9;
+        }
+        button[type="submit"] {
+            background: #2C2825;
+            border: none;
+            padding: 14px 36px;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover { background: #A47C46; }
+        footer {
+            background: #1E1B18;
+            color: #CBBEAE;
+            padding: 60px 0 30px;
+        }
+        .footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; }
+        .footer-logo { font-size: 1.8rem; font-weight: 700; color: #DCC29E; }
+        .social-icons i { font-size: 1.4rem; margin-right: 20px; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(35px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.7s ease;
+        }
+        .fade-scroll.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 992px) {
+            .hero-title { font-size: 3rem; }
+            .container { padding: 0 28px; }
+            .nav-links { display: none; }
+            .menu-icon { display: block; }
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: #FCF9F5;
+                padding: 32px;
+                gap: 24px;
+            }
+            .mastery-grid { flex-direction: column; }
+            .gallery-header { flex-direction: column; gap: 20px; align-items: flex-start; }
+        }
+    </style>
 </head>
-<body style="background-color: yellow;">
-  <h1 style="color: blue;">I am sidra</h1>
-  <p style="color: red;"> I am sidra</p>
-  <p style="font-size: 10px;"> I am sidra</p>
+<body>
+
+<header id="header">
+    <div class="container navbar">
+        <div class="logo">ARTEON<span> STONE</span></div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Fabrika</a></li>
+            <li><a href="#technical">Teknik</a></li>
+            <li><a href="#landmarks">Referanslar</a></li>
+            <li><a href="#gallery">Galeri</a></li>
+            <li><a href="#contact">İletişim</a></li>
+        </ul>
+        <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+    </div>
+</header>
+
+<!-- HERO -->
+<section id="home" class="hero">
+    <div class="hero-overlay">
+        <div class="container hero-content">
+            <h1 class="hero-title">Mermer & Seramik<br>Fabrikası</h1>
+            <p class="hero-sub">20.000 m² üretim tesisi, endüstriyel su jeti, 7 eksen CNC ve robotik cila hatları.</p>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Fabrikayı Ziyaret Et</button>
+                <button class="btn-outline-dark" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">Ürün Galerisi</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- THE HEART OF THE FACTORY / TEKNİK USTALIK -->
+<section id="technical" class="technical-mastery">
+    <div class="container">
+        <div class="mastery-grid">
+            <div class="mastery-content fade-scroll">
+                <div class="mastery-badge">THE HEART OF THE FACTORY</div>
+                <h2>Technical Mastery at Scale</h2>
+                <p class="mastery-desc">Our production facility is a high-tech environment where raw geological materials are transformed through advanced mechanics. We operate industrial-grade waterjet cutters, 7-axis CNC milling machines, and automated polishing lines capable of handling slabs up to 20 tons.</p>
+                <div class="tech-list">
+                    <div class="tech-item"><h4>🔍 OPTICAL SCANNING</h4><p>Every slab is 3D scanned for structural micro-fractures before production begins.</p></div>
+                    <div class="tech-item"><h4>🤖 ROBOTIC FABRICATION</h4><p>Precision tolerances of +/- 0.5mm for complex architectural joinery.</p></div>
+                </div>
+                <button class="btn-primary" style="margin-top: 35px; background:#1F1C19;" onclick="alert('Fabrika turu rezervasyonu için iletişime geçin.')">FACILITY TOUR →</button>
+            </div>
+            <div class="mastery-image fade-scroll">
+                <img src="https://images.pexels.com/photos/587741/pexels-photo-587741.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Fabrika içi üretim">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GLOBAL LANDMARKS (REFERANS PROJELER) -->
+<section id="landmarks" class="landmarks">
+    <div class="container">
+        <div class="text-center fade-scroll" style="text-align:center; margin-bottom: 50px;">
+            <span class="font-label text-[10px] tracking-[0.5em] text-primary font-bold uppercase mb-4 block" style="color:#A47C46;">The Factory's Legacy</span>
+            <h2 class="noto-serif-display text-4xl font-light" style="font-size: 2.8rem;">Global Landmarks</h2>
+        </div>
+        <div class="landmark-logos fade-scroll">
+            <div class="logo-item">AMAN</div>
+            <div class="logo-item">FOUR SEASONS</div>
+            <div class="logo-item">RITZ-CARLTON</div>
+            <div class="logo-item">BULGARI</div>
+        </div>
+        <div class="project-grid fade-scroll">
+            <div class="project-card">
+                <img src="https://images.pexels.com/photos/3634741/pexels-photo-3634741.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Dubai Villa">
+                <div class="project-overlay">
+                    <p>Residential Estate</p>
+                    <h3>The Sky Villa, Dubai</h3>
+                </div>
+            </div>
+            <div class="project-card">
+                <img src="https://images.pexels.com/photos/2414397/pexels-photo-2414397.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Zurich HQ">
+                <div class="project-overlay">
+                    <p>Corporate HQ</p>
+                    <h3>Lumina Plaza, Zurich</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- THE CURATED GALLERY (Premium mermer ve seramik) -->
+<section id="gallery" class="curated-gallery">
+    <div class="container">
+        <div class="gallery-header fade-scroll">
+            <div>
+                <span>The Finished Product</span>
+                <h2>The Curated Gallery</h2>
+            </div>
+            <a class="view-link" href="#" onclick="alert('Tüm koleksiyon için iletişime geçin'); return false;">VIEW ALL SERIES →</a>
+        </div>
+        <div class="gallery-masonry">
+            <div class="gallery-art-item fade-scroll">
+                <img src="https://images.pexels.com/photos/1467521/pexels-photo-1467521.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Calacatta">
+                <div class="art-overlay">
+                    <span>Origin: Carrara, Italy</span>
+                    <h3>Calacatta Borghini</h3>
+                    <div class="art-btn">Discover Texture</div>
+                </div>
+            </div>
+            <div class="gallery-art-item fade-scroll">
+                <img src="https://images.pexels.com/photos/3634741/pexels-photo-3634741.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Nero Marquina">
+                <div class="art-overlay">
+                    <span>Origin: Basque Country, Spain</span>
+                    <h3>Nero Marquina</h3>
+                    <div class="art-btn">Discover Texture</div>
+                </div>
+            </div>
+            <div class="gallery-art-item fade-scroll">
+                <img src="https://images.pexels.com/photos/1251602/pexels-photo-1251602.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Statuario">
+                <div class="art-overlay">
+                    <span>Origin: Apuan Alps, Italy</span>
+                    <h3>Statuario Extra</h3>
+                    <div class="art-btn">Discover Texture</div>
+                </div>
+            </div>
+            <div class="gallery-art-item fade-scroll">
+                <img src="https://images.pexels.com/photos/3943873/pexels-photo-3943873.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Travertine">
+                <div class="art-overlay">
+                    <span>Origin: Turkey</span>
+                    <h3>Silver Travertine</h3>
+                    <div class="art-btn">Discover Texture</div>
+                </div>
+            </div>
+            <div class="gallery-art-item fade-scroll">
+                <img src="https://images.pexels.com/photos/3729043/pexels-photo-3729043.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Empire Beige">
+                <div class="art-overlay">
+                    <span>Origin: Mediterranean</span>
+                    <h3>Empire Beige</h3>
+                    <div class="art-btn">Discover Texture</div>
+                </div>
+            </div>
+            <div class="gallery-art-item fade-scroll">
+                <img src="https://images.pexels.com/photos/2079249/pexels-photo-2079249.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Porselen Seramik">
+                <div class="art-overlay">
+                    <span>Ceramic Collection</span>
+                    <h3>Luxe Porcelain</h3>
+                    <div class="art-btn">Discover Texture</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- İLETİŞİM (beğendiğin gibi) -->
+<section id="contact">
+    <div class="container">
+        <div class="contact-area fade-scroll">
+            <div class="contact-flex">
+                <div class="contact-info">
+                    <h3 style="font-size: 2rem; font-family: 'Noto Serif Display'; margin-bottom: 32px;">Fabrikamıza Ulaşın</h3>
+                    <div class="info-line"><i class="fas fa-map-marker-alt"></i><span>İzmir Torbalı / Mermer İhtisas OSB, Türkiye</span></div>
+                    <div class="info-line"><i class="fas fa-phone-alt"></i><span>+90 232 678 90 40</span></div>
+                    <div class="info-line"><i class="fas fa-envelope"></i><span>info@arteonstone.com</span></div>
+                    <div class="info-line"><i class="fas fa-clock"></i><span>Pzt - Cmt: 08:00 - 18:30</span></div>
+                    <div style="margin-top: 40px;"><p style="font-weight: 500;">Fabrika gezisi ve numune talepleri için formu doldurun.</p></div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group"><input type="text" id="name" placeholder="Adınız Soyadınız" required></div>
+                        <div class="form-group"><input type="email" id="email" placeholder="E-posta Adresiniz" required></div>
+                        <div class="form-group"><input type="tel" id="phone" placeholder="Telefon Numaranız"></div>
+                        <div class="form-group"><textarea rows="4" id="message" placeholder="Mermer / seramik talebi, proje detayları veya fabrika ziyareti"></textarea></div>
+                        <button type="submit" id="submitBtn">Mesaj Gönder <i class="fas fa-arrow-right"></i></button>
+                        <p id="formFeedback" style="margin-top: 15px; font-size:0.85rem;"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div><div class="footer-logo">ARTEON STONE</div><p style="margin-top: 18px;">Fabrika Üretimi · Mermer · Seramik · Doğal Taş</p></div>
+            <div><h4>Keşfet</h4><p><a href="#technical" style="color:#CBBEAE; text-decoration:none;">Teknik Üstünlük</a></p><p><a href="#landmarks" style="color:#CBBEAE; text-decoration:none;">Referanslar</a></p><p><a href="#gallery" style="color:#CBBEAE; text-decoration:none;">Galeri</a></p></div>
+            <div><h4>Fabrika</h4><p>İzmir Serbest Bölge</p><p>+90 232 678 90 40</p><div class="social-icons"><i class="fab fa-instagram"></i><i class="fab fa-linkedin-in"></i><i class="fab fa-youtube"></i></div></div>
+        </div>
+        <hr style="border-color:#3D352E; margin: 40px 0 20px;">
+        <p style="text-align: center; font-size:0.75rem;">© 2025 Arteon Stone Fabrikası — Teknik Üstünlük & Zamansız Tasarım</p>
+    </div>
+</footer>
+
+<script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+    document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('active')));
+
+    const fadeElements = document.querySelectorAll('.fade-scroll');
+    const checkVisibility = () => {
+        fadeElements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 70) el.classList.add('visible');
+        });
+    };
+    window.addEventListener('scroll', checkVisibility);
+    window.addEventListener('load', checkVisibility);
+
+    const contactForm = document.getElementById('contactForm');
+    const formFeedback = document.getElementById('formFeedback');
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        if(!name || !email) {
+            formFeedback.style.color = '#C75C3E';
+            formFeedback.innerText = 'Lütfen ad-soyad ve e-posta alanlarını doldurun.';
+            return;
+        }
+        const btn = document.getElementById('submitBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Gönderiliyor...';
+        btn.disabled = true;
+        setTimeout(() => {
+            formFeedback.style.color = '#2A7A3B';
+            formFeedback.innerText = '✓ Talebiniz fabrika ekibimize iletildi. En kısa sürede dönüş yapılacaktır.';
+            contactForm.reset();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            setTimeout(() => formFeedback.innerText = '', 4500);
+        }, 1000);
+    });
+
+    const galleryArt = document.querySelectorAll('.gallery-art-item, .project-card');
+    galleryArt.forEach(item => {
+        item.addEventListener('click', (e) => {
+            if(e.target.closest('.art-btn') || e.target.closest('.view-link')) return;
+            const img = item.querySelector('img');
+            if(img) {
+                const lightDiv = document.createElement('div');
+                lightDiv.innerHTML = `<div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); backdrop-filter:blur(12px); z-index:2000; display:flex; align-items:center; justify-content:center; cursor:pointer;" id="lightbox"><img src="${img.src}" style="max-width:85%; max-height:80%; object-fit:contain; border-radius:8px;"><div style="position:absolute; bottom:40px; color:white;">Premium Collection</div></div>`;
+                document.body.appendChild(lightDiv);
+                document.getElementById('lightbox').addEventListener('click', function() { this.remove(); });
+            }
+        });
+    });
+</script>
 </body>
 </html>
