@@ -5,7 +5,6 @@ import {
     FaCog,
     FaPlus,
     FaPlay,
-    FaEye,
     FaShoppingBag,
     FaHome,
     FaUser,
@@ -65,7 +64,7 @@ const Profile: React.FC = () => {
         { id: 'reels', icon: <FaPlay />, label: 'Reels', path: '/medya' },
         { id: 'craftoraShop', icon: <FaGem />, label: 'CraftoraShop', path: '/medya' },
         { id: 'search', icon: <FaSearch />, label: 'Search', isSearch: true },
-        { id: 'competition', icon: <FaTrophy />, label: 'Competition', path: '/medya' },
+        { id: 'competition', icon: <FaTrophy />, label: 'Competition', path: '/competition' },
         { id: 'profile', icon: <FaUser />, label: 'Profile', path: '/profile' },
     ];
 
@@ -416,7 +415,7 @@ const Profile: React.FC = () => {
                             className={`${styles.bottomNavItem} ${activeNav === item.id ? styles.bottomNavItemActive : ''} ${item.isSearch ? styles.bottomNavSearch : ''}`}
                             onClick={() => {
                                 if (item.isSearch) {
-                                    toggleSearch();
+                                    navigate('/search');
                                 } else if (item.path) {
                                     setActiveNav(item.id);
                                     navigate(item.path);

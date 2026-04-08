@@ -824,7 +824,7 @@ const Competition: React.FC = () => {
                             className={`${styles.bottomNavItem} ${activeNav === item.id ? styles.bottomNavItemActive : ''} ${item.isSearch ? styles.bottomNavSearch : ''}`}
                             onClick={() => {
                                 if (item.isSearch) {
-                                    toggleSearch();
+                                    navigate('/search');
                                 } else if (item.path) {
                                     setActiveNav(item.id);
                                     navigate(item.path);

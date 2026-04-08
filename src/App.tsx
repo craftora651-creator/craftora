@@ -47,7 +47,7 @@ import SellerProducts from './middleware/SellerProducts';
 import Profile from './pages/Profile';
 import CraftoraShops from './pages/CraftoraShops';
 import Competition from './pages/Competition'; // ✅ BUNU EKLE
-import { apiClient } from './api/apiClient';
+import SearchPage from './pages/SearchPage';
 
 import "./index.css";
 
@@ -271,6 +271,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/craftora-shops" element={<CraftoraShops />} />
               <Route path="/competition" element={<Competition />} />
+              <Route path="/search" element={<SearchPage />} />
               
 
               <Route

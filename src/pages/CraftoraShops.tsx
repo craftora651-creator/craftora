@@ -11,6 +11,7 @@ import Deal from '../app/Deal'
 import Winners from '../app/Winners';
 import Testimonials from '../app/Testimonials'
 import Footer from '../app/Footer';
+import SearchPage from '../pages/SearchPage';
 
 const CraftoraShops: React.FC = () => {
     const navigate = useNavigate();
@@ -19,17 +20,15 @@ const CraftoraShops: React.FC = () => {
     const [searchActive, setSearchActive] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     const toggleDarkMode = () => {
         setIsDarkMode(!isDarkMode);
     };
 
     const toggleSearch = () => {
-        setSearchActive(!searchActive);
-        if (!searchActive) {
-            setTimeout(() => searchInputRef.current?.focus(), 100);
-        }
-    };
+    setIsSearchOpen(true);
+};
 
     // Alt navigasyon itemları (Medya ile aynı)
     const bottomNavItems = [
@@ -93,7 +92,7 @@ const CraftoraShops: React.FC = () => {
                             className={`${styles.bottomNavItem} ${activeNav === item.id ? styles.bottomNavItemActive : ''} ${item.isSearch ? styles.bottomNavSearch : ''}`}
                             onClick={() => {
                                 if (item.isSearch) {
-                                    toggleSearch();
+                                    navigate('/search');
                                 } else if (item.path) {
                                     setActiveNav(item.id);
                                     navigate(item.path);

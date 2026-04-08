@@ -304,7 +304,7 @@ const Medya: React.FC = () => {
                             className={`${styles.bottomNavItem} ${activeNav === item.id ? styles.bottomNavItemActive : ''} ${item.isSearch ? styles.bottomNavSearch : ''}`}
                             onClick={() => {
                                 if (item.isSearch) {
-                                    toggleSearch();
+                                    navigate('/search');
                                 } else if (item.id === 'profile') {
                                     navigate('/profile');
                                 } else if (item.id === 'home') {
