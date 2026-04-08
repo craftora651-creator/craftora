@@ -1,5 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaInstagram, FaFacebook, FaTiktok, FaPinterest } from 'react-icons/fa';
+import { useMyShops, useShopSettings, useUpdateShopSettings } from '../server/FastAPI/shop.hooks';
+import { useCurrentUser } from '../server/FastAPI/user.hooks';
+import {
+  useSendNewOrderNotification,
+  useSendNewSubscriberNotification,
+  useSendPayoutNotification
+} from '../server/Gin/email.hooks';
 
 interface SettingsPageProps {
   colors: {
@@ -12,9 +19,12 @@ interface SettingsPageProps {
   };
 }
 
+
+
 const SettingsPage = ({ colors }: SettingsPageProps) => {
   const [activeTab, setActiveTab] = useState('contact'); // contact, payment, notification, invoice, security
-
+  const { data: shops } = useMyShops();
+  const currentShop = shops?.[0];
   const tabs = [
     { id: 'contact', label: '📞 İletişim & Sosyal', icon: 'contact_mail' },
     { id: 'payment', label: '💰 Ödeme Ayarları', icon: 'payments' },
@@ -22,6 +32,7 @@ const SettingsPage = ({ colors }: SettingsPageProps) => {
     { id: 'invoice', label: '📄 Fatura & Teslimat', icon: 'receipt' },
     { id: 'security', label: '🔒 Hesap Güvenliği', icon: 'security' },
   ];
+
 
   return (
     <div>
@@ -74,7 +85,8 @@ const SettingsPage = ({ colors }: SettingsPageProps) => {
         border: `1px solid ${colors.border}`,
         padding: 28
       }}>
-        {activeTab === 'contact' && <ContactSettings colors={colors} />}
+
+        {activeTab === 'contact' && <ContactSettings colors={colors} shopId={currentShop?.id || ''} />}
         {activeTab === 'payment' && <PaymentSettings colors={colors} />}
         {activeTab === 'notification' && <NotificationSettings colors={colors} />}
         {activeTab === 'invoice' && <InvoiceSettings colors={colors} />}
@@ -85,16 +97,128 @@ const SettingsPage = ({ colors }: SettingsPageProps) => {
 };
 
 // 1. İLETİŞİM & SOSYAL MEDYA
-const ContactSettings = ({ colors }: SettingsPageProps) => {
-  const [email, setEmail] = useState('iletisim@craftora.com');
-  const [phone, setPhone] = useState('+90 555 123 45 67');
-  const [address, setAddress] = useState('İstanbul, Türkiye');
-  const [social, setSocial] = useState({
-    instagram: 'https://instagram.com/craftora',
-    facebook: 'https://facebook.com/craftora',
-    tiktok: 'https://tiktok.com/@craftora',
-    pinterest: 'https://pinterest.com/craftora'
+// 1. İLETİŞİM & SOSYAL MEDYA
+const ContactSettings = ({ colors, shopId }: { colors: any; shopId: string }) => {
+  const { data: shopSettings, isLoading, refetch, error } = useShopSettings(shopId);
+  console.log("🔍 shopSettings:", shopSettings);
+  console.log("🔍 error:", error);
+  const updateSettings = useUpdateShopSettings();
+  const { data: currentUser } = useCurrentUser();
+
+  const [formData, setFormData] = useState({
+    contactEmail: '',
+    supportEmail: '',
+    phone: '',
+    address: {
+      street: '',
+      city: '',
+      country: '',
+      postalCode: ''
+    },
+    socialMedia: {
+      instagram: '',
+      facebook: '',
+      tiktok: '',
+      pinterest: ''
+    }
   });
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Backend'den gelen verileri form'a yükle
+  useEffect(() => {
+    if (shopSettings && shopSettings.shop_id) {
+      console.log("📦 Gelen shopSettings:", shopSettings);
+      console.log("📦 address:", shopSettings.address);
+      console.log("📦 social_media:", shopSettings.social_media);
+
+      setFormData({
+        contactEmail: shopSettings.contact_email || currentUser?.email || '',
+        supportEmail: shopSettings.support_email || '',
+        phone: shopSettings.phone || '',
+        address: {
+          street: shopSettings.address?.street || '',
+          city: shopSettings.address?.city || '',
+          country: shopSettings.address?.country || '',
+          postalCode: shopSettings.address?.postal_code || ''  // DİKKAT: postal_code (alt çizgili)
+        },
+        socialMedia: {
+          instagram: shopSettings.social_media?.instagram || '',
+          facebook: shopSettings.social_media?.facebook || '',
+          tiktok: shopSettings.social_media?.tiktok || '',
+          pinterest: shopSettings.social_media?.pinterest || ''
+        }
+      });
+    }
+  }, [shopSettings, currentUser]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+
+    const payload = {
+      contact_email: formData.contactEmail,
+      support_email: formData.supportEmail,
+      phone: formData.phone,
+      address: {
+        street: formData.address.street,
+        city: formData.address.city,
+        country: formData.address.country,
+        postal_code: formData.address.postalCode
+      },
+      social_media: {
+        instagram: formData.socialMedia.instagram,
+        facebook: formData.socialMedia.facebook,
+        tiktok: formData.socialMedia.tiktok,
+        pinterest: formData.socialMedia.pinterest
+      }
+    };
+
+    try {
+      await updateSettings.mutateAsync({
+        shopId: shopId,
+        settings: payload
+      });
+
+      alert('✅ Ayarlar başarıyla kaydedildi!');
+
+      // REFETCH YAP VE GELEN VERİYLE FORM'U GÜNCELLE
+      const result = await refetch();
+      if (result.data) {
+        console.log("🔄 Gelen yeni veri:", result.data);
+        // Form'u manuel güncelle
+        setFormData({
+          contactEmail: result.data.contact_email || currentUser?.email || '',
+          supportEmail: result.data.support_email || '',
+          phone: result.data.phone || '',
+          address: {
+            street: result.data.address?.street || '',
+            city: result.data.address?.city || '',
+            country: result.data.address?.country || '',
+            postalCode: result.data.address?.postal_code || ''
+          },
+          socialMedia: {
+            instagram: result.data.social_media?.instagram || '',
+            facebook: result.data.social_media?.facebook || '',
+            tiktok: result.data.social_media?.tiktok || '',
+            pinterest: result.data.social_media?.pinterest || ''
+          }
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Kaydetme hatası:', error);
+      if (error.response) {
+        console.error('❌ Backend hatası:', error.response.data);
+      }
+      alert('❌ Kaydedilirken bir hata oluştu!');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div style={{ textAlign: 'center', padding: '40px' }}>Yükleniyor...</div>;
+  }
 
   return (
     <div>
@@ -102,43 +226,110 @@ const ContactSettings = ({ colors }: SettingsPageProps) => {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div>
-          <label style={{ fontSize: 13, color: colors.textSecondary, display: 'block', marginBottom: 8 }}>📧 İletişim E-postası</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
+          <label style={{ fontSize: 13, color: colors.textSecondary, display: 'block', marginBottom: 8 }}>📧 İletişim E-postası *</label>
+          <input
+            type="email"
+            value={formData.contactEmail}
+            onChange={e => setFormData({ ...formData, contactEmail: e.target.value })}
+            style={{ width: '100%', padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }}
+          />
+        </div>
+
+        <div>
+          <label style={{ fontSize: 13, color: colors.textSecondary, display: 'block', marginBottom: 8 }}>📧 Destek E-postası</label>
+          <input
+            type="email"
+            value={formData.supportEmail}
+            onChange={e => setFormData({ ...formData, supportEmail: e.target.value })}
+            style={{ width: '100%', padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }}
+          />
         </div>
 
         <div>
           <label style={{ fontSize: 13, color: colors.textSecondary, display: 'block', marginBottom: 8 }}>📞 Telefon Numarası</label>
-          <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} style={{ width: '100%', padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
+          <input
+            type="tel"
+            value={formData.phone}
+            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+            placeholder="+90 555 123 4567"
+            style={{ width: '100%', padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }}
+          />
         </div>
 
         <div>
-          <label style={{ fontSize: 13, color: colors.textSecondary, display: 'block', marginBottom: 8 }}>📍 Adres</label>
-          <textarea rows={2} value={address} onChange={e => setAddress(e.target.value)} style={{ width: '100%', padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
+          <label style={{ fontSize: 13, color: colors.textSecondary, display: 'block', marginBottom: 8 }}>📍 Adres Bilgileri</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <input
+              type="text"
+              placeholder="Cadde / Sokak"
+              value={formData.address.street}
+              onChange={e => setFormData({ ...formData, address: { ...formData.address, street: e.target.value } })}
+              style={{ padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }}
+            />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <input
+                type="text"
+                placeholder="Şehir"
+                value={formData.address.city}
+                onChange={e => setFormData({ ...formData, address: { ...formData.address, city: e.target.value } })}
+                style={{ padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }}
+              />
+              <input
+                type="text"
+                placeholder="Posta Kodu"
+                value={formData.address.postalCode}
+                onChange={e => setFormData({ ...formData, address: { ...formData.address, postalCode: e.target.value } })}
+                style={{ padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }}
+              />
+            </div>
+            <input
+              type="text"
+              placeholder="Ülke"
+              value={formData.address.country}
+              onChange={e => setFormData({ ...formData, address: { ...formData.address, country: e.target.value } })}
+              style={{ padding: '12px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }}
+            />
+          </div>
         </div>
 
         <div>
           <label style={{ fontSize: 13, color: colors.textSecondary, display: 'block', marginBottom: 8 }}>🌐 Sosyal Medya Hesapları</label>
-<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-    <FaInstagram style={{ width: 24, height: 24, color: '#E4405F' }} />
-    <input type="text" placeholder="Instagram" value={social.instagram} onChange={e => setSocial({...social, instagram: e.target.value})} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
-  </div>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-    <FaFacebook style={{ width: 24, height: 24, color: '#1877F2' }} />
-    <input type="text" placeholder="Facebook" value={social.facebook} onChange={e => setSocial({...social, facebook: e.target.value})} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
-  </div>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-    <FaTiktok style={{ width: 24, height: 24, color: '#000000' }} />
-    <input type="text" placeholder="TikTok" value={social.tiktok} onChange={e => setSocial({...social, tiktok: e.target.value})} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
-  </div>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-    <FaPinterest style={{ width: 24, height: 24, color: '#BD081C' }} />
-    <input type="text" placeholder="Pinterest" value={social.pinterest} onChange={e => setSocial({...social, pinterest: e.target.value})} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
-  </div>
-</div>        </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <FaInstagram style={{ width: 24, height: 24, color: '#E4405F' }} />
+              <input type="text" placeholder="Instagram" value={formData.socialMedia.instagram} onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <FaFacebook style={{ width: 24, height: 24, color: '#1877F2' }} />
+              <input type="text" placeholder="Facebook" value={formData.socialMedia.facebook} onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, facebook: e.target.value } })} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <FaTiktok style={{ width: 24, height: 24, color: '#000000' }} />
+              <input type="text" placeholder="TikTok" value={formData.socialMedia.tiktok} onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, tiktok: e.target.value } })} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <FaPinterest style={{ width: 24, height: 24, color: '#BD081C' }} />
+              <input type="text" placeholder="Pinterest" value={formData.socialMedia.pinterest} onChange={e => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, pinterest: e.target.value } })} style={{ flex: 1, padding: '10px 16px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 12, color: colors.text }} />
+            </div>
+          </div>
+        </div>
 
-        <button style={{ padding: '12px 24px', backgroundColor: colors.primary, border: 'none', borderRadius: 40, color: 'white', fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start' }}>
-          Değişiklikleri Kaydet
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: colors.primary,
+            border: 'none',
+            borderRadius: 40,
+            color: 'white',
+            fontWeight: 600,
+            cursor: isSaving ? 'not-allowed' : 'pointer',
+            alignSelf: 'flex-start',
+            opacity: isSaving ? 0.7 : 1
+          }}
+        >
+          {isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
         </button>
       </div>
     </div>
@@ -286,7 +477,14 @@ const PaymentSettings = ({ colors }: SettingsPageProps) => {
 };
 
 // 3. BİLDİRİMLER (Yeni sipariş, Abonelik, Müşteri mesajı, Ödeme)
+// 3. BİLDİRİMLER (Yeni sipariş, Abonelik, Müşteri mesajı, Ödeme)
 const NotificationSettings = ({ colors }: SettingsPageProps) => {
+  const { data: shops } = useMyShops();
+  const currentShop = shops?.[0];
+  const { data: shopSettings, refetch } = useShopSettings(currentShop?.id || '');
+  const updateSettings = useUpdateShopSettings();
+
+  // Bildirim tercihlerini backend'den al veya default değerleri kullan
   const [notifications, setNotifications] = useState({
     newOrder: true,
     newSubscriber: true,
@@ -294,39 +492,262 @@ const NotificationSettings = ({ colors }: SettingsPageProps) => {
     payoutSent: true,
   });
 
+  const [isSaving, setIsSaving] = useState(false);
+  const [testStatus, setTestStatus] = useState<{ type: string; status: string } | null>(null);
+
+  // Test bildirimi gönderme hook'ları
+  const { mutate: sendOrderTest, isPending: isOrderPending } = useSendNewOrderNotification();
+  const { mutate: sendSubscriberTest, isPending: isSubscriberPending } = useSendNewSubscriberNotification();
+  const { mutate: sendPayoutTest, isPending: isPayoutPending } = useSendPayoutNotification();
+
+  // Backend'den gelen tercihleri yükle
+  useEffect(() => {
+    if (shopSettings?.settings?.notifications) {
+      const prefs = shopSettings.settings.notifications;
+      setNotifications({
+        newOrder: prefs.new_order ?? true,
+        newSubscriber: prefs.new_subscriber ?? true,
+        customerMessage: prefs.customer_message ?? true,
+        payoutSent: prefs.payout_sent ?? true,
+      });
+    }
+  }, [shopSettings]);
+
   const toggle = (key: keyof typeof notifications) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Bildirim tercihlerini kaydet
+  const handleSavePreferences = async () => {
+    setIsSaving(true);
+    try {
+      await updateSettings.mutateAsync({
+        shopId: currentShop?.id || '',
+        settings: {
+          notifications: {
+            new_order: notifications.newOrder,
+            new_subscriber: notifications.newSubscriber,
+            customer_message: notifications.customerMessage,
+            payout_sent: notifications.payoutSent,
+          }
+        }
+      });
+      alert('✅ Bildirim tercihleri kaydedildi!');
+      refetch();
+    } catch (error) {
+      console.error('❌ Kaydetme hatası:', error);
+      alert('❌ Kaydedilirken bir hata oluştu!');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Test bildirimi gönder
+  const sendTestNotification = (type: string) => {
+    const shopEmail = shopSettings?.contact_email || 'test@craftora.com';
+    const shopName = currentShop?.shop_name || 'Test Mağaza';
+
+    setTestStatus({ type, status: 'sending' });
+
+    const handleResponse = (result: any) => {
+      if (result?.success) {
+        setTestStatus({ type, status: 'success' });
+        setTimeout(() => setTestStatus(null), 3000);
+      } else {
+        setTestStatus({ type, status: 'error' });
+        setTimeout(() => setTestStatus(null), 3000);
+      }
+    };
+
+    const handleError = () => {
+      setTestStatus({ type, status: 'error' });
+      setTimeout(() => setTestStatus(null), 3000);
+    };
+
+    switch (type) {
+      case 'order':
+        sendOrderTest({
+          to_email: shopEmail,
+          order_id: 'TEST-001',
+          order_total: '1.250,00',
+          customer_name: 'Test Müşteri',
+          shop_name: shopName,
+        }, {
+          onSuccess: handleResponse,
+          onError: handleError
+        });
+        break;
+      case 'subscriber':
+        sendSubscriberTest({
+          to_email: shopEmail,
+          subscriber_email: 'abone@test.com',
+          shop_name: shopName,
+        }, {
+          onSuccess: handleResponse,
+          onError: handleError
+        });
+        break;
+      case 'payout':
+        sendPayoutTest({
+          to_email: shopEmail,
+          amount: '5.000,00',
+          payment_date: new Date().toLocaleDateString('tr-TR'),
+          shop_name: shopName,
+        }, {
+          onSuccess: handleResponse,
+          onError: handleError
+        });
+        break;
+    }
+  };
+
+  const isTesting = (type: string) => {
+    if (type === 'order') return isOrderPending;
+    if (type === 'subscriber') return isSubscriberPending;
+    if (type === 'payout') return isPayoutPending;
+    return false;
   };
 
   return (
     <div>
       <h2 style={{ fontSize: 20, fontWeight: 600, color: colors.text, marginBottom: 24 }}>Bildirim Tercihleri</h2>
 
+      <p style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 24 }}>
+        Bu bildirimler <strong>{shopSettings?.contact_email || 'kayıtlı e-posta adresinize'}</strong> gönderilecektir.
+      </p>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <NotificationItem label="📦 Yeni Sipariş" description="Yeni bir sipariş geldiğinde bildirim al" enabled={notifications.newOrder} onToggle={() => toggle('newOrder')} colors={colors} />
-        <NotificationItem label="🔔 Yeni Abone" description="Bir kullanıcı mağazana abone olduğunda bildirim al" enabled={notifications.newSubscriber} onToggle={() => toggle('newSubscriber')} colors={colors} />
-        <NotificationItem label="💬 Müşteri Mesajı" description="Müşteri size mesaj gönderdiğinde bildirim al" enabled={notifications.customerMessage} onToggle={() => toggle('customerMessage')} colors={colors} />
-        <NotificationItem label="💰 Ödeme Gönderildi" description="Kazancınız hesabınıza aktarıldığında bildirim al" enabled={notifications.payoutSent} onToggle={() => toggle('payoutSent')} colors={colors} />
+        <NotificationItem
+          label="📦 Yeni Sipariş"
+          description="Yeni bir sipariş geldiğinde bildirim al"
+          enabled={notifications.newOrder}
+          onToggle={() => toggle('newOrder')}
+          colors={colors}
+          onTest={() => sendTestNotification('order')}
+          isTesting={isTesting('order')}
+          testStatus={testStatus?.type === 'order' ? testStatus.status : null}
+        />
+        <NotificationItem
+          label="🔔 Yeni Abone"
+          description="Bir kullanıcı mağazana abone olduğunda bildirim al"
+          enabled={notifications.newSubscriber}
+          onToggle={() => toggle('newSubscriber')}
+          colors={colors}
+          onTest={() => sendTestNotification('subscriber')}
+          isTesting={isTesting('subscriber')}
+          testStatus={testStatus?.type === 'subscriber' ? testStatus.status : null}
+        />
+        <NotificationItem
+          label="💬 Müşteri Mesajı"
+          description="Müşteri size mesaj gönderdiğinde bildirim al"
+          enabled={notifications.customerMessage}
+          onToggle={() => toggle('customerMessage')}
+          colors={colors}
+        />
+        <NotificationItem
+          label="💰 Ödeme Gönderildi"
+          description="Kazancınız hesabınıza aktarıldığında bildirim al"
+          enabled={notifications.payoutSent}
+          onToggle={() => toggle('payoutSent')}
+          colors={colors}
+          onTest={() => sendTestNotification('payout')}
+          isTesting={isTesting('payout')}
+          testStatus={testStatus?.type === 'payout' ? testStatus.status : null}
+        />
       </div>
 
-      <button style={{ marginTop: 24, padding: '12px 24px', backgroundColor: colors.primary, border: 'none', borderRadius: 40, color: 'white', fontWeight: 600, cursor: 'pointer' }}>
-        Kaydet
-      </button>
+      <div style={{ display: 'flex', gap: 16, marginTop: 32 }}>
+        <button
+          onClick={handleSavePreferences}
+          disabled={isSaving}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: colors.primary,
+            border: 'none',
+            borderRadius: 40,
+            color: 'white',
+            fontWeight: 600,
+            cursor: isSaving ? 'not-allowed' : 'pointer',
+            opacity: isSaving ? 0.7 : 1
+          }}
+        >
+          {isSaving ? 'Kaydediliyor...' : 'Tercihleri Kaydet'}
+        </button>
+      </div>
+
+      <div style={{
+        marginTop: 24,
+        padding: 16,
+        backgroundColor: colors.bg,
+        borderRadius: 12,
+        border: `1px solid ${colors.border}`
+      }}>
+        <div style={{ fontSize: 12, color: colors.textSecondary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="material-icons-round" style={{ fontSize: 16 }}>info</span>
+          Not: Test bildirimleri göndermek için "Test Et" butonlarını kullanabilirsiniz.
+          Bildirimler {shopSettings?.contact_email || 'e-posta adresinize'} gönderilecektir.
+        </div>
+      </div>
     </div>
   );
 };
 
-const NotificationItem = ({ label, description, enabled, onToggle, colors }: any) => (
+// Güncellenmiş NotificationItem component'i
+const NotificationItem = ({ label, description, enabled, onToggle, colors, onTest, isTesting, testStatus }: any) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: `1px solid ${colors.border}` }}>
     <div>
       <div style={{ fontSize: 14, fontWeight: 500, color: colors.text }}>{label}</div>
       <div style={{ fontSize: 12, color: colors.textSecondary }}>{description}</div>
     </div>
-    <button onClick={onToggle} style={{ width: 48, height: 24, borderRadius: 30, backgroundColor: enabled ? colors.primary : colors.border, border: 'none', cursor: 'pointer', transition: 'all 0.2s', position: 'relative' }}>
-      <div style={{ width: 18, height: 18, borderRadius: 18, backgroundColor: 'white', position: 'absolute', top: 3, left: enabled ? 27 : 3, transition: 'left 0.2s' }} />
-    </button>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      {onTest && (
+        <button
+          onClick={onTest}
+          disabled={isTesting}
+          style={{
+            padding: '6px 12px',
+            fontSize: 11,
+            backgroundColor: testStatus === 'success' ? '#10b981' : (testStatus === 'error' ? '#ef4444' : colors.bg),
+            border: `1px solid ${colors.border}`,
+            borderRadius: 30,
+            color: testStatus === 'success' ? 'white' : (testStatus === 'error' ? 'white' : colors.textSecondary),
+            cursor: isTesting ? 'not-allowed' : 'pointer',
+            opacity: isTesting ? 0.6 : 1,
+            transition: 'all 0.2s'
+          }}
+        >
+          {isTesting ? 'Gönderiliyor...' : (testStatus === 'success' ? '✓ Gönderildi' : (testStatus === 'error' ? '❌ Hata' : 'Test Et'))}
+        </button>
+      )}
+      <button
+        onClick={onToggle}
+        style={{
+          width: 48,
+          height: 24,
+          borderRadius: 30,
+          backgroundColor: enabled ? colors.primary : colors.border,
+          border: 'none',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          position: 'relative'
+        }}
+      >
+        <div style={{
+          width: 18,
+          height: 18,
+          borderRadius: 18,
+          backgroundColor: 'white',
+          position: 'absolute',
+          top: 3,
+          left: enabled ? 27 : 3,
+          transition: 'left 0.2s'
+        }} />
+      </button>
+    </div>
   </div>
 );
+
+
 
 // 4. FATURA & TESLİMAT
 const InvoiceSettings = ({ colors }: SettingsPageProps) => {
@@ -374,20 +795,34 @@ const InvoiceSettings = ({ colors }: SettingsPageProps) => {
 
 // 5. HESAP GÜVENLİĞİ (Google/Apple bağlantısı, oturumlar)
 const SecuritySettings = ({ colors }: SettingsPageProps) => {
-  const [connectedAccount, setConnectedAccount] = useState({
-    type: 'google', // google, apple, email
-    email: 'tom.cook@craftora.com',
-    name: 'Tom Cook',
-    avatar: 'https://ui-avatars.com/api/?name=Tom+Cook&background=0ea5e9&color=fff&size=80'
-  });
+  const { data: userData, isLoading: userLoading } = useCurrentUser();
+  
+  const connectedAccount = {
+    type: userData?.auth_provider || 'email',
+    email: userData?.email || '',
+    name: userData?.full_name || userData?.email?.split('@')[0] || 'Kullanıcı',
+    avatar: userData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.full_name || 'Kullanıcı')}&background=e07c5c&color=fff&size=80`
+  };
 
-  const [sessions] = useState([
-    { device: 'Chrome on Windows', location: 'İstanbul, TR', ip: '192.168.1.1', lastActive: 'Şu an aktif', current: true },
-    { device: 'Safari on iPhone', location: 'Ankara, TR', ip: '192.168.1.2', lastActive: '2 saat önce', current: false },
-    { device: 'Firefox on Mac', location: 'İzmir, TR', ip: '192.168.1.3', lastActive: '3 gün önce', current: false },
-  ]);
+  // Giriş Geçmişi - Son 5 giriş
+  const loginHistory = [
+    { date: 'Bugün 10:30', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
+    { date: 'Dün 22:15', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
+    { date: '2 gün önce', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
+    { date: '5 gün önce', location: 'İstanbul, TR', device: 'Firefox on Windows', ip: '192.168.1.2' },
+    { date: '1 hafta önce', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
+  ];
 
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  // Güvenlik Önerileri
+  const securityTips = [
+    { text: 'Şifrenizi değiştirmeyeli 90 gün oldu', action: 'Şifre Değiştir', urgent: true },
+    { text: 'İki faktörlü kimlik doğrulama aktif değil', action: 'Aktif Et', urgent: false },
+    { text: 'Hesabınıza bağlı uygulama yok', action: 'Uygulama Ekle', urgent: false },
+  ];
+
+  if (userLoading) {
+    return <div style={{ padding: 20, color: colors.text }}>Yükleniyor...</div>;
+  }
 
   return (
     <div>
@@ -432,75 +867,77 @@ const SecuritySettings = ({ colors }: SettingsPageProps) => {
         </div>
       </div>
 
-      {/* İki Faktörlü Kimlik Doğrulama */}
-      <div style={{ marginBottom: 32, padding: 20, backgroundColor: colors.bg, borderRadius: 20, border: `1px solid ${colors.border}` }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="material-icons-round" style={{ color: colors.primary }}>security</span>
-              İki Faktörlü Kimlik Doğrulama (2FA)
-            </div>
-            <div style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>Hesabınıza ekstra bir güvenlik katmanı ekleyin</div>
-          </div>
-          <button onClick={() => setTwoFactorEnabled(!twoFactorEnabled)} style={{ width: 48, height: 24, borderRadius: 30, backgroundColor: twoFactorEnabled ? colors.primary : colors.border, border: 'none', cursor: 'pointer', transition: 'all 0.2s', position: 'relative' }}>
-            <div style={{ width: 18, height: 18, borderRadius: 18, backgroundColor: 'white', position: 'absolute', top: 3, left: twoFactorEnabled ? 27 : 3, transition: 'left 0.2s' }} />
-          </button>
-        </div>
-        {twoFactorEnabled && (
-          <div style={{ marginTop: 16, padding: 12, backgroundColor: colors.surface, borderRadius: 12, border: `1px solid ${colors.border}` }}>
-            <div style={{ fontSize: 12, color: colors.textSecondary }}>✅ 2FA aktive edildi. Telefonunuza veya authenticator uygulamanıza kod gönderilecek.</div>
-          </div>
-        )}
-      </div>
-
-      {/* Aktif Oturumlar */}
+      {/* Güvenlik Önerileri */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="material-icons-round" style={{ color: colors.primary }}>devices</span>
-          Aktif Oturumlar
+          <span className="material-icons-round" style={{ color: colors.primary }}>tips_and_updates</span>
+          Güvenlik Önerileri
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {sessions.map((session, idx) => (
-            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: colors.bg, borderRadius: 16, border: `1px solid ${colors.border}` }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <span className="material-icons-round" style={{ color: session.current ? colors.primary : colors.textSecondary }}>devices</span>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: colors.text }}>{session.device}</span>
-                  {session.current && <span style={{ fontSize: 10, backgroundColor: colors.primary, color: 'white', padding: '2px 10px', borderRadius: 20 }}>Bu cihaz</span>}
-                </div>
-                <div style={{ fontSize: 12, color: colors.textSecondary, marginTop: 6 }}>
-                  📍 {session.location} • 🌐 {session.ip} • ⏱️ {session.lastActive}
-                </div>
+          {securityTips.map((tip, idx) => (
+            <div key={idx} style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '14px 16px',
+              backgroundColor: tip.urgent ? 'rgba(239, 68, 68, 0.1)' : colors.bg,
+              borderRadius: 16,
+              border: `1px solid ${tip.urgent ? '#ef4444' : colors.border}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span className="material-icons-round" style={{ color: tip.urgent ? '#ef4444' : colors.primary }}>
+                  {tip.urgent ? 'warning' : 'info'}
+                </span>
+                <span style={{ fontSize: 14, color: colors.text }}>{tip.text}</span>
               </div>
-              {!session.current && (
-                <button style={{ padding: '6px 14px', backgroundColor: 'transparent', border: `1px solid ${colors.border}`, borderRadius: 20, color: '#ef4444', fontSize: 12, cursor: 'pointer' }}>
-                  Çıkış Yap
-                </button>
-              )}
+              <button style={{
+                padding: '6px 16px',
+                backgroundColor: tip.urgent ? '#ef4444' : 'transparent',
+                border: tip.urgent ? 'none' : `1px solid ${colors.border}`,
+                borderRadius: 30,
+                color: tip.urgent ? 'white' : colors.textSecondary,
+                fontSize: 12,
+                cursor: 'pointer'
+              }}>
+                {tip.action}
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Güvenlik Aksiyonları */}
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 16 }}>
-        <button style={{ padding: '10px 20px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 30, color: colors.text, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="material-icons-round" style={{ fontSize: 18 }}>lock_reset</span>
-          Şifre Değiştir
-        </button>
-        <button style={{ padding: '10px 20px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 30, color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="material-icons-round" style={{ fontSize: 18 }}>logout</span>
-          Tüm Cihazlardan Çıkış Yap
-        </button>
-        <button style={{ padding: '10px 20px', backgroundColor: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 30, color: colors.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="material-icons-round" style={{ fontSize: 18 }}>download</span>
-          Hesap Verilerimi İndir
-        </button>
-      </div>
-
-      <div style={{ fontSize: 12, color: colors.textSecondary, marginTop: 20, padding: 12, backgroundColor: colors.bg, borderRadius: 12, border: `1px solid ${colors.border}` }}>
-        <span className="material-icons-round" style={{ fontSize: 14, verticalAlign: 'middle', marginRight: 6 }}>info</span>
-        Şifre değiştirme ve hesap verileri için yönlendirileceksiniz. Güvenlik önemlidir!
+      {/* Giriş Geçmişi */}
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="material-icons-round" style={{ color: colors.primary }}>history</span>
+          Giriş Geçmişi
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {loginHistory.map((item, idx) => (
+            <div key={idx} style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '12px 16px',
+              backgroundColor: colors.bg,
+              borderRadius: 12,
+              border: `1px solid ${colors.border}`,
+              flexWrap: 'wrap',
+              gap: 8
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span className="material-icons-round" style={{ color: colors.textSecondary }}>computer</span>
+                <div>
+                  <div style={{ fontSize: 13, color: colors.text }}>{item.device}</div>
+                  <div style={{ fontSize: 11, color: colors.textSecondary }}>{item.location} • {item.ip}</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: colors.textSecondary }}>
+                🕐 {item.date}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

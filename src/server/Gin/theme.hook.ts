@@ -444,6 +444,18 @@ export const useDeleteMedia = () => {
   });
 };
 
+// ==================== TEMA BAŞLATMA API'SI ====================
+// Yeni mağaza oluşturulduğunda tema başlatmak için
+
+export const useInitializeShopTheme = () => {
+  return useMutation({
+    mutationFn: async (shopId: string) => {
+      const { data } = await api.post('/api/shop/theme/initialize', { shop_id: shopId });
+      return data;
+    },
+  });
+};
+
 // ==================== CUSTOM HOOK ====================
 export const useTheme = (shopId: string) => {
   const activeTheme = useActiveTheme(shopId);

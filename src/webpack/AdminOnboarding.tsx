@@ -48,13 +48,13 @@ export interface ShopOnboardingData {
   primaryCategory?: string;
   logo?: File;
   banner?: File;
-  
+
   // Step 2 - İletişim
   contactEmail: string;
   supportEmail?: string;
   phone?: string;
   address: ShopAddress;
-  
+
   // Step 3 - Sosyal Medya
   socialMedia: SocialMediaLinks;
 }
@@ -76,7 +76,7 @@ const AdminOnboarding: React.FC = () => {
   const navigate = useNavigate();
   const { data: currentUser, isLoading: userLoading } = useCurrentUser(); // ✅ Kullanıcıyı al
   const [currentStep, setCurrentStep] = useState(1);
-  
+
   const [formData, setFormData] = useState<ShopOnboardingData>({
     shopName: '',
     shopDescription: '',
@@ -128,7 +128,7 @@ const AdminOnboarding: React.FC = () => {
       <div className="error-container">
         <h2>🔐 Giriş Yapmalısınız</h2>
         <p>Mağaza oluşturmak için lütfen giriş yapın.</p>
-        <button 
+        <button
           className="login-button"
           onClick={() => navigate('/login')}
         >
@@ -148,126 +148,142 @@ const AdminOnboarding: React.FC = () => {
 
 
 
-const generateSlug = (text: string): string => {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-};
+  const generateSlug = (text: string): string => {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  };
 
-// 📞 Telefon formatla
-const formatPhone = (phone: string): string | null => {
-  if (!phone) return null;
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length === 10) return `+90${digits}`;
-  if (digits.length === 11 && digits.startsWith('0')) return `+90${digits.substring(1)}`;
-  if (digits.length === 12 && digits.startsWith('90')) return `+${digits}`;
-  return null;
-};
+  // 📞 Telefon formatla
+  const formatPhone = (phone: string): string | null => {
+    if (!phone) return null;
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 10) return `+90${digits}`;
+    if (digits.length === 11 && digits.startsWith('0')) return `+90${digits.substring(1)}`;
+    if (digits.length === 12 && digits.startsWith('90')) return `+${digits}`;
+    return null;
+  };
 
-const handleComplete = async () => {
-  console.log('✅ Mağaza oluşturuluyor:', {
-    ...formData,
-    userId: currentUser.id,
-    userEmail: currentUser.email
-  });
-  
-  try {
-    // 1️⃣ Logo yükle
-    let logoUrl = null;
-    if (formData.logo) {
-      console.log('📤 Logo yükleniyor...');
-      const logoResult = await apiClient.uploadFile(
-        formData.logo,
-        currentUser.id,
-        "shop_logo"
-      );
-      logoUrl = logoResult.file.s3_url;
-      console.log('✅ Logo yüklendi:', logoUrl);
-    }
+  const handleComplete = async () => {
+    console.log('✅ Mağaza oluşturuluyor:', {
+      ...formData,
+      userId: currentUser.id,
+      userEmail: currentUser.email
+    });
 
-    // 2️⃣ Banner yükle
-    let bannerUrl = null;
-    if (formData.banner) {
-      console.log('📤 Banner yükleniyor...');
-      const bannerResult = await apiClient.uploadFile(
-        formData.banner,
-        currentUser.id,
-        "shop_banner"
-      );
-      bannerUrl = bannerResult.file.s3_url;
-      console.log('✅ Banner yüklendi:', bannerUrl);
-    }
-
-    // 3️⃣ Mağaza verisi hazırla
-    const shopData = {
-      shop_name: formData.shopName.trim(),
-      description: formData.shopDescription,
-      short_description: formData.shortDescription || "",
-      slug: generateSlug(formData.shopName),
-      primary_category: formData.primaryCategory || "digital-art",
-      secondary_categories: [],
-      tags: [],
-      contact_email: formData.contactEmail,
-      support_email: formData.supportEmail || "",
-      phone: formatPhone(formData.phone),  // ✅ formatPhone KULLANILIYOR!
-      slogan: "",
-      website_url: null,
-      tax_number: "",
-      tax_office: ""
-    };
-
-    console.log('📤 Gönderilen shop data:', shopData);
-
-    // 4️⃣ FastAPI'ye gönder
-    const response = await apiClient.post<ShopCreateResponse>('/api/shops/', shopData);
-    if (response && response.id) {
-      localStorage.setItem('shop_id', response.id);
-      console.log('✅ Shop ID kaydedildi:', response.id);
-    } else {
-      console.error('❌ Shop ID alınamadı! Response:', response);
-    }
-    
-    console.log('✅ Mağaza oluşturuldu:', response);
-    alert('🎉 Mağazanız başarıyla oluşturuldu!');
-    navigate('/admin');
-
-  } catch (error) {
-    console.error('❌ Mağaza oluşturma hatası:', error);
-    
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        const responseData = error.response.data as Record<string, unknown>;
-        console.log('📋 Hata DETAYI:', responseData);
-        console.log('📋 Hata STATUS:', error.response.status);
-        console.log('📋 Hata HEADERS:', error.response.headers);
-        
-        if (responseData && 'detail' in responseData) {
-          const detail = responseData.detail;
-          
-          if (Array.isArray(detail)) {
-            let errorMessage = 'Validasyon hataları:\n';
-            detail.forEach((err, index) => {
-              const errObj = err as { loc?: string[]; msg?: string };
-              const field = errObj.loc?.slice(1).join('.') || 'bilinmeyen alan';
-              const message = errObj.msg || 'geçersiz değer';
-              errorMessage += `${index + 1}. ${field}: ${message}\n`;
-            });
-            alert(errorMessage);
-          } else {
-            alert('Hata: ' + String(detail));
-          }
-        }
-      } else if (error.request) {
-        alert('Sunucuya ulaşılamadı.');
-      } else {
-        alert('İstek hatası: ' + error.message);
+    try {
+      // 1️⃣ Logo yükle
+      let logoUrl = null;
+      if (formData.logo) {
+        console.log('📤 Logo yükleniyor...');
+        const logoResult = await apiClient.uploadFile(
+          formData.logo,
+          currentUser.id,
+          "shop_logo"
+        );
+        logoUrl = logoResult.file.s3_url;
+        console.log('✅ Logo yüklendi:', logoUrl);
       }
-    } else if (error instanceof Error) {
-      alert('Hata: ' + error.message);
+
+      // 2️⃣ Banner yükle
+      let bannerUrl = null;
+      if (formData.banner) {
+        console.log('📤 Banner yükleniyor...');
+        const bannerResult = await apiClient.uploadFile(
+          formData.banner,
+          currentUser.id,
+          "shop_banner"
+        );
+        bannerUrl = bannerResult.file.s3_url;
+        console.log('✅ Banner yüklendi:', bannerUrl);
+      }
+
+      // 3️⃣ Mağaza verisi hazırla
+      const shopData = {
+        shop_name: formData.shopName.trim(),
+        description: formData.shopDescription,
+        short_description: formData.shortDescription || "",
+        slug: generateSlug(formData.shopName),
+        primary_category: formData.primaryCategory || "digital-art",
+        secondary_categories: [],
+        tags: [],
+        contact_email: formData.contactEmail,
+        support_email: formData.supportEmail || "",
+        phone: formData.phone ? formatPhone(formData.phone) : null,
+        slogan: "",
+        website_url: null,
+        tax_number: "",
+        tax_office: "",
+        // 🔥 ADDRESS EKLE
+        address: {
+          street: formData.address.street || "",
+          city: formData.address.city || "",
+          country: formData.address.country || "",
+          postal_code: formData.address.postalCode || ""
+        },
+        // 🔥 SOCIAL MEDIA EKLE - undefined'ları boş string yap
+        social_links: {
+          instagram: formData.socialMedia.instagram || "",
+          facebook: formData.socialMedia.facebook || "",
+          tiktok: formData.socialMedia.tiktok || "",
+          twitter: formData.socialMedia.twitter || "",
+          youtube: formData.socialMedia.youtube || "",
+          linkedin: formData.socialMedia.linkedin || ""
+        }
+      };
+
+      console.log('📤 Gönderilen shop data:', shopData);
+
+      // 4️⃣ FastAPI'ye gönder
+      const response = await apiClient.post<ShopCreateResponse>('/api/shops/', shopData);
+      if (response && response.id) {
+        localStorage.setItem('shop_id', response.id);
+        console.log('✅ Shop ID kaydedildi:', response.id);
+      } else {
+        console.error('❌ Shop ID alınamadı! Response:', response);
+      }
+
+      console.log('✅ Mağaza oluşturuldu:', response);
+      alert('🎉 Mağazanız başarıyla oluşturuldu!');
+      navigate('/admin');
+
+    } catch (error) {
+      console.error('❌ Mağaza oluşturma hatası:', error);
+
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          const responseData = error.response.data as Record<string, unknown>;
+          console.log('📋 Hata DETAYI:', responseData);
+          console.log('📋 Hata STATUS:', error.response.status);
+          console.log('📋 Hata HEADERS:', error.response.headers);
+
+          if (responseData && 'detail' in responseData) {
+            const detail = responseData.detail;
+
+            if (Array.isArray(detail)) {
+              let errorMessage = 'Validasyon hataları:\n';
+              detail.forEach((err, index) => {
+                const errObj = err as { loc?: string[]; msg?: string };
+                const field = errObj.loc?.slice(1).join('.') || 'bilinmeyen alan';
+                const message = errObj.msg || 'geçersiz değer';
+                errorMessage += `${index + 1}. ${field}: ${message}\n`;
+              });
+              alert(errorMessage);
+            } else {
+              alert('Hata: ' + String(detail));
+            }
+          }
+        } else if (error.request) {
+          alert('Sunucuya ulaşılamadı.');
+        } else {
+          alert('İstek hatası: ' + error.message);
+        }
+      } else if (error instanceof Error) {
+        alert('Hata: ' + error.message);
+      }
     }
-  }
-};
+  };
 
   const renderStep = () => {
     const commonProps = {
@@ -275,7 +291,7 @@ const handleComplete = async () => {
       updateData: updateFormData
     };
 
-    switch(currentStep) {
+    switch (currentStep) {
       case 1:
         return <Step1 {...commonProps} onNext={handleNext} />;
       case 2:
@@ -283,9 +299,9 @@ const handleComplete = async () => {
       case 3:
         return <Step3 {...commonProps} onNext={handleNext} onPrev={handlePrev} />;
       case 4:
-        return <Step4 
-          {...commonProps} 
-          onPrev={handlePrev} 
+        return <Step4
+          {...commonProps}
+          onPrev={handlePrev}
           onComplete={handleComplete}
           currentUser={currentUser}  // ✅ Kullanıcıyı Step4'e gönder
         />;
@@ -308,7 +324,7 @@ const handleComplete = async () => {
             { num: 3, label: 'Sosyal Medya' },
             { num: 4, label: 'Özet' }
           ].map(step => (
-            <div 
+            <div
               key={step.num}
               className={`step ${currentStep >= step.num ? 'active' : ''} ${currentStep === step.num ? 'current' : ''}`}
             >

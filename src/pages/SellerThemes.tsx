@@ -5,6 +5,8 @@ import { useActiveTheme } from '../server/Gin/theme.hook';
 import { useMyShops } from '../server/FastAPI/shop.hooks';
 import { useCurrentUser } from '../server/FastAPI/user.hooks';
 import { useCart, useAddToCart, useRemoveFromCart, useClearCart } from '../server/FastAPI/cart.hooks';
+import { useMyProducts } from '../server/FastAPI/product.hooks';
+import axios from 'axios';
 
 
 interface SellerThemesProps {
@@ -57,9 +59,8 @@ const SellerThemes = ({ colors = {
   });
   // SellerThemes.tsx - state'lerin olduğu yere ekle
   const [showCartModal, setShowCartModal] = useState(false);
+  const { data: productsFromBackend, isLoading: productsLoading } = useMyProducts();
 
-
-  const [shopDescription, setShopDescription] = useState('Dijital Ürünler Marketi');
   const [stats, setStats] = useState([
     { value: '500+', label: 'Ürün' },
     { value: '10K+', label: 'Müşteri' },
@@ -107,11 +108,63 @@ const SellerThemes = ({ colors = {
       sales: 312
     }
   ]);
+  // State'lerin olduğu yere ekle (useState'lerin yanına)
+  const [subscriberEmail, setSubscriberEmail] = useState('');
+  const [subscriberStatus, setSubscriberStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  // Abone ol fonksiyonu (axios ile)
+  // handleSubscribe fonksiyonunu şu şekilde düzelt
+  // handleSubscribe fonksiyonunu SADELEŞTİR
+  const handleSubscribe = async () => {
+    if (!subscriberEmail) {
+      setSubscriberStatus({ type: 'error', message: 'Lütfen e-posta adresinizi girin' });
+      setTimeout(() => setSubscriberStatus({ type: null, message: '' }), 3000);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(subscriberEmail)) {
+      setSubscriberStatus({ type: 'error', message: 'Geçerli bir e-posta adresi girin' });
+      setTimeout(() => setSubscriberStatus({ type: null, message: '' }), 3000);
+      return;
+    }
+
+    setIsSubscribing(true);
+
+    try {
+      // ✅ SADECE ABONE OL - check-email yok!
+      const subscribeResponse = await axios.post('http://localhost:8082/api/newsletter/subscribe', {
+        email: subscriberEmail,
+        shop_id: selectedShopId
+      });
+
+      if (subscribeResponse.status === 200) {
+        setSubscriberStatus({ type: 'success', message: '✅ Başarıyla abone oldunuz!' });
+        setSubscriberEmail('');
+      } else {
+        setSubscriberStatus({ type: 'error', message: subscribeResponse.data.error || 'Abonelik sırasında bir hata oluştu' });
+      }
+    } catch (error: any) {
+      console.error('Abonelik hatası:', error);
+      if (error.response?.status === 409) {
+        setSubscriberStatus({ type: 'error', message: '⚠️ Bu e-posta zaten abone!' });
+      } else {
+        setSubscriberStatus({ type: 'error', message: 'Bir hata oluştu. Lütfen tekrar deneyin.' });
+      }
+    } finally {
+      setIsSubscribing(false);
+      setTimeout(() => setSubscriberStatus({ type: null, message: '' }), 3000);
+    }
+  };
+
   // State'lerin olduğu yere ekle
   const { data: cartData, isLoading: cartLoading, refetch: refetchCart } = useCart();
   const addToCartMutation = useAddToCart();
   const removeFromCartMutation = useRemoveFromCart('');
   const clearCartMutation = useClearCart();
+
+  // SellerThemes.tsx - themeData'dan shopDescription'u al
 
   // Sepet verilerinden hesaplama
   const cartItems = cartData?.items || [];
@@ -142,7 +195,7 @@ const SellerThemes = ({ colors = {
     });
   };
   console.log('cartData:', cartData);
-console.log('cartItems:', cartItems);
+  console.log('cartItems:', cartItems);
 
 
   // Dark mode tema renkleri
@@ -183,6 +236,11 @@ console.log('cartItems:', cartItems);
     }
   }, [myShops]);
   const { data: themeData } = useActiveTheme(selectedShopId);
+  const shopDescription = themeData?.settings?.shop_description || 'Dijital Ürünler Marketi';
+  const selectedProductsFromTheme = themeData?.settings?.selected_products || [];
+  const popularProducts = selectedProductsFromTheme.length > 0
+    ? selectedProductsFromTheme
+    : (productsFromBackend || []).slice(0, 4);
 
   useEffect(() => {
     if (themeData?.settings?.footer_about) {
@@ -232,7 +290,6 @@ console.log('cartItems:', cartItems);
       console.log('🎨 Features loaded from backend:', themeData.settings.features);
     }
   }, [themeData]);
-  const popularProducts = themeData?.settings?.selected_products || [];
   // themeData'dan hero değerlerini al (varsayılan değerlerle)
   const heroTitle = themeData?.settings?.hero_title || 'Dijital Ürünlerin Yeni Adresi';
   const heroSubtitle = themeData?.settings?.hero_subtitle || 'En iyi tasarımlar, yazılımlar ve eğitim içerikleri tek bir yerde. Hemen keşfetmeye başla!';
@@ -543,64 +600,40 @@ console.log('cartItems:', cartItems);
 
           {/* Logo Card - Backend'den gelen logo */}
           <div style={{
-            backgroundColor: 'rgba(255,255,255,0.95)',
-            borderRadius: 24,
-            padding: '32px 40px',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.3)',
-            textAlign: 'center',
-            backdropFilter: 'blur(10px)',
-            minWidth: isMobile ? 200 : 280,
-            transition: 'transform 0.3s ease',
-            cursor: 'pointer'
-          }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-            <div style={{
-              width: isMobile ? 120 : 160,
-              height: isMobile ? 120 : 160,
-              margin: '0 auto 20px',
-              backgroundImage: shopLogo ? `url(${shopLogo})` : 'none',
-              backgroundColor: !shopLogo ? '#0ea5e9' : 'transparent',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {!shopLogo && (
-                <span style={{
-                  fontSize: isMobile ? 48 : 64,
-                  color: 'white',
-                  fontWeight: 'bold',
-                  zIndex: 1,
-                  textShadow: '2px 2px 8px rgba(0,0,0,0.3)',
-                  letterSpacing: 2
-                }}>
-                  {shopName?.charAt(0) || 'C'}
-                </span>
-              )}
-            </div>
-            <h3 style={{ fontSize: 24, fontWeight: 'bold', color: '#111827', marginBottom: 8 }}>{shopName || 'Craftora'}</h3>
-            <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 12 }}>{shopDescription || 'Dijital Ürünler Marketi'}</p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} style={{ fontSize: 16, color: '#fbbf24' }}>★</span>
-              ))}
-              <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 4 }}>(4.9)</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, paddingTop: 12, borderTop: '1px solid #e5e7eb' }}>
-              {stats.map((stat, index) => (
-                <div key={index} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 18, fontWeight: 'bold', color: '#0ea5e9' }}>{stat.value}</div>
-                  <div style={{ fontSize: 11, color: '#6b7280' }}>{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+  borderRadius: 24,
+  padding: '24px',
+  transition: 'transform 0.3s ease',
+  cursor: 'pointer'
+}}
+onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+  
+  {/* SADECE LOGO - BÜYÜTÜLDÜ */}
+  <div style={{
+    width: isMobile ? 140 : 180,
+    height: isMobile ? 140 : 180,
+    margin: '0 auto',
+    backgroundImage: shopLogo ? `url(${shopLogo})` : 'none',
+    backgroundColor: !shopLogo ? '#0ea5e9' : 'transparent',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 15px 35px rgba(0,0,0,0.2)'
+  }}>
+    {!shopLogo && (
+      <span style={{
+        fontSize: isMobile ? 56 : 72,
+        color: 'white',
+        fontWeight: 'bold'
+      }}>
+        {shopName?.charAt(0) || 'C'}
+      </span>
+    )}
+  </div>
+</div>
         </div>
       </div>
 
@@ -1196,7 +1229,13 @@ console.log('cartItems:', cartItems);
               }}>
                 <span style={{ fontSize: 18, fontWeight: 'bold', color: 'white' }}>{shopName?.charAt(0) || 'C'}</span>
               </div>
-              <span style={{ fontSize: 18, fontWeight: 'bold', color: '#0ea5e9' }}>{shopName || 'Craftora'}</span>
+              <div>
+                <span style={{ fontSize: 18, fontWeight: 'bold', color: '#0ea5e9', display: 'block' }}>{shopName || 'Craftora'}</span>
+                {/* ✅ BURAYA EKLE - Logo altı açıklama */}
+                <span style={{ fontSize: 11, color: colors.textSecondary, display: 'block', marginTop: 2 }}>
+                  {shopDescription || 'Dijital Ürünler Marketi'}
+                </span>
+              </div>
             </div>
 
             {/* Arama */}
@@ -1289,6 +1328,7 @@ console.log('cartItems:', cartItems);
                 isDarkMode={isDarkMode}
                 onAddToCart={handleAddToCart}
                 onProductClick={openProductDetail}
+                products={productsFromBackend || []}  // ✅ BUNU EKLE
               />
             )}
             {currentPage === 'blog' && <BlogPage />}
@@ -1354,6 +1394,7 @@ console.log('cartItems:', cartItems);
             </div>
 
             {/* 3. Sütun - Bizi Takip Edin */}
+            {/* 3. Sütun - Bizi Takip Edin */}
             <div>
               <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 24, color: 'white', position: 'relative', display: 'inline-block' }}>
                 Bizi Takip Edin
@@ -1361,65 +1402,80 @@ console.log('cartItems:', cartItems);
               </h4>
               <div style={{ display: 'flex', gap: 20, marginBottom: 24 }}>
                 {/* Instagram */}
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: '#9ca3af', textDecoration: 'none', transition: 'all 0.2s', opacity: 0.8 }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-                >
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg"
-                    alt="Instagram"
-                    width="28"
-                    height="28"
-                    style={{ filter: 'invert(1)' }}
-                  />
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', transition: 'all 0.2s', opacity: 0.8 }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}>
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" width="28" height="28" style={{ filter: 'invert(1)' }} />
                 </a>
-
                 {/* TikTok */}
-                <a
-                  href="https://tiktok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: '#9ca3af', textDecoration: 'none', transition: 'all 0.2s', opacity: 0.8 }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-                >
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg"
-                    alt="TikTok"
-                    width="28"
-                    height="28"
-                    style={{ filter: 'invert(1)' }}
-                  />
+                <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', transition: 'all 0.2s', opacity: 0.8 }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}>
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok" width="28" height="28" style={{ filter: 'invert(1)' }} />
                 </a>
-
                 {/* Facebook */}
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: '#9ca3af', textDecoration: 'none', transition: 'all 0.2s', opacity: 0.8 }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-                >
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg"
-                    alt="Facebook"
-                    width="28"
-                    height="28"
-                    style={{ filter: 'invert(1)' }}
-                  />
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', transition: 'all 0.2s', opacity: 0.8 }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}>
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook" width="28" height="28" style={{ filter: 'invert(1)' }} />
                 </a>
               </div>
               <p style={{ color: '#6b7280', fontSize: 13, lineHeight: 1.6 }}>
                 📩 Yeniliklerden ilk siz haberdar olun!
               </p>
-              <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                <input type="email" placeholder="E-posta adresiniz" style={{ flex: 1, padding: '10px 12px', borderRadius: 30, border: 'none', backgroundColor: isDarkMode ? '#1e293b' : '#374151', color: 'white', outline: 'none', fontSize: 13 }} />
-                <button style={{ padding: '10px 20px', borderRadius: 30, border: 'none', backgroundColor: '#0ea5e9', color: 'white', cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>Abone Ol</button>
+
+              {/* Abone Ol Formu */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    type="email"
+                    placeholder="E-posta adresiniz"
+                    value={subscriberEmail}
+                    onChange={(e) => setSubscriberEmail(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 12px',
+                      borderRadius: 30,
+                      border: 'none',
+                      backgroundColor: isDarkMode ? '#1e293b' : '#374151',
+                      color: 'white',
+                      outline: 'none',
+                      fontSize: 13
+                    }}
+                  />
+                  <button
+                    onClick={handleSubscribe}
+                    disabled={isSubscribing}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: 30,
+                      border: 'none',
+                      backgroundColor: '#0ea5e9',
+                      color: 'white',
+                      cursor: isSubscribing ? 'not-allowed' : 'pointer',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      opacity: isSubscribing ? 0.7 : 1,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSubscribing) e.currentTarget.style.backgroundColor = '#0284c7';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSubscribing) e.currentTarget.style.backgroundColor = '#0ea5e9';
+                    }}
+                  >
+                    {isSubscribing ? 'İşleniyor...' : 'Abone Ol'}
+                  </button>
+                </div>
+
+                {/* Durum Mesajı */}
+                {subscriberStatus.type && (
+                  <div style={{
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    backgroundColor: subscriberStatus.type === 'success' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)',
+                    color: subscriberStatus.type === 'success' ? '#10b981' : '#ef4444',
+                    fontSize: 12,
+                    textAlign: 'center'
+                  }}>
+                    {subscriberStatus.message}
+                  </div>
+                )}
               </div>
             </div>
           </div>

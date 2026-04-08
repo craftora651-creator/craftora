@@ -263,8 +263,26 @@ export interface ShopStats {
 }
 
 // GET /shops/{id}/settings için
+// GET /shops/{id}/settings için
 export interface ShopSettingsResponse {
   shop_id: string;
+  contact_email?: string;
+  support_email?: string;
+  phone?: string;
+  address?: {
+    street: string;
+    city: string;
+    country: string;
+    postal_code: string;
+  };
+  social_media?: {
+    instagram?: string;
+    facebook?: string;
+    tiktok?: string;
+    twitter?: string;
+    youtube?: string;
+    pinterest?: string;
+  };
   settings: Record<string, unknown>;
   metadata: Record<string, unknown>;
   plan?: string;

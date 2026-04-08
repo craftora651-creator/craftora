@@ -7,7 +7,12 @@ import type {
   EmailConfig,
   EmailLog,
   EmailStats,
-  EmailLogsResponse
+  EmailLogsResponse,
+  NewOrderNotificationRequest,
+  NewSubscriberNotificationRequest,
+  PayoutNotificationRequest,
+  CustomerMessageNotificationRequest,
+  NotificationResponse
 } from '../../types/email.types';
 
 // ==================== QUERY KEYS ====================
@@ -306,5 +311,94 @@ export const useEmailStats = () => {
     },
     enabled: !!logs,
     staleTime: 1000 * 60, // 1 dakika
+  });
+};
+
+
+// ==================== BİLDİRİM API FONKSİYONLARI (YENİ) ====================
+
+/**
+ * Yeni Sipariş Bildirimi Gönder
+ */
+const sendNewOrderNotificationAPI = async (data: NewOrderNotificationRequest): Promise<NotificationResponse> => {
+  return apiClient.goPost<NotificationResponse>('/api/notifications/order', data);
+};
+
+/**
+ * Yeni Abone Bildirimi Gönder
+ */
+const sendNewSubscriberNotificationAPI = async (data: NewSubscriberNotificationRequest): Promise<NotificationResponse> => {
+  return apiClient.goPost<NotificationResponse>('/api/notifications/subscriber', data);
+};
+
+/**
+ * Ödeme Bildirimi Gönder
+ */
+const sendPayoutNotificationAPI = async (data: PayoutNotificationRequest): Promise<NotificationResponse> => {
+  return apiClient.goPost<NotificationResponse>('/api/notifications/payout', data);
+};
+
+/**
+ * Müşteri Mesajı Bildirimi Gönder
+ */
+const sendCustomerMessageNotificationAPI = async (data: CustomerMessageNotificationRequest): Promise<NotificationResponse> => {
+  return apiClient.goPost<NotificationResponse>('/api/notifications/message', data);
+};
+
+// ==================== BİLDİRİM HOOKS (YENİ) ====================
+
+/**
+ * Yeni Sipariş Bildirimi Gönder
+ */
+export const useSendNewOrderNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<NotificationResponse, Error, NewOrderNotificationRequest>({
+    mutationFn: sendNewOrderNotificationAPI,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: emailKeys.logs() });
+    },
+  });
+};
+
+/**
+ * Yeni Abone Bildirimi Gönder
+ */
+export const useSendNewSubscriberNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<NotificationResponse, Error, NewSubscriberNotificationRequest>({
+    mutationFn: sendNewSubscriberNotificationAPI,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: emailKeys.logs() });
+    },
+  });
+};
+
+/**
+ * Ödeme Bildirimi Gönder
+ */
+export const useSendPayoutNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<NotificationResponse, Error, PayoutNotificationRequest>({
+    mutationFn: sendPayoutNotificationAPI,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: emailKeys.logs() });
+    },
+  });
+};
+
+/**
+ * Müşteri Mesajı Bildirimi Gönder
+ */
+export const useSendCustomerMessageNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<NotificationResponse, Error, CustomerMessageNotificationRequest>({
+    mutationFn: sendCustomerMessageNotificationAPI,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: emailKeys.logs() });
+    },
   });
 };

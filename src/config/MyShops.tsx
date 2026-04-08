@@ -47,6 +47,7 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
 
   // shopData'yı myShops array'inden bul (API çağrısı yok!)
   const shopData = myShops?.find(shop => shop.id === selectedShopId);
+  
 
   // ========== 2. RESPONSIVE ==========
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -83,9 +84,7 @@ const MyShopsPage = ({ colors }: MyShopsPageProps) => {
   const [showWhySection, setShowWhySection] = useState(true);
 
   // Backend'den ürünleri çek
-  const { data: sellerProducts, isLoading: loadingProducts, error: productsError } = useMyProducts(selectedShopId, undefined, {
-    enabled: !!selectedShopId
-  });
+  const { data: sellerProducts, isLoading: loadingProducts, error: productsError } = useMyProducts();
   const { data: themeData } = useActiveTheme(selectedShopId);
   const updateThemeSettings = useUpdateThemeSettings();
   console.log('🔍 selectedShopId:', selectedShopId);
@@ -204,6 +203,7 @@ useEffect(() => {
       selected_products: selectedProducts,
       show_why_section: showWhySection,
       blog_posts: blogPosts,
+      shop_description: shopDescription,
     });
     console.log('🎨 themeData?.settings?.blog_posts:', themeData?.settings?.blog_posts);
 

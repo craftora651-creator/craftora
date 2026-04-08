@@ -17,8 +17,11 @@ import SupplierSettings from '../lib/SupplierSettings';
 import CreateModal from '../.paket/CreateModal';
 import SettingsPage from '../config/Settings';
 import HelpCenter from '../config/HelpCenter';
+import ThemesPage from '../config/ThemesPage';
 import { Chart } from 'chart.js';
 import { useCurrentUser } from '../server/FastAPI/user.hooks';
+import { useMyShops } from '../server/FastAPI/shop.hooks';
+
 
 declare global {
   interface Window {
@@ -39,6 +42,7 @@ const KankamAdminPanel = () => {
     if (path.includes('/admin/orders')) return 'orders';
     if (path.includes('/admin/suppliers')) return 'suppliers';
     if (path.includes('/admin/reports')) return 'reports';
+    if (path.includes('/admin/settings')) return 'settings';
     if (path.includes('/admin/general')) return 'general';
     if (path.includes('/admin/help')) return 'help';
     if (path.includes('/admin/myshops')) return 'myshops';
@@ -53,6 +57,12 @@ const KankamAdminPanel = () => {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const handleOpenCreateModal = () => setOpenCreateModal(true);
   const handleCloseCreateModal = () => setOpenCreateModal(false);
+  const [openProfileModal, setOpenProfileModal] = useState(false);
+  const handleOpenProfileModal = () => setOpenProfileModal(true);
+  const handleCloseProfileModal = () => setOpenProfileModal(false);
+  const { data: shops, isLoading: shopsLoading } = useMyShops();
+  const currentShop = shops?.[0];
+
 
   useEffect(() => {
     setActiveSection(getActiveSectionFromPath());
@@ -112,10 +122,10 @@ const KankamAdminPanel = () => {
   const userFullName = userData?.full_name || userData?.email?.split('@')[0] || 'Kullanıcı';
   const userEmail = userData?.email || '';
   const handleLogout = () => {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  navigate('/login');
-};
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    navigate('/login');
+  };
 
 
   return (
@@ -879,31 +889,157 @@ const KankamAdminPanel = () => {
             ))}
           </nav>
           {/* Profil */}
+
+          {/* Profil - Güncellenmiş Modern Tasarım */}
           <div style={{ padding: 24 }}>
-            <div style={{
-              padding: 16,
-              backgroundColor: colors.bg,
-              borderRadius: 16,
+            <div onClick={handleOpenProfileModal} style={{
+              padding: 20,
+              background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.bg} 100%)`,
+              borderRadius: 20,
               border: `1px solid ${colors.border}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
+              boxShadow: isDarkMode
+                ? '0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
+                : '0 8px 24px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8)',
+              position: 'relative',
+              overflow: 'hidden'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{
-                  width: 44,
-                  height: 44,
-                  backgroundColor: '#0ea5e9',
-                  borderRadius: 22,
-                  backgroundImage: 'url(https://ui-avatars.com/api/?name=Tom+Cook&background=0ea5e9&color=fff&size=44)',
-                  backgroundSize: 'cover'
-                }} />
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 'bold', color: colors.text }}>Tom Cook</div>
-                  <div style={{ fontSize: 11, color: colors.textSecondary }}>tom@example.com</div>
+              {/* Dekoratif gradient arkaplan efekti */}
+              <div style={{
+                position: 'absolute',
+                top: -50,
+                right: -50,
+                width: 120,
+                height: 120,
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(14,165,233,0.15) 0%, rgba(14,165,233,0) 70%)',
+                pointerEvents: 'none'
+              }} />
+
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                position: 'relative',
+                zIndex: 1
+              }}>
+                {/* Avatar - Animasyonlu hover efekti */}
+                <div style={{ position: 'relative' }}>
+                  <div style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 26,
+                    background: `linear-gradient(135deg, #0ea5e9, #3b82f6)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(14,165,233,0.3)',
+                    transition: 'transform 0.2s ease',
+                    cursor: 'pointer'
+                  }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <span style={{
+                      fontSize: 22,
+                      color: 'white',
+                      fontWeight: 600,
+                      textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                    }}>
+                      {userFullName?.charAt(0).toUpperCase() || '?'}
+                    </span>
+                  </div>
+                  {/* Online durumu göstergesi */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: 2,
+                    width: 12,
+                    height: 12,
+                    borderRadius: 6,
+                    backgroundColor: '#10b981',
+                    border: `2px solid ${colors.surface}`,
+                    boxShadow: '0 0 0 2px rgba(16,185,129,0.3)'
+                  }} />
+                </div>
+
+                {/* Kullanıcı Bilgileri */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: colors.text,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    marginBottom: 4
+                  }}>
+                    {userFullName}
+                  </div>
+                  <div style={{
+                    fontSize: 11,
+                    color: colors.textSecondary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    <span className="material-icons-round" style={{ fontSize: 12 }}>email</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{userEmail}</span>
+                  </div>
+                </div>
+
+                {/* Logout Butonu - Tooltip efekti */}
+                <div
+                  onClick={handleLogout}
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: isDarkMode ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.05)',
+                    color: '#ef4444',
+                    transition: 'all 0.2s ease',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = isDarkMode ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.05)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  title="Çıkış Yap"
+                >
+                  <span className="material-icons-round" style={{ fontSize: 20 }}>logout</span>
                 </div>
               </div>
-              <span className="material-icons-round" style={{ color: colors.textSecondary, fontSize: 20, cursor: 'pointer' }}>logout</span>
+
+              {/* Kullanıcı rolü / plan bilgisi (opsiyonel) */}
+              <div style={{
+                marginTop: 16,
+                paddingTop: 12,
+                borderTop: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                position: 'relative',
+                zIndex: 1
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span className="material-icons-round" style={{ fontSize: 14, color: '#0ea5e9' }}>verified</span>
+                  <span style={{ fontSize: 10, color: colors.textSecondary, fontWeight: 500 }}>Pro Account</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span className="material-icons-round" style={{ fontSize: 12, color: '#f59e0b' }}>star</span>
+                  <span style={{ fontSize: 10, color: colors.textSecondary }}>Seller Level 2</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -974,6 +1110,7 @@ const KankamAdminPanel = () => {
                 {activeSection === 'reports' && 'Reports'}
                 {activeSection === 'general' && 'General Settings'}
                 {activeSection === 'help' && 'Help'}
+                {activeSection === 'settings' && 'Settings'}
               </h1>
             </div>
             {/* Header sağ kısım - BUTONLAR */}
@@ -1206,6 +1343,10 @@ const KankamAdminPanel = () => {
                 <OrdersPage colors={colors} />
               } />
 
+              <Route path="/themes" element={
+                <ThemesPage colors={colors} shopId={currentShop?.id || ''} />
+              } />
+
               <Route path="/reports" element={
                 <ReportsPage colors={colors} />
               } />
@@ -1230,6 +1371,169 @@ const KankamAdminPanel = () => {
         onClose={handleCloseCreateModal}
         colors={colors}
       />
+
+      {/* PROFILE MODAL - BURAYA EKLE */}
+      {openProfileModal && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={handleCloseProfileModal}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              backdropFilter: 'blur(8px)',
+              zIndex: 2000,
+            }}
+          />
+
+          {/* Modal İçeriği */}
+          <div style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90%',
+            maxWidth: 480,
+            backgroundColor: colors.surface,
+            borderRadius: 28,
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            zIndex: 2001,
+            overflow: 'hidden'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: `linear-gradient(135deg, #0ea5e9, #3b82f6)`,
+              padding: '32px 24px',
+              textAlign: 'center',
+              position: 'relative'
+            }}>
+              <button
+                onClick={handleCloseProfileModal}
+                style={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  background: 'rgba(255,255,255,0.2)',
+                  border: 'none',
+                  borderRadius: 30,
+                  width: 32,
+                  height: 32,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'white'
+                }}
+              >
+                <span className="material-icons-round" style={{ fontSize: 20 }}>close</span>
+              </button>
+
+              <div style={{
+                width: 100,
+                height: 100,
+                borderRadius: 50,
+                background: `linear-gradient(135deg, #fff, #e2e8f0)`,
+                margin: '0 auto 16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                border: '4px solid rgba(255,255,255,0.3)'
+              }}>
+                <span style={{ fontSize: 48, fontWeight: 700, color: '#0ea5e9' }}>
+                  {userFullName?.charAt(0).toUpperCase() || '?'}
+                </span>
+              </div>
+
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: 'white', margin: '0 0 4px 0' }}>
+                {userFullName}
+              </h2>
+
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', margin: 0 }}>
+                {userEmail}
+              </p>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '24px' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 0',
+                borderBottom: `1px solid ${colors.border}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span className="material-icons-round" style={{ color: '#0ea5e9', fontSize: 20 }}>verified</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>Hesap Durumu</div>
+                    <div style={{ fontSize: 11, color: colors.textSecondary }}>Premium Üyelik</div>
+                  </div>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 30, backgroundColor: 'rgba(16,185,129,0.1)', color: '#10b981' }}>
+                  Aktif
+                </span>
+              </div>
+
+              <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
+                <button
+                  onClick={() => {
+                    handleCloseProfileModal();
+                    navigate('/admin/settings');
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: 30,
+                    border: `1px solid ${colors.border}`,
+                    backgroundColor: 'transparent',
+                    color: colors.text,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8
+                  }}
+                >
+                  <span className="material-icons-round" style={{ fontSize: 18 }}>settings</span>
+                  Hesap Ayarları
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleCloseProfileModal();
+                    handleLogout();
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: 30,
+                    border: 'none',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8
+                  }}
+                >
+                  <span className="material-icons-round" style={{ fontSize: 18 }}>logout</span>
+                  Çıkış Yap
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -1265,42 +1569,63 @@ const SidebarButton = ({
 }: SidebarButtonProps) => {
   const isActive = activeSection === id;
   const navigate = useNavigate();
+  const comingSoonMenus = ['suppliers', 'themes'];
+  const handleClick = () => {
+    // Eğer yakında menüsüyse hiçbir şey yapma
+    if (comingSoonMenus.includes(id)) {
+      return;
+    }
+    navigate(path);
+    if (window.innerWidth <= 1024) {
+      setIsMobileMenuOpen(false);
+    }
+  };
 
-  return (
+ return (
     <div
-      onClick={() => {
-        navigate(path);
-        if (window.innerWidth <= 1024) {
-          setIsMobileMenuOpen(false);
-        }
-      }}
+      onClick={handleClick}
       style={{
         display: 'flex',
         alignItems: 'center',
         gap: 12,
         padding: '12px 16px',
         borderRadius: 12,
-        cursor: 'pointer',
+        cursor: comingSoonMenus.includes(id) ? 'default' : 'pointer',
         backgroundColor: isActive
           ? isDarkMode ? 'rgba(14, 165, 233, 0.2)' : 'rgba(14, 165, 233, 0.1)'
           : 'transparent',
         color: isActive ? '#0ea5e9' : colors.textSecondary,
         marginBottom: 4,
-        transition: 'all 0.2s ease'
+        transition: 'all 0.2s ease',
+        opacity: comingSoonMenus.includes(id) ? 0.5 : 1,
       }}
       onMouseEnter={(e) => {
-        if (!isActive) {
+        if (!isActive && !comingSoonMenus.includes(id)) {
           e.currentTarget.style.backgroundColor = isDarkMode ? '#2d3a4f' : '#f1f5f9';
         }
       }}
       onMouseLeave={(e) => {
-        if (!isActive) {
+        if (!isActive && !comingSoonMenus.includes(id)) {
           e.currentTarget.style.backgroundColor = 'transparent';
         }
       }}
     >
       <span className="material-icons-round" style={{ fontSize: 20 }}>{icon}</span>
       <span style={{ fontSize: 14, fontWeight: isActive ? 600 : 400 }}>{label}</span>
+      {comingSoonMenus.includes(id) && (
+        <span style={{
+          marginLeft: 'auto',
+          fontSize: 10,
+          backgroundColor: '#f59e0b',
+          color: 'white',
+          padding: '2px 8px',
+          borderRadius: 30,
+          fontWeight: 600,
+          letterSpacing: 0.5
+        }}>
+          Yakında
+        </span>
+      )}
     </div>
   );
 };

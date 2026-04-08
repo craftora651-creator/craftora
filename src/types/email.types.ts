@@ -111,3 +111,89 @@ export interface IEmailService {
     date_to?: string;
   }): Promise<EmailListResponse>;
 }
+
+
+// ==================== BİLDİRİM TİPLERİ (YENİ) ====================
+
+// Bildirim tipi
+export type NotificationType = 
+  | 'new_order'      // Yeni sipariş
+  | 'new_subscriber' // Yeni abone
+  | 'payout_sent'    // Ödeme gönderildi
+  | 'customer_message' // Müşteri mesajı
+  | 'low_stock'      // Stok azaldı
+  | 'new_review'     // Yeni yorum
+  | 'payment_reminder'; // Ödeme hatırlatma
+
+// Bildirim durumu
+export type NotificationStatus = 'pending' | 'sent' | 'failed' | 'cancelled';
+
+// Bildirim önceliği
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+// Bildirim log'u
+export interface NotificationLog {
+  id: string;
+  shop_id: string;
+  user_id: string;
+  type: NotificationType;
+  status: NotificationStatus;
+  priority: NotificationPriority;
+  title: string;
+  message: string;
+  data?: Record<string, unknown>;  // Ek veriler (sipariş ID, tutar vb.)
+  sent_at?: string;
+  error?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Yeni Sipariş Bildirimi Request
+export interface NewOrderNotificationRequest {
+  to_email: string;
+  order_id: string;
+  order_total: string;
+  customer_name: string;
+  shop_name: string;
+}
+
+// Yeni Abone Bildirimi Request
+export interface NewSubscriberNotificationRequest {
+  to_email: string;
+  subscriber_email: string;
+  shop_name: string;
+}
+
+// Ödeme Bildirimi Request
+export interface PayoutNotificationRequest {
+  to_email: string;
+  amount: string;
+  payment_date: string;
+  shop_name: string;
+}
+
+// Müşteri Mesajı Bildirimi Request
+export interface CustomerMessageNotificationRequest {
+  to_email: string;
+  customer_name: string;
+  message: string;
+  shop_name: string;
+}
+
+// Bildirim Tercihleri (Settings'te kaydedilecek)
+export interface NotificationPreferences {
+  new_order: boolean;           // Yeni sipariş
+  new_subscriber: boolean;      // Yeni abone
+  customer_message: boolean;    // Müşteri mesajı
+  payout_sent: boolean;         // Ödeme gönderildi
+  low_stock: boolean;           // Stok azaldı
+  new_review: boolean;          // Yeni yorum
+  payment_reminder: boolean;    // Ödeme hatırlatma
+}
+
+// Bildirim Response
+export interface NotificationResponse {
+  success: boolean;
+  message: string;
+  notification_id?: string;
+}

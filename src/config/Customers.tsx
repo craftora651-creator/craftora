@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useSendEmail } from '../server/Gin/email.hooks';
+import { useMyShops } from '../server/FastAPI/shop.hooks';
+import axios from 'axios';
 
 interface CustomersPageProps {
   colors: {
@@ -23,7 +24,7 @@ interface Customer {
   lastActive: string;
   online: boolean;
   avatar: string;
-  type: 'Ziyaretçi' | 'Görüntüleyen' | 'Alıcı';
+  type: 'Ziyaretçi' | 'Görüntüleyen' | 'Alıcı' | 'Abone';
   lastPurchase: string;
   totalOrders: number;
   joinDate: string;
@@ -32,103 +33,28 @@ interface Customer {
   purchaseCount: number;
 }
 
-interface CustomersResponse {
-  customers: Customer[];
-  total: number;
-  stats: {
-    totalVisitors: number;
-    totalBuyers: number;
-    totalViewers: number;
-    conversionRate: number;
-  };
+interface Subscriber {
+  id: number;
+  email: string;
+  status: string;
+  created_at: string;
 }
 
 // ==================== API FUNCTIONS ====================
-const getCustomers = async (): Promise<CustomersResponse> => {
-  return {
-    customers: [
-      {
-        id: '1',
-        name: 'Ahmet Yılmaz',
-        email: 'damlakiberat@gmail.com',
-        phone: '+90 555 123 4567',
-        location: 'İstanbul, Türkiye',
-        status: 'ACTIVE',
-        lastActive: '5 dakika önce',
-        online: true,
-        avatar: 'https://ui-avatars.com/api/?name=Ahmet+Yilmaz&background=0ea5e9&color=fff&size=80',
-        type: 'Ziyaretçi',
-        lastPurchase: 'Henüz alışveriş yok',
-        totalOrders: 0,
-        joinDate: '10 Mar 2025',
-        visitCount: 5,
-        viewCount: 12,
-        purchaseCount: 0
-      },
-      {
-        id: '2',
-        name: 'Ayşe Demir',
-        email: 'navmuhammed@gmail.com',
-        phone: '+90 555 234 5678',
-        location: 'Ankara, Türkiye',
-        status: 'ACTIVE',
-        lastActive: '15 dakika önce',
-        online: true,
-        avatar: 'https://ui-avatars.com/api/?name=Ayse+Demir&background=0ea5e9&color=fff&size=80',
-        type: 'Görüntüleyen',
-        lastPurchase: 'Henüz alışveriş yok',
-        totalOrders: 0,
-        joinDate: '15 Mar 2025',
-        visitCount: 3,
-        viewCount: 18,
-        purchaseCount: 0
-      },
-      {
-        id: '3',
-        name: 'Mehmet Kaya',
-        email: 'mehmet@example.com',
-        phone: '+90 555 345 6789',
-        location: 'İzmir, Türkiye',
-        status: 'ACTIVE',
-        lastActive: '1 saat önce',
-        online: false,
-        avatar: 'https://ui-avatars.com/api/?name=Mehmet+Kaya&background=0ea5e9&color=fff&size=80',
-        type: 'Alıcı',
-        lastPurchase: 'Spor Ayakkabı',
-        totalOrders: 3,
-        joinDate: '05 Şub 2025',
-        visitCount: 8,
-        viewCount: 25,
-        purchaseCount: 3
-      },
-      {
-        id: '4',
-        name: 'Zeynep Şahin',
-        email: 'zeynep@example.com',
-        phone: '+90 555 456 7890',
-        location: 'Bursa, Türkiye',
-        status: 'ACTIVE',
-        lastActive: '30 dakika önce',
-        online: true,
-        avatar: 'https://ui-avatars.com/api/?name=Zeynep+Sahin&background=0ea5e9&color=fff&size=80',
-        type: 'Alıcı',
-        lastPurchase: 'Laptop Çantası',
-        totalOrders: 5,
-        joinDate: '20 Oca 2025',
-        visitCount: 12,
-        viewCount: 42,
-        purchaseCount: 5
-      }
-    ],
-    total: 4,
-    stats: {
-      totalVisitors: 4,
-      totalBuyers: 2,
-      totalViewers: 1,
-      conversionRate: 50
-    }
-  };
+// Aboneleri backend'den çek
+const getSubscribersFromBackend = async (shopId: string): Promise<Subscriber[]> => {
+  if (!shopId) return [];
+  try {
+    const { data } = await axios.get(`http://localhost:8082/api/newsletter/subscribers?shop_id=${shopId}`);
+    return data.subscribers || [];
+  } catch (error) {
+    console.error('Aboneler alınamadı:', error);
+    return [];
+  }
 };
+
+// Mock müşteri verileri
+
 
 // ==================== MODAL BİLEŞENLERİ ====================
 interface MailModalProps {
@@ -160,6 +86,7 @@ const MailModal = ({ isOpen, onClose, customer, colors, onSendMail, isLoading }:
       }, 0);
     }
   }, [customer]);
+  
   if (!isOpen || !customer) return null;
 
   const handleSend = () => {
@@ -379,6 +306,7 @@ const DetailModal = ({ isOpen, onClose, customer, colors }: DetailModalProps) =>
     switch (customer.type) {
       case 'Alıcı': return { bg: '#10b981', color: 'white' };
       case 'Görüntüleyen': return { bg: '#f59e0b', color: 'white' };
+      case 'Abone': return { bg: '#8b5cf6', color: 'white' };
       default: return { bg: '#0ea5e9', color: 'white' };
     }
   };
@@ -559,6 +487,7 @@ const CustomerCard = ({ customer, onMailClick, onDetailClick, colors }: Customer
     switch (customer.type) {
       case 'Alıcı': return '#10b981';
       case 'Görüntüleyen': return '#f59e0b';
+      case 'Abone': return '#8b5cf6';
       default: return '#0ea5e9';
     }
   };
@@ -697,335 +626,6 @@ const CustomerCard = ({ customer, onMailClick, onDetailClick, colors }: Customer
   );
 };
 
-// ==================== ANA SAYFA ====================
-const CustomersPage = ({ colors }: CustomersPageProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [searchTerm] = useState('');
-  const [mailModal, setMailModal] = useState<{ isOpen: boolean; customer: Customer | null }>({
-    isOpen: false,
-    customer: null
-  });
-  const [detailModal, setDetailModal] = useState<{ isOpen: boolean; customer: Customer | null }>({
-    isOpen: false,
-    customer: null
-  });
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
-  const [successModal, setSuccessModal] = useState<{ isOpen: boolean; to: string }>({
-    isOpen: false,
-    to: ''
-  });
-  const customersPerPage = 6;
-
-  const { mutate: sendEmail, isPending: isSendingEmail } = useSendEmail();
-
-  const { data, isLoading, error } = useQuery<CustomersResponse>({
-    queryKey: ['customers'],
-    queryFn: getCustomers,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const allCustomers = data?.customers || [];
-  const stats = data?.stats;
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const filteredCustomers = allCustomers.filter(customer => {
-    if (filterStatus !== 'all' && customer.status !== filterStatus) return false;
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      return (
-        customer.name.toLowerCase().includes(term) ||
-        customer.email.toLowerCase().includes(term) ||
-        customer.location.toLowerCase().includes(term)
-      );
-    }
-    return true;
-  });
-
-  const indexOfLastCustomer = currentPage * customersPerPage;
-  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-  const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
-  const totalPages = Math.ceil(filteredCustomers.length / customersPerPage);
-
-  const handleSendMail = (to: string, subject: string, content: string) => {
-    sendEmail(
-      { to, subject, body: content },
-      {
-        onSuccess: () => {
-          // alert kaldır, success modal aç
-          setSuccessModal({ isOpen: true, to });
-          setMailModal({ isOpen: false, customer: null });
-        },
-        onError: (error) => {
-          alert(`❌ Mail gönderilemedi: ${error.message}`);
-        }
-      }
-    );
-  };
-
-  const openMailModal = (customer: Customer) => {
-    setMailModal({ isOpen: true, customer });
-  };
-
-  const openDetailModal = (customer: Customer) => {
-    setDetailModal({ isOpen: true, customer });
-  };
-
-  const getCardGridColumns = () => {
-    if (isMobile) return '1fr';
-    if (isTablet) return 'repeat(2, 1fr)';
-    return 'repeat(3, 1fr)';
-  };
-
-  if (isLoading) {
-    return (
-      <div style={{ textAlign: 'center', padding: 48, color: colors.textSecondary }}>
-        <div style={{ fontSize: 20, marginBottom: 12 }}>📊</div>
-        Müşteri verileri yükleniyor...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ textAlign: 'center', padding: 48, color: '#ef4444' }}>
-        Veriler yüklenirken bir hata oluştu.
-      </div>
-    );
-  }
-
-
-
-  return (
-    <div style={{ minHeight: '100%' }}>
-      {/* İstatistik Kartları */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-        gap: isMobile ? 12 : 20,
-        marginBottom: 28
-      }}>
-        <div style={{ backgroundColor: colors.surface, borderRadius: 24, padding: isMobile ? 16 : 20, border: `1px solid ${colors.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 44, height: 44, backgroundColor: 'rgba(14,165,233,0.1)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 22 }}>👥</span>
-            </div>
-          </div>
-          <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: colors.text }}>{stats?.totalVisitors || 0}</div>
-          <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginTop: 4 }}>Toplam Ziyaretçi</div>
-        </div>
-
-        <div style={{ backgroundColor: colors.surface, borderRadius: 24, padding: isMobile ? 16 : 20, border: `1px solid ${colors.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 44, height: 44, backgroundColor: 'rgba(16,185,129,0.1)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 22 }}>🛒</span>
-            </div>
-          </div>
-          <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: colors.text }}>{stats?.totalBuyers || 0}</div>
-          <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginTop: 4 }}>Satın Alan</div>
-        </div>
-
-        <div style={{ backgroundColor: colors.surface, borderRadius: 24, padding: isMobile ? 16 : 20, border: `1px solid ${colors.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 44, height: 44, backgroundColor: 'rgba(245,158,11,0.1)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 22 }}>👁️</span>
-            </div>
-          </div>
-          <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: colors.text }}>{stats?.totalViewers || 0}</div>
-          <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginTop: 4 }}>Görüntüleyen</div>
-        </div>
-
-        <div style={{ backgroundColor: colors.surface, borderRadius: 24, padding: isMobile ? 16 : 20, border: `1px solid ${colors.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 44, height: 44, backgroundColor: 'rgba(168,85,247,0.1)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 22 }}>📈</span>
-            </div>
-          </div>
-          <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: colors.text }}>{stats?.conversionRate || 0}%</div>
-          <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginTop: 4 }}>Dönüşüm Oranı</div>
-        </div>
-      </div>
-
-      {/* Filtreler */}
-      <div style={{ marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
-        <div style={{ display: 'flex', gap: 8, backgroundColor: colors.surface, padding: 4, borderRadius: 40, border: `1px solid ${colors.border}`, width: 'fit-content' }}>
-          {[
-            { key: 'all', label: 'Tümü', icon: '📋' },
-            { key: 'ACTIVE', label: 'Aktif', icon: '🟢' },
-            { key: 'AWAY', label: 'Uzakta', icon: '🟡' },
-            { key: 'OFFLINE', label: 'Çevrimdışı', icon: '⚫' }
-          ].map(filter => (
-            <button
-              key={filter.key}
-              onClick={() => setFilterStatus(filter.key)}
-              style={{
-                padding: isMobile ? '6px 16px' : '8px 24px',
-                backgroundColor: filterStatus === filter.key ? '#0ea5e9' : 'transparent',
-                border: 'none',
-                borderRadius: 40,
-                color: filterStatus === filter.key ? 'white' : colors.textSecondary,
-                fontSize: isMobile ? 13 : 14,
-                fontWeight: 500,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                transition: 'all 0.2s'
-              }}
-            >
-              <span>{filter.icon}</span>
-              <span>{filter.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Müşteri Kartları */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: getCardGridColumns(),
-        gap: 20
-      }}>
-        {currentCustomers.map((customer) => (
-          <CustomerCard
-            key={customer.id}
-            customer={customer}
-            onMailClick={openMailModal}
-            onDetailClick={openDetailModal}
-            colors={colors}
-          />
-        ))}
-      </div>
-
-      {/* Boş Durum */}
-      {currentCustomers.length === 0 && (
-        <div style={{
-          textAlign: 'center',
-          padding: 48,
-          color: colors.textSecondary,
-          backgroundColor: colors.surface,
-          borderRadius: 24,
-          border: `1px solid ${colors.border}`
-        }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>👤</div>
-          <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 8 }}>Müşteri bulunamadı</div>
-          <div style={{ fontSize: 13 }}>Filtreleri kaldırarak tekrar deneyin</div>
-        </div>
-      )}
-
-      {/* Modallar */}
-      <MailModal
-        isOpen={mailModal.isOpen}
-        onClose={() => setMailModal({ isOpen: false, customer: null })}
-        customer={mailModal.customer}
-        colors={colors}
-        onSendMail={handleSendMail}
-        isLoading={isSendingEmail}
-      />
-      <DetailModal
-        isOpen={detailModal.isOpen}
-        onClose={() => setDetailModal({ isOpen: false, customer: null })}
-        customer={detailModal.customer}
-        colors={colors}
-      />
-      <MailSuccessModal   // 👈 BUNU EKLE
-        isOpen={successModal.isOpen}
-        onClose={() => setSuccessModal({ isOpen: false, to: '' })}
-        to={successModal.to}
-        colors={colors}
-      />
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div style={{ marginTop: 32, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: 16 }}>
-          <div style={{ fontSize: isMobile ? 12 : 13, color: colors.textSecondary, textAlign: isMobile ? 'center' : 'left' }}>
-            {indexOfFirstCustomer + 1} - {Math.min(indexOfLastCustomer, filteredCustomers.length)} / {filteredCustomers.length} müşteri
-          </div>
-          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              style={{
-                padding: isMobile ? '8px 14px' : '8px 16px',
-                background: 'none',
-                border: `1px solid ${colors.border}`,
-                borderRadius: 40,
-                color: currentPage === 1 ? colors.textSecondary : colors.text,
-                fontSize: isMobile ? 12 : 13,
-                cursor: currentPage === 1 ? 'default' : 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              ← Önceki
-            </button>
-            {!isMobile && [...Array(Math.min(totalPages, 5))].map((_, i) => {
-              const pageNum = i + 1;
-              return (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(pageNum)}
-                  style={{
-                    minWidth: 36,
-                    padding: '8px 12px',
-                    background: currentPage === pageNum ? '#0ea5e9' : 'none',
-                    border: `1px solid ${currentPage === pageNum ? '#0ea5e9' : colors.border}`,
-                    borderRadius: 40,
-                    color: currentPage === pageNum ? 'white' : colors.textSecondary,
-                    fontSize: isMobile ? 12 : 13,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-            {isMobile && (
-              <span style={{
-                padding: '8px 16px',
-                background: colors.bg,
-                border: `1px solid ${colors.border}`,
-                borderRadius: 40,
-                color: colors.text,
-                fontSize: 13
-              }}>
-                {currentPage} / {totalPages}
-              </span>
-            )}
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              style={{
-                padding: isMobile ? '8px 14px' : '8px 16px',
-                background: 'none',
-                border: `1px solid ${colors.border}`,
-                borderRadius: 40,
-                color: currentPage === totalPages ? colors.textSecondary : colors.text,
-                fontSize: isMobile ? 12 : 13,
-                cursor: currentPage === totalPages ? 'default' : 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              Sonraki →
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
 // ==================== BAŞARILI MAIL MODALI ====================
 interface MailSuccessModalProps {
   isOpen: boolean;
@@ -1113,6 +713,530 @@ const MailSuccessModal = ({ isOpen, onClose, to, colors }: MailSuccessModalProps
   );
 };
 
+// ==================== ANA SAYFA ====================
+const CustomersPage = ({ colors }: CustomersPageProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterType, setFilterType] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [mailModal, setMailModal] = useState<{ isOpen: boolean; customer: Customer | null }>({
+    isOpen: false,
+    customer: null
+  });
+  const [detailModal, setDetailModal] = useState<{ isOpen: boolean; customer: Customer | null }>({
+    isOpen: false,
+    customer: null
+  });
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [successModal, setSuccessModal] = useState<{ isOpen: boolean; to: string }>({
+    isOpen: false,
+    to: ''
+  });
+  const customersPerPage = 6;
 
+  const { mutate: sendEmail, isPending: isSendingEmail } = useSendEmail();
+  const { data: myShops } = useMyShops();
+  const [selectedShopId, setSelectedShopId] = useState('');
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [loadingSubscribers, setLoadingSubscribers] = useState(false);
+  const [mockCustomers, setMockCustomers] = useState<Customer[]>([]);
+  const [loadingMock, setLoadingMock] = useState(false);
+
+  // Mağaza ID'sini al
+  useEffect(() => {
+    if (myShops && myShops.length > 0) {
+      setSelectedShopId(myShops[0].id);
+    }
+  }, [myShops]);
+
+  // Aboneleri çek
+  useEffect(() => {
+    if (selectedShopId) {
+      setLoadingSubscribers(true);
+      getSubscribersFromBackend(selectedShopId)
+        .then(data => {
+          setSubscribers(data);
+          setLoadingSubscribers(false);
+        })
+        .catch(err => {
+          console.error('Abone çekme hatası:', err);
+          setLoadingSubscribers(false);
+        });
+    }
+  }, [selectedShopId]);
+
+  // Mock müşterileri çek
+
+  // Aboneleri Customer formatına çevir
+  const subscriberCustomers: Customer[] = subscribers.map(sub => ({
+    id: `sub_${sub.id}`,
+    name: sub.email.split('@')[0],
+    email: sub.email,
+    phone: '-',
+    location: '-',
+    status: 'ACTIVE',
+    lastActive: new Date(sub.created_at).toLocaleString(),
+    online: false,
+    avatar: `https://ui-avatars.com/api/?name=${sub.email.split('@')[0]}&background=8b5cf6&color=fff&size=80`,
+    type: 'Abone',
+    lastPurchase: 'Henüz alışveriş yok',
+    totalOrders: 0,
+    joinDate: new Date(sub.created_at).toLocaleDateString('tr-TR'),
+    visitCount: 0,
+    viewCount: 0,
+    purchaseCount: 0
+  }));
+
+  // Tüm müşteriler = Mock müşteriler + Aboneler
+  const allCustomers = [...mockCustomers, ...subscriberCustomers];
+
+  // İstatistikler
+  const stats = {
+    totalVisitors: allCustomers.filter(c => c.type === 'Ziyaretçi').length,
+    totalBuyers: allCustomers.filter(c => c.type === 'Alıcı').length,
+    totalViewers: allCustomers.filter(c => c.type === 'Görüntüleyen').length,
+    totalSubscribers: allCustomers.filter(c => c.type === 'Abone').length,
+    conversionRate: allCustomers.length > 0 
+      ? Math.round((allCustomers.filter(c => c.type === 'Alıcı').length / allCustomers.length) * 100) 
+      : 0
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Filtreleme
+  const filteredCustomers = allCustomers.filter(customer => {
+    if (filterStatus !== 'all' && customer.status !== filterStatus) return false;
+    if (filterType !== 'all' && customer.type !== filterType) return false;
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      return (
+        customer.name.toLowerCase().includes(term) ||
+        customer.email.toLowerCase().includes(term) ||
+        customer.location.toLowerCase().includes(term)
+      );
+    }
+    return true;
+  });
+
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  const totalPages = Math.ceil(filteredCustomers.length / customersPerPage);
+
+  const handleSendMail = (to: string, subject: string, content: string) => {
+    sendEmail(
+      { to, subject, body: content },
+      {
+        onSuccess: () => {
+          setSuccessModal({ isOpen: true, to });
+          setMailModal({ isOpen: false, customer: null });
+        },
+        onError: (error) => {
+          alert(`❌ Mail gönderilemedi: ${error.message}`);
+        }
+      }
+    );
+  };
+
+  const openMailModal = (customer: Customer) => {
+    setMailModal({ isOpen: true, customer });
+  };
+
+  const openDetailModal = (customer: Customer) => {
+    setDetailModal({ isOpen: true, customer });
+  };
+
+  const getCardGridColumns = () => {
+    if (isMobile) return '1fr';
+    if (isTablet) return 'repeat(2, 1fr)';
+    return 'repeat(3, 1fr)';
+  };
+
+  const isLoading = loadingMock || loadingSubscribers;
+
+  if (isLoading) {
+    return (
+      <div style={{ textAlign: 'center', padding: 48, color: colors.textSecondary }}>
+        <div style={{ fontSize: 20, marginBottom: 12 }}>📊</div>
+        Müşteri verileri yükleniyor...
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: '100%' }}>
+      {/* İstatistik Kartları - 5 KART */}
+      {/* İstatistik Kartları - 4 KART */}
+{/* İstatistik Kartları - 4 KART (Analytics sayfasındaki gibi) */}
+<div className="grid-4" style={{
+  display: 'grid',
+  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : (isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'),
+  gap: isMobile ? 10 : 20,
+  marginBottom: 32
+}}>
+  {/* Ziyaretçi */}
+  <div style={{
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: isMobile ? 16 : 24,
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: isMobile ? 12 : 16 }}>
+      <div style={{
+        width: isMobile ? 40 : 48,
+        height: isMobile ? 40 : 48,
+        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+        borderRadius: 14,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <span className="material-icons-round" style={{ color: '#0ea5e9', fontSize: isMobile ? 20 : 24 }}>group</span>
+      </div>
+      <span style={{
+        color: '#10b981',
+        fontSize: isMobile ? 11 : 12,
+        fontWeight: 'bold',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        padding: isMobile ? '2px 8px' : '4px 10px',
+        borderRadius: 20
+      }}>
+        +12%
+      </span>
+    </div>
+    <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginBottom: isMobile ? 4 : 6 }}>
+      TOPLAM ZİYARETÇİ
+    </div>
+    <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 'bold', color: colors.text }}>
+      {stats.totalVisitors}
+    </div>
+  </div>
+
+  {/* Satın Alan */}
+  <div style={{
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: isMobile ? 16 : 24,
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: isMobile ? 12 : 16 }}>
+      <div style={{
+        width: isMobile ? 40 : 48,
+        height: isMobile ? 40 : 48,
+        backgroundColor: 'rgba(168, 85, 247, 0.1)',
+        borderRadius: 14,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <span className="material-icons-round" style={{ color: '#a855f7', fontSize: isMobile ? 20 : 24 }}>shopping_cart</span>
+      </div>
+      <span style={{
+        color: colors.textSecondary,
+        fontSize: isMobile ? 11 : 12,
+        fontWeight: 'bold',
+        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+        padding: isMobile ? '2px 8px' : '4px 10px',
+        borderRadius: 20
+      }}>
+        +8%
+      </span>
+    </div>
+    <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginBottom: isMobile ? 4 : 6 }}>
+      SATIN ALAN
+    </div>
+    <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 'bold', color: colors.text }}>
+      {stats.totalBuyers}
+    </div>
+  </div>
+
+  {/* Görüntüleyen */}
+  <div style={{
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: isMobile ? 16 : 24,
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: isMobile ? 12 : 16 }}>
+      <div style={{
+        width: isMobile ? 40 : 48,
+        height: isMobile ? 40 : 48,
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        borderRadius: 14,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <span className="material-icons-round" style={{ color: '#f59e0b', fontSize: isMobile ? 20 : 24 }}>visibility</span>
+      </div>
+      <span style={{
+        color: colors.textSecondary,
+        fontSize: isMobile ? 11 : 12,
+        fontWeight: 'bold',
+        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+        padding: isMobile ? '2px 8px' : '4px 10px',
+        borderRadius: 20
+      }}>
+        +15%
+      </span>
+    </div>
+    <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginBottom: isMobile ? 4 : 6 }}>
+      GÖRÜNTÜLEYEN
+    </div>
+    <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 'bold', color: colors.text }}>
+      {stats.totalViewers}
+    </div>
+  </div>
+
+  {/* Abone */}
+  <div style={{
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: isMobile ? 16 : 24,
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: isMobile ? 12 : 16 }}>
+      <div style={{
+        width: isMobile ? 40 : 48,
+        height: isMobile ? 40 : 48,
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        borderRadius: 14,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <span className="material-icons-round" style={{ color: '#8b5cf6', fontSize: isMobile ? 20 : 24 }}>mail</span>
+      </div>
+      <span style={{
+        color: '#10b981',
+        fontSize: isMobile ? 11 : 12,
+        fontWeight: 'bold',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        padding: isMobile ? '2px 8px' : '4px 10px',
+        borderRadius: 20
+      }}>
+        +5%
+      </span>
+    </div>
+    <div style={{ fontSize: isMobile ? 11 : 12, color: colors.textSecondary, marginBottom: isMobile ? 4 : 6 }}>
+      ABONE
+    </div>
+    <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 'bold', color: colors.text }}>
+      {stats.totalSubscribers}
+    </div>
+  </div>
+</div>
+      {/* Tip Filtresi */}
+      <div style={{ marginBottom: 24, display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 16, justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {[
+            { key: 'all', label: 'Tümü', icon: '📋' },
+            { key: 'Alıcı', label: 'Alıcı', icon: '🛒' },
+            { key: 'Ziyaretçi', label: 'Ziyaretçi', icon: '👥' },
+            { key: 'Görüntüleyen', label: 'Görüntüleyen', icon: '👁️' },
+            { key: 'Abone', label: 'Abone', icon: '📧' }
+          ].map(filter => (
+            <button
+              key={filter.key}
+              onClick={() => setFilterType(filter.key)}
+              style={{
+                padding: isMobile ? '6px 16px' : '8px 20px',
+                backgroundColor: filterType === filter.key ? '#0ea5e9' : 'transparent',
+                border: `1px solid ${filterType === filter.key ? '#0ea5e9' : colors.border}`,
+                borderRadius: 40,
+                color: filterType === filter.key ? 'white' : colors.textSecondary,
+                fontSize: isMobile ? 12 : 13,
+                fontWeight: 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                transition: 'all 0.2s'
+              }}
+            >
+              <span>{filter.icon}</span>
+              <span>{filter.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Arama Kutusu */}
+        <div style={{ position: 'relative', minWidth: isMobile ? '100%' : 250 }}>
+          <input
+            type="text"
+            placeholder="İsim, e-posta veya konum ara..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              width: '100%',
+              padding: isMobile ? '10px 16px 10px 40px' : '10px 16px 10px 40px',
+              borderRadius: 40,
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.bg,
+              outline: 'none',
+              fontSize: isMobile ? 13 : 14,
+              color: colors.text
+            }}
+          />
+          <span style={{
+            position: 'absolute',
+            left: 14,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            fontSize: 16
+          }}>🔍</span>
+        </div>
+      </div>
+
+      {/* Durum Filtresi */}
+     
+
+      {/* Müşteri Kartları */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: getCardGridColumns(),
+        gap: 20
+      }}>
+        {currentCustomers.map((customer) => (
+          <CustomerCard
+            key={customer.id}
+            customer={customer}
+            onMailClick={openMailModal}
+            onDetailClick={openDetailModal}
+            colors={colors}
+          />
+        ))}
+      </div>
+
+      {/* Boş Durum */}
+      {currentCustomers.length === 0 && (
+        <div style={{
+          textAlign: 'center',
+          padding: 48,
+          color: colors.textSecondary,
+          backgroundColor: colors.surface,
+          borderRadius: 24,
+          border: `1px solid ${colors.border}`
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>👤</div>
+          <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 8 }}>Müşteri bulunamadı</div>
+          <div style={{ fontSize: 13 }}>Filtreleri kaldırarak tekrar deneyin</div>
+        </div>
+      )}
+
+      {/* Modallar */}
+      <MailModal
+        isOpen={mailModal.isOpen}
+        onClose={() => setMailModal({ isOpen: false, customer: null })}
+        customer={mailModal.customer}
+        colors={colors}
+        onSendMail={handleSendMail}
+        isLoading={isSendingEmail}
+      />
+      <DetailModal
+        isOpen={detailModal.isOpen}
+        onClose={() => setDetailModal({ isOpen: false, customer: null })}
+        customer={detailModal.customer}
+        colors={colors}
+      />
+      <MailSuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ isOpen: false, to: '' })}
+        to={successModal.to}
+        colors={colors}
+      />
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ marginTop: 32, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: 16 }}>
+          <div style={{ fontSize: isMobile ? 12 : 13, color: colors.textSecondary, textAlign: isMobile ? 'center' : 'left' }}>
+            {indexOfFirstCustomer + 1} - {Math.min(indexOfLastCustomer, filteredCustomers.length)} / {filteredCustomers.length} müşteri
+          </div>
+          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              style={{
+                padding: isMobile ? '8px 14px' : '8px 16px',
+                background: 'none',
+                border: `1px solid ${colors.border}`,
+                borderRadius: 40,
+                color: currentPage === 1 ? colors.textSecondary : colors.text,
+                fontSize: isMobile ? 12 : 13,
+                cursor: currentPage === 1 ? 'default' : 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              ← Önceki
+            </button>
+            {!isMobile && [...Array(Math.min(totalPages, 5))].map((_, i) => {
+              const pageNum = i + 1;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(pageNum)}
+                  style={{
+                    minWidth: 36,
+                    padding: '8px 12px',
+                    background: currentPage === pageNum ? '#0ea5e9' : 'none',
+                    border: `1px solid ${currentPage === pageNum ? '#0ea5e9' : colors.border}`,
+                    borderRadius: 40,
+                    color: currentPage === pageNum ? 'white' : colors.textSecondary,
+                    fontSize: isMobile ? 12 : 13,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            {isMobile && (
+              <span style={{
+                padding: '8px 16px',
+                background: colors.bg,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 40,
+                color: colors.text,
+                fontSize: 13
+              }}>
+                {currentPage} / {totalPages}
+              </span>
+            )}
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: isMobile ? '8px 14px' : '8px 16px',
+                background: 'none',
+                border: `1px solid ${colors.border}`,
+                borderRadius: 40,
+                color: currentPage === totalPages ? colors.textSecondary : colors.text,
+                fontSize: isMobile ? 12 : 13,
+                cursor: currentPage === totalPages ? 'default' : 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              Sonraki →
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default CustomersPage;

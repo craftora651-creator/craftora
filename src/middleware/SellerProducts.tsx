@@ -43,9 +43,7 @@ const SellerProducts = ({ colors, isDarkMode, onAddToCart, onProductClick }: Sel
   }, [myShops]);
   
   // ✅ Backend'den tüm ürünleri çek
-  const { data: products, isLoading, error } = useMyProducts(selectedShopId, undefined, {
-    enabled: !!selectedShopId
-  });
+  const { data: products, isLoading, error } = useMyProducts();
   
   console.log('🔍 Products from backend:', products);
   console.log('🔍 isLoading:', isLoading);

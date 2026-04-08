@@ -20,7 +20,6 @@ const OrderDetailModal = ({ order, onClose, colors, downloads }: {
   downloads?: any;
 }) => {
   if (!order) return null;
-
   const getStatusInfo = (status: string) => {
     switch(status) {
       case 'COMPLETED':

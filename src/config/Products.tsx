@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';  
+import { useState, useEffect } from 'react';
 import { useMyProducts, useBulkDeleteProducts, useDeleteProduct } from '../server/FastAPI/product.hooks';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
@@ -369,26 +369,36 @@ const ProductsPage = ({ colors }: ProductsPageProps) => {
             </button>
 
             <button
-              onClick={() => {
-                setProductType('physical');
-                setStatusFilter('all');
-              }}
+              disabled={true}
               style={{
                 flex: isMobile ? 1 : 'none',
                 padding: isMobile ? '10px 0' : '8px 24px',
-                backgroundColor: productType === 'physical'
-                  ? '#0ea5e9'
-                  : isMobile ? colors.surface : 'transparent',
+                backgroundColor: isMobile ? colors.surface : 'transparent',
                 border: isMobile ? `1px solid ${colors.border}` : 'none',
                 borderRadius: 30,
-                color: productType === 'physical' ? 'white' : colors.textSecondary,
+                color: colors.textSecondary,
                 fontSize: isMobile ? 14 : 14,
                 fontWeight: 500,
-                cursor: 'pointer',
-                textAlign: 'center'
+                cursor: 'not-allowed',
+                textAlign: 'center',
+                opacity: 0.5,
+                position: 'relative'
               }}
             >
               Physical
+              <span style={{
+                position: 'absolute',
+                top: -8,
+                right: -8,
+                backgroundColor: '#f59e0b',
+                color: 'white',
+                fontSize: 9,
+                padding: '2px 6px',
+                borderRadius: 20,
+                fontWeight: 600
+              }}>
+                Yakında
+              </span>
             </button>
             {productType === 'physical' && (
               <select
