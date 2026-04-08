@@ -20,6 +20,7 @@ const OrderDetailModal = ({ order, onClose, colors, downloads }: {
   downloads?: any;
 }) => {
   if (!order) return null;
+  
   const getStatusInfo = (status: string) => {
     switch(status) {
       case 'COMPLETED':
@@ -171,7 +172,7 @@ const OrderDetailModal = ({ order, onClose, colors, downloads }: {
             </span>
           </div>
 
-          {downloads?.digital_delivered && downloads.downloads?.length > 0 && (
+          {downloads?.digital_delivered && downloads?.downloads?.length > 0 && (
             <div style={{
               backgroundColor: '#0ea5e9',
               borderRadius: 16,
@@ -231,129 +232,24 @@ const OrdersPage = ({ colors }: OrdersPageProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [useMock, setUseMock] = useState(true); // ✅ true = mock kullan, false = backend kullan
   
   const ordersPerPage = 8;
 
-  // ✅ MOCK SİPARİŞLER (TEST İÇİN)
-  const mockOrders = [
-    {
-      id: "mock-1",
-      order_id: "mock-1",
-      order_number: "CRA-2024-001",
-      customer_name: "Ahmet Yılmaz",
-      customer_email: "ahmet@example.com",
-      customer_phone: "+90 555 123 4567",
-      customer: {
-        name: "Ahmet Yılmaz",
-        email: "ahmet@example.com",
-        phone: "+90 555 123 4567",
-        avatar: "https://ui-avatars.com/api/?name=Ahmet+Yilmaz&background=0ea5e9&color=fff&size=40"
-      },
-      items: [
-        { product_name: "Premium UI Kit", quantity: 1, unit_price: 89, price: 89 },
-        { product_name: "Tailwind Pro Components", quantity: 2, unit_price: 49, price: 49 }
-      ],
-      products: [
-        { name: "Premium UI Kit", quantity: 1, price: 89 },
-        { name: "Tailwind Pro Components", quantity: 2, price: 49 }
-      ],
-      total_amount: 187,
-      totalAmount: 187,
-      status: "COMPLETED",
-      orderStatus: "COMPLETED",
-      created_at: "2024-03-28T10:30:00",
-      orderDate: "2024-03-28T10:30:00",
-      digital_delivered: true,
-      digital_delivered_at: "2024-03-28T10:30:00",
-      order_type: "digital",
-      shop_id: "shop-1"
-    },
-    {
-      id: "mock-2",
-      order_id: "mock-2",
-      order_number: "CRA-2024-002",
-      customer_name: "Ayşe Demir",
-      customer_email: "ayse@example.com",
-      customer_phone: "+90 555 987 6543",
-      customer: {
-        name: "Ayşe Demir",
-        email: "ayse@example.com",
-        phone: "+90 555 987 6543",
-        avatar: "https://ui-avatars.com/api/?name=Ayse+Demir&background=0ea5e9&color=fff&size=40"
-      },
-      items: [
-        { product_name: "E-book: React Mastery", quantity: 1, unit_price: 39, price: 39 },
-        { product_name: "Video Course: Next.js 14", quantity: 1, unit_price: 129, price: 129 }
-      ],
-      products: [
-        { name: "E-book: React Mastery", quantity: 1, price: 39 },
-        { name: "Video Course: Next.js 14", quantity: 1, price: 129 }
-      ],
-      total_amount: 168,
-      totalAmount: 168,
-      status: "PENDING",
-      orderStatus: "PENDING",
-      created_at: "2024-03-29T15:20:00",
-      orderDate: "2024-03-29T15:20:00",
-      digital_delivered: false,
-      digital_delivered_at: null,
-      order_type: "digital",
-      shop_id: "shop-2"
-    }
-  ];
-
-  const mockDownloads = {
-    digital_delivered: true,
-    downloads: [
-      {
-        product_id: "prod-1",
-        product_name: "Premium UI Kit",
-        file_url: "https://example.com/download/premium-ui-kit.zip",
-        file_name: "premium-ui-kit.zip",
-        downloads_used: 1,
-        downloads_remaining: 4,
-        download_limit: 5,
-        access_expires: "2025-03-28T10:30:00"
-      }
-    ]
-  };
-
-  // ✅ BACKEND HOOKLARI (useMock false olunca aktif)
+  // BACKEND HOOKLARI
   const { 
-    data: backendOrders = [], 
-    isLoading: backendLoading, 
-    isError: backendError, 
-    error: backendErrorObj,
-    refetch: backendRefetch 
+    data: orders = [], 
+    isLoading, 
+    isError, 
+    error,
+    refetch 
   } = useMyOrders(
-    filterStatus !== 'all' ? { status: filterStatus as OrderStatus } : {},
-    { enabled: !useMock } // ✅ mock kullanıyorsa backend'i çağırma
+    filterStatus !== 'all' ? { status: filterStatus as OrderStatus } : {}
   );
   
-  const { data: backendDownloads } = useOrderDownloads(
+  const { data: downloads } = useOrderDownloads(
     selectedOrder?.id || selectedOrder?.order_id || '',
-    { enabled: !!selectedOrder && showDetailModal && !useMock }
+    { enabled: !!selectedOrder && showDetailModal }
   );
-
-  // ✅ MOCK veya BACKEND verisini seç
-  const orders = useMock ? mockOrders : backendOrders;
-  const isLoading = useMock ? false : backendLoading;
-  const isError = useMock ? false : backendError;
-  const error = useMock ? null : backendErrorObj;
-  const refetch = useMock ? () => {} : backendRefetch;
-  
-  // ✅ Downloads seçimi
-  const getMockDownloads = (orderId: string) => {
-    if (orderId === "mock-1") {
-      return mockDownloads;
-    }
-    return null;
-  };
-  
-  const downloads = useMock 
-    ? getMockDownloads(selectedOrder?.id || selectedOrder?.order_id || '')
-    : backendDownloads;
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -456,24 +352,6 @@ const OrdersPage = ({ colors }: OrdersPageProps) => {
         ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
         * { scrollbar-width: thin; scrollbar-color: #0ea5e9 ${colors.bg}; }
       `}</style>
-      
-      {/* TEST MODU İÇİN BİR BUTON (isteğe bağlı) */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-        <button
-          onClick={() => setUseMock(!useMock)}
-          style={{
-            padding: '6px 12px',
-            backgroundColor: useMock ? '#f59e0b' : '#10b981',
-            border: 'none',
-            borderRadius: 20,
-            color: 'white',
-            fontSize: 12,
-            cursor: 'pointer'
-          }}
-        >
-          {useMock ? '📦 Test Verisi Kullanılıyor' : '🔌 Backend\'e Bağlan'}
-        </button>
-      </div>
       
       {/* 4'lü Metric Kartlar */}
       <div style={{
@@ -599,7 +477,7 @@ const OrdersPage = ({ colors }: OrdersPageProps) => {
           })}
         </div>
       ) : (
-        // MOBİL KARTLAR (aynı kalabilir)
+        // MOBİL KARTLAR
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
           {currentOrders.map((order) => {
             const status = getStatusBadge(order.status);
