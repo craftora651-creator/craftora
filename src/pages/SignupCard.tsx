@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useGoogleLogin } from "../server/FastAPI/auth.hooks";
+import { useGoogleLogin, useAppleLogin } from "../server/FastAPI/auth.hooks";
 import { useDispatch } from 'react-redux';
 import { setCurrentUser } from '../redux/userSlice';
-import { apiClient } from '../api/apiClient';
 import type { UserResponse } from '../types/user.types';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCurrentUser } from "../server/FastAPI/user.hooks";  // ✅ EKLE
+import { useQueryClient } from '@tanstack/react-query';
 import '../css/SignupCard.css';
 import RobotBuddy from '../components/RobotBuddy';
 
-// Dosyanın en üstüne, import'lardan sonra ekle:
 declare global {
     interface Window {
         google?: {
@@ -23,6 +23,17 @@ declare global {
                     prompt: () => void;
                     show?: () => void;
                 };
+            };
+        };
+        AppleID?: {
+            auth: {
+                signIn: () => void;
+                init: (config: {
+                    clientId: string;
+                    scope: string;
+                    redirectURI: string;
+                    usePopup: boolean;
+                }) => void;
             };
         };
     }
@@ -89,7 +100,68 @@ const SignupCard: React.FC = () => {
     };
   }, []);
 
+  const queryClient = useQueryClient();  // ✅ EKLE
+  const { refetch } = useCurrentUser();   // ✅ EKLE
+
   const googleLoginMutation = useGoogleLogin();
+  const appleLoginMutation = useAppleLogin();
+
+  const handleAppleLogin = () => {
+    console.log('🍎 Apple login butonuna tıklandı!');
+    if (window.AppleID) {
+      window.AppleID.auth.signIn();
+    } else {
+      // Apple SDK'yı yükle
+      const script = document.createElement('script');
+      script.src = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
+      script.async = true;
+      script.onload = () => {
+        initAppleLogin();
+      };
+      document.body.appendChild(script);
+    }
+  };
+  const initAppleLogin = () => {
+    if (!window.AppleID) return;
+    window.AppleID.auth.init({
+      clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
+      scope: 'name email',
+      redirectURI: import.meta.env.VITE_APPLE_REDIRECT_URI,
+      usePopup: true
+    });
+    window.AppleID.auth.signIn();
+    window.addEventListener('appleid_signin', async (event: any) => {
+      try {
+        const { authorization } = event.detail;
+        const identityToken = authorization.id_token;
+        console.log('🍎 Apple token alındı, backend\'e gönderiliyor...');
+        const result = await appleLoginMutation.mutateAsync({
+          identity_token: identityToken,
+          authorization_code: authorization.code,
+          user: undefined  
+        });
+        localStorage.setItem('access_token', result.access_token);
+        localStorage.setItem('refresh_token', result.refresh_token);
+        localStorage.setItem('user', JSON.stringify(result.user));
+        await refetch();
+        const user = queryClient.getQueryData<UserResponse>(['user', 'current']);
+        if (user) {
+          dispatch(setCurrentUser(user));
+        }
+        if (result.is_new_user) {
+          navigate('/onboarding?first=true');
+        } else {
+          navigate('/onboarding');
+        }
+
+      } catch (error) {
+        console.error('🍎 Apple login hatası:', error);
+        setError('Apple ile giriş yapılamadı. Lütfen tekrar deneyin.');
+      }
+    });
+  };
+
+
 
   const handleGoogleSignup = () => {
     console.log('🟢 Google signup butonuna tıklandı!');
@@ -141,14 +213,12 @@ const SignupCard: React.FC = () => {
           localStorage.setItem('access_token', result.access_token);
           localStorage.setItem('refresh_token', result.refresh_token);
           localStorage.setItem('user', JSON.stringify(result.user));
-
-          // Kullanıcı bilgilerini Redux'a kaydet
-          const me = await apiClient.get<UserResponse>('/api/users/me');
-          dispatch(setCurrentUser(me));
-
+          await refetch();
+          const user = queryClient.getQueryData<UserResponse>(['user', 'current']);
+          if (user) {
+            dispatch(setCurrentUser(user));
+          }
           setIsLoading(false);
-
-          // Yeni kullanıcı olduğu için onboarding'e yönlendir
           navigate('/onboarding?first=true');
 
         } catch (error) {
@@ -158,11 +228,7 @@ const SignupCard: React.FC = () => {
         }
       }
     });
-
-    // One Tap UI göster
     window.google.accounts.id.prompt();
-
-    // 2 saniye sonra popup zorla
     setTimeout(() => {
       if (window.google?.accounts?.id?.show) {
         window.google.accounts.id.show();
@@ -173,31 +239,23 @@ const SignupCard: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    // Validasyon
     if (!name || !email || !password || !confirmPassword) {
       setError('Tüm alanları doldurun!');
       return;
     }
-
     if (password !== confirmPassword) {
       setError('Şifreler eşleşmiyor!');
       return;
     }
-
     if (password.length < 6) {
       setError('Şifre en az 6 karakter olmalı!');
       return;
     }
-
     if (!agreeTerms) {
       setError('Devam etmek için şartları kabul etmelisiniz!');
       return;
     }
-
     setIsLoading(true);
-
-    // Başarılı kayıt simülasyonu
     setTimeout(() => {
       setIsLoading(false);
       if (cardRef.current) {
@@ -338,11 +396,11 @@ const SignupCard: React.FC = () => {
                     <div className="el-strength-bar">
                       <div
                         className={`el-strength-fill ${password.length < 6 ? 'weak' :
-                            password.length < 10 ? 'medium' : 'strong'
+                          password.length < 10 ? 'medium' : 'strong'
                           }`}
                         style={{
                           width: `${password.length < 6 ? '33%' :
-                              password.length < 10 ? '66%' : '100%'
+                            password.length < 10 ? '66%' : '100%'
                             }`
                         }}
                       ></div>
@@ -427,9 +485,12 @@ const SignupCard: React.FC = () => {
 
                     <button
                       type="button"
+                      onClick={handleAppleLogin}
                       className="el-social-btn"
                     >
-                      <span className="material-icons text-slate-500">fingerprint</span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.05 20.28c-.98.95-2.05.86-3.08.41-1.09-.48-2.09-.48-3.18 0-1.03.45-2.1.54-3.08-.41-2.98-2.84-3.28-8.28-1.45-11.81 1.13-2.18 3.07-3.12 4.98-3.12 1.27 0 2.44.56 3.26.56.81 0 2.08-.68 3.48-.68 1.38 0 2.56.64 3.48 1.68-1.38.89-2.16 2.58-1.74 4.48.45 2.02 2.07 3.06 3.08 3.48-.46 1.18-1.18 2.32-1.85 3.4zM15.5 4.25c.58-.71.97-1.68.85-2.68-.9.05-1.99.61-2.62 1.36-.56.68-.94 1.66-.81 2.62.94.05 1.88-.5 2.58-1.3z" />
+                      </svg>
                     </button>
                   </div>
                 </div>

@@ -392,6 +392,7 @@ export const useDeleteFile = () => {
 /**
  * Batch upload mutation'ı
  */
+
 export const useBatchUpload = () => {
   const queryClient = useQueryClient();
 

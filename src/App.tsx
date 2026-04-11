@@ -48,7 +48,9 @@ import Profile from './pages/Profile';
 import CraftoraShops from './pages/CraftoraShops';
 import Competition from './pages/Competition'; // ✅ BUNU EKLE
 import SearchPage from './pages/SearchPage';
-
+import VideoPlayer from './pages/VideoPlayer';
+import MedyaProfile from './pages/MedyaProfile';
+import Security from './pages/Security';
 import "./index.css";
 
 function App() {
@@ -272,7 +274,14 @@ function App() {
               <Route path="/craftora-shops" element={<CraftoraShops />} />
               <Route path="/competition" element={<Competition />} />
               <Route path="/search" element={<SearchPage />} />
-              
+              <Route path="/medya-profile" element={<MedyaProfile />} />
+              <Route path="/security" element={<Security />} />
+
+              <Route
+                path="/video/:id"
+                element={<VideoPlayer/>}  // ✅ colors prop'unu ekle
+              />
+
 
               <Route
                 path="/theme/enterprise/*"

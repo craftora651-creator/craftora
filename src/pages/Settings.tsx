@@ -45,9 +45,9 @@ const Settings: React.FC<SettingsProps> = ({ isOpen, onClose }) => {
   };
 
   const menuItems = [
-    { icon: <FaUser />, label: 'Profilim', description: 'Kişisel bilgilerini düzenle', onClick: () => navigate('/profile') },
+    { icon: <FaUser />, label: 'Profilim', description: 'Kişisel bilgilerini düzenle', onClick: () => navigate('/medya-profile') },
     { icon: <FaBell />, label: 'Bildirimler', description: 'Bildirim tercihlerini yönet', onClick: () => {} },
-    { icon: <FaLock />, label: 'Gizlilik ve Güvenlik', description: 'Hesap güvenlik ayarları', onClick: () => {} },
+    { icon: <FaLock />, label: 'Gizlilik ve Güvenlik', description: 'Hesap güvenlik ayarları', onClick: () => navigate('/security') },
     { icon: <FaPalette />, label: 'Tema', description: 'Light / Dark mod seçimi', onClick: () => setIsDarkMode(!isDarkMode) },
     { icon: <FaLanguage />, label: 'Dil', description: 'Türkçe / English', onClick: () => {} },
     { icon: <FaQuestionCircle />, label: 'Yardım', description: 'Sık sorulan sorular', onClick: () => {} },

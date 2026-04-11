@@ -1,5 +1,9 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Chart } from 'chart.js';
+import { useCurrentUser } from '../server/FastAPI/user.hooks';
+import { useMyShops } from '../server/FastAPI/shop.hooks'
 import ProductsPage from '../config/Products';
 import AnalyticsPage from '../config/Analytics';
 import CustomersPage from '../config/Customers';
@@ -8,7 +12,6 @@ import ReportsPage from '../config/Reports';
 import PhysicalProductsPage from '../config/PhysicalProductsPage';
 import SuppliersPage from '../config/SuppliersPage';
 import MyShopsPage from '../config/MyShops';
-import { Routes, Route } from 'react-router-dom';
 import ProductDetail from '../lib/ProductDetail';
 import EditProduct from '../helpers/EditProduct';
 import AnalyticsDetail from '../lib/AnalyticsDetail';
@@ -17,10 +20,7 @@ import SupplierSettings from '../lib/SupplierSettings';
 import CreateModal from '../.paket/CreateModal';
 import SettingsPage from '../config/Settings';
 import HelpCenter from '../config/HelpCenter';
-import ThemesPage from '../config/ThemesPage';
-import { Chart } from 'chart.js';
-import { useCurrentUser } from '../server/FastAPI/user.hooks';
-import { useMyShops } from '../server/FastAPI/shop.hooks';
+import ThemesPage from '../config/ThemesPage';;
 
 
 declare global {
@@ -60,7 +60,7 @@ const KankamAdminPanel = () => {
   const [openProfileModal, setOpenProfileModal] = useState(false);
   const handleOpenProfileModal = () => setOpenProfileModal(true);
   const handleCloseProfileModal = () => setOpenProfileModal(false);
-  const { data: shops, isLoading: shopsLoading } = useMyShops();
+  const { data: shops } = useMyShops();
   const currentShop = shops?.[0];
 
 
@@ -118,7 +118,7 @@ const KankamAdminPanel = () => {
   };
 
   const navigate = useNavigate();
-  const { data: userData, isLoading: userLoading } = useCurrentUser();
+  const { data: userData } = useCurrentUser();
   const userFullName = userData?.full_name || userData?.email?.split('@')[0] || 'Kullanıcı';
   const userEmail = userData?.email || '';
   const handleLogout = () => {
@@ -1581,7 +1581,7 @@ const SidebarButton = ({
     }
   };
 
- return (
+  return (
     <div
       onClick={handleClick}
       style={{

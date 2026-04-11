@@ -14,40 +14,8 @@ export const useCurrentUser = () => {
   return useQuery<UserResponse, Error>({
     queryKey: ["user", "current"],
     queryFn: async () => {
-      try {
-        // 🟢 GEÇİCİ: Token yoksa mock data döndür
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          console.warn('⚠️ No token found, returning mock user');
-          return {
-            id: "test-user-id",
-            email: "test@example.com",
-            full_name: "Test User",
-            role: "user",
-            is_active: true,
-            is_verified: true,
-            auth_provider: "email",
-            created_at: new Date().toISOString(),
-            shop_id: "14cecd34-d21d-4cf9-8f9e-b39c62d71f14"
-          } as UserResponse;
-        }
-        
-        const response = await apiClient.get<UserResponse>("/api/users/me");
-        return response;
-      } catch (error) {
-        console.error("❌ useCurrentUser error:", error);
-        // 🟢 Hata durumunda mock döndür
-        return {
-          id: "mock-user-id",
-          email: "mock@example.com", 
-          full_name: "Mock User",
-          role: "user",
-          is_active: true,
-          is_verified: true,
-          auth_provider: "mock",
-          created_at: new Date().toISOString()
-        } as UserResponse;
-      }
+      const response = await apiClient.get<UserResponse>("/api/users/me");
+      return response;
     },
     staleTime: 2 * 60 * 1000,
     retry: 1,
@@ -232,3 +200,29 @@ export const useDatabaseStats = () => {
 };
 
 // ✅ Database health check (basit versiyon)
+
+
+// hooks/users.hooks.ts - YENİ HOOK
+export const useUserSessions = () => {
+  return useQuery<{
+    id: string;
+    user_agent: string;
+    ip_address: string;
+    created_at: string;
+    expires_at: string;
+    is_revoked: boolean;
+  }[], Error>({
+    queryKey: ["user", "sessions"],
+    queryFn: async () => {
+      return await apiClient.get<{
+        id: string;
+        user_agent: string;
+        ip_address: string;
+        created_at: string;
+        expires_at: string;
+        is_revoked: boolean;
+      }[]>("/api/users/me/sessions");  // ✅ DOĞRU!
+    },
+    staleTime: 60 * 1000,
+  });
+};

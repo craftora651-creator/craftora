@@ -12,48 +12,30 @@ export interface UserBase {
 }
 
 export interface UserResponse extends UserBase {
-  // Contact info - SQL ile UYUMLU
-  phone_number: string | null;  // ✅ Model: phone_number (NOT phone!)
-  
-  // Auth info
+  phone_number: string | null;
   is_apple_user: boolean;
   is_google_user: boolean;
   email_verified: boolean;
-  
-  // Status - SQL'de var mı kontrol et!
-  status: 'active' | 'inactive' | 'suspended' | 'banned';
-  
-  // Seller info
   seller_since: string | null;
   shop_count: number;
   stripe_customer_id: string | null;
   stripe_account_id: string | null;
-  seller_verified: boolean;  // ✅ SQL'de var: seller_verified
-  
-  // Timestamps - SQL ile UYUMLU
-  updated_at: string;         // ✅ NULL DEĞİL! Modelde nullable=False
+  seller_verified: boolean;
+  updated_at: string;
   last_login_at: string | null;
   last_active_at: string | null;
-  verified_at: string | null;  // ✅ SQL'de var: verified_at
-  
-  // Preferences & Metadata
+  verified_at: string | null;
   preferences: Record<string, unknown>;
-  
-  // Business info - SQL'de var mı?
-  business_name?: string | null;   // SQL: business_name
-  tax_id?: string | null;          // SQL: tax_id
-  
-  // Statistics (computed - SQL'de yok)
+  business_name?: string | null;
+  tax_id?: string | null;
   total_orders: number;
   total_spent: number;
   last_order_at: string | null;
-  
-  // Computed properties
   is_seller: boolean;
   is_admin: boolean;
   display_name: string;
   account_age_days: number;
-  shop_id?: string | null; 
+  shop_id?: string | null;
 }
 
 export interface UserPublic {
@@ -89,25 +71,45 @@ export interface UserUpdateRequest {
   marketing_emails?: boolean;
 }
 
+// UserResponse - status alanını kaldır (is_active var zaten)
+export interface UserResponse extends UserBase {
+  phone_number: string | null;
+  is_apple_user: boolean;
+  is_google_user: boolean;
+  email_verified: boolean;
+  // status kaldırıldı ❌
+  seller_since: string | null;
+  shop_count: number;
+  stripe_customer_id: string | null;
+  stripe_account_id: string | null;
+  seller_verified: boolean;
+  updated_at: string;
+  last_login_at: string | null;
+  last_active_at: string | null;
+  verified_at: string | null;
+  preferences: Record<string, unknown>;
+  business_name?: string | null;
+  tax_id?: string | null;
+  total_orders: number;
+  total_spent: number;
+  last_order_at: string | null;
+  is_seller: boolean;
+  is_admin: boolean;
+  display_name: string;
+  account_age_days: number;
+  shop_id?: string | null;
+}
+
 export interface UserAdminResponse extends UserResponse {
-  // Security info
   login_attempts: number;
   locked_until: string | null;
   two_factor_enabled: boolean;
-  
-  // Provider IDs
   google_id: string | null;
   apple_id: string | null;
   apple_private_email: string | null;
   is_apple_provided_email: boolean;
-  
-  // Metadata
-  metadata: Record<string, unknown>;
-  
-  // Audit
-  created_by_ip: string | null;
-  last_ip_address: string | null;
-  user_agent: string | null;
+  user_metadata: Record<string, unknown>;  // ✅ düzeltildi
+  // created_by_ip ve last_ip_address - yoksa kaldır
 }
 
 export interface UserStats {

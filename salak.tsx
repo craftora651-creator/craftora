@@ -51,7 +51,7 @@ class ApiClient {
     // Go client - PORT 8082
     this.goClient = axios.create({
       baseURL: import.meta.env.VITE_GO_URL ?? "http://localhost:8082",
-      timeout: 120000,
+      timeout: 10000,
       headers: {
         "Content-Type": "application/json",
       },
@@ -248,13 +248,6 @@ class ApiClient {
     return response.data as T;
   }
 
-  async goDelete<T = unknown>(url: string, config?: RequestConfig): Promise<T> {
-    const axiosConfig = { ...config } as AxiosRequestConfig;
-    const response = await this.goClient.delete<T>(url, axiosConfig);
-    console.log(`📡 goDelete ${url}:`, response.data);
-    return response.data;
-  }
-
   async post<T = unknown>(
     url: string,
     data?: unknown,
@@ -291,27 +284,24 @@ class ApiClient {
   }
 
   // ----- GO SERVICE METHODS -----
-  // ----- GO SERVICE METHODS -----
   async goGet<T = unknown>(url: string, config?: RequestConfig): Promise<T> {
-  const axiosConfig = { ...config } as AxiosRequestConfig;
-  const response = await this.goClient.get<T>(url, axiosConfig);
-  
-  console.log("📡 goGet response:", response.data);
-  
-  // Backend direkt { reels: [], count: 0 } dönüyor
-  // ApiResponse wrapper'ı yok, direkt response.data'yı döndür
-  return response.data;
-}
+    const axiosConfig = { ...config } as AxiosRequestConfig;
+    const response = await this.goClient.get<ApiResponse<T>>(url, axiosConfig);
+    return response.data.data;
+  }
 
-  async goPost<T = unknown>(url: string, data?: unknown, config?: RequestConfig): Promise<T> {
-  const axiosConfig = { ...config } as AxiosRequestConfig;
-  const response = await this.goClient.post<T>(url, data, axiosConfig);
-  
-  console.log("📡 goPost response:", response.data);
-  
-  // Backend direkt { message: "...", reels: {...} } dönüyor
-  return response.data;
-}
+  async goPost<T = unknown>(
+    url: string,
+    data?: unknown,
+    config?: RequestConfig,
+  ): Promise<T> {
+    const axiosConfig = { ...config } as AxiosRequestConfig;
+    const response = await this.goClient.post<T>(url, data, axiosConfig);
+
+    console.log(`📡 goPost ${url}:`, response.data); // Log ekle!
+
+    return response.data; // ✅ DOĞRU!
+  }
 
   // ----- AUTH METHODS -----
   async login(email: string, password: string): Promise<AuthResponse> {
@@ -336,31 +326,29 @@ class ApiClient {
 
   // ----- GOOGLE AUTH -----
   async googleAuth(idToken: string): Promise<AuthResponse> {
-    try {
-      const response = await this.fastApiClient.post<AuthResponse>(
-        "/api/auth/google",
-        { id_token: idToken },
-        { skipAuth: true } as CustomAxiosRequestConfig,
-      );
+  try {
+    const response = await this.fastApiClient.post<AuthResponse>(
+      "/api/auth/google",
+      { id_token: idToken },
+      { skipAuth: true } as CustomAxiosRequestConfig,
+    );
 
-      // ✅ Token'ı kaydet!
-      if (response.data.access_token) {
-        this.setToken(response.data.access_token);
-        if (typeof window !== "undefined") {
-          localStorage.setItem("refresh_token", response.data.refresh_token);
-          localStorage.setItem("user", JSON.stringify(response.data.user));
-        }
-        this.invalidateCache("/api/useers/me");
-        console.log("✅ Token kaydedildi ve user cache temizlendi!")
-        console.log("✅ Token kaydedildi!");
+    // ✅ Token'ı kaydet!
+    if (response.data.access_token) {
+      this.setToken(response.data.access_token);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
-
-      return response.data;
-    } catch (error) {
-      console.error("Google auth error:", error);
-      throw error;
+      console.log("✅ Token kaydedildi!");
     }
+
+    return response.data;
+  } catch (error) {
+    console.error("Google auth error:", error);
+    throw error;
   }
+}
 
   async logout(): Promise<void> {
     try {
@@ -371,46 +359,9 @@ class ApiClient {
     }
   }
 
-  // ==================== APPLE AUTH ====================
-async appleAuth(
-  identityToken: string,
-  authorizationCode: string,
-  user?: { email?: string; name?: string }
-): Promise<AuthResponse> {
-  try {
-    const response = await this.fastApiClient.post<AuthResponse>(
-      "/api/auth/apple",
-      {
-        identity_token: identityToken,
-        authorization_code: authorizationCode,
-        user: user || null
-      },
-      { skipAuth: true } as CustomAxiosRequestConfig,
-    );
-
-    if (response.data.access_token) {
-      this.setToken(response.data.access_token);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("refresh_token", response.data.refresh_token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-      }
-      
-      // User cache'ini temizle
-      this.invalidateCache("/api/users/me");
-      
-      console.log("✅ Apple token kaydedildi!");
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Apple auth error:", error);
-    throw error;
+  async getCurrentUser(): Promise<User> {
+    return await this.get<User>("/api/users/me");
   }
-}
-
-  async getCurrentUser(useCache: boolean = false): Promise<User> {
-  return await this.get<User>("/api/users/me", { useCache });
-}
 
   // ==================== ANALYTICS PUBLIC METHODS (tracking - no auth) ====================
 

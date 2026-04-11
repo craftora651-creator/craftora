@@ -1,6 +1,9 @@
 // components/Header.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCurrentUser } from '../server/FastAPI/user.hooks';
+import { useAuthMe } from '../server/FastAPI/auth.hooks';
+
 
 interface HeaderProps {
     colors: {
@@ -20,9 +23,9 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ colors, isDarkMode, onToggleDarkMode }) => {
     const navigate = useNavigate();
+    const { data: currentUser, isLoading } = useCurrentUser();
+    const { data: authUser } = useAuthMe();
     const [isScrolled, setIsScrolled] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userEmail, setUserEmail] = useState('');
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,6 +36,9 @@ const Header: React.FC<HeaderProps> = ({ colors, isDarkMode, onToggleDarkMode })
     const menuRef = useRef<HTMLDivElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
 
+    const isLoggedIn = !!currentUser || !!authUser;
+    const userEmail = currentUser?.email || authUser?.email || '';
+
     // Ekran boyutu değişimini dinle
     useEffect(() => {
         const handleResize = () => {
@@ -42,20 +48,6 @@ const Header: React.FC<HeaderProps> = ({ colors, isDarkMode, onToggleDarkMode })
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    useEffect(() => {
-        const token = localStorage.getItem('access_token');
-        const userStr = localStorage.getItem('user');
-
-        if (token && userStr) {
-            try {
-                const user = JSON.parse(userStr);
-                setUserEmail(user.email || 'Kullanıcı');
-                setIsLoggedIn(true);
-            } catch (e) {
-                console.error('User parse error:', e);
-            }
-        }
-    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -174,30 +166,30 @@ const Header: React.FC<HeaderProps> = ({ colors, isDarkMode, onToggleDarkMode })
                 }}>
                     {/* LOGO - SOLDAAA */}
                     {/* LOGO - SOLDAAA */}
-<div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-    <div style={{
-        width: 45,
-        height: 45,
-        background: `linear-gradient(145deg, ${colors.primary}, ${colors.primaryDark})`,
-        borderRadius: 14,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: `0 10px 25px rgba(224, 124, 92, 0.3)`
-    }}>
-        <span style={{ fontSize: 24, color: 'white' }}>✨</span>
-    </div>
-    
-    {/* CRAFTORA YAZISI - Gradient'i kaldır, düz renk kullan */}
-    <span style={{
-        fontSize: 24,
-        fontWeight: 800,
-        color: isDarkMode ? '#ffffff' : '#1a1a1a',  // SADECE DÜZ RENK
-        letterSpacing: '-0.5px'
-    }}>
-        CRAFT<span style={{ color: colors.primary }}>ORA</span>
-    </span>
-</div>
+                    <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                        <div style={{
+                            width: 45,
+                            height: 45,
+                            background: `linear-gradient(145deg, ${colors.primary}, ${colors.primaryDark})`,
+                            borderRadius: 14,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: `0 10px 25px rgba(224, 124, 92, 0.3)`
+                        }}>
+                            <span style={{ fontSize: 24, color: 'white' }}>✨</span>
+                        </div>
+
+                        {/* CRAFTORA YAZISI - Gradient'i kaldır, düz renk kullan */}
+                        <span style={{
+                            fontSize: 24,
+                            fontWeight: 800,
+                            color: isDarkMode ? '#ffffff' : '#1a1a1a',  // SADECE DÜZ RENK
+                            letterSpacing: '-0.5px'
+                        }}>
+                            CRAFT<span style={{ color: colors.primary }}>ORA</span>
+                        </span>
+                    </div>
 
                     {/* SEARCH BAR - DESKTOP */}
                     <div style={{
@@ -383,7 +375,20 @@ const Header: React.FC<HeaderProps> = ({ colors, isDarkMode, onToggleDarkMode })
                                                     </div>
                                                     <div style={{ padding: '10px 0' }}>
                                                         <MenuItem onClick={() => navigate('/shop')} icon="🛍️" label="Craftora Shop" colors={colors} />
-                                                        <MenuItem onClick={() => navigate('/admin')} icon="🏪" label="Mağazam" colors={colors} />
+                                                        <MenuItem
+                                                            onClick={() => {
+                                                                if (isLoggedIn && currentUser?.role === 'seller') {
+                                                                    // Zaten satıcı → direkt mağazaya git
+                                                                    navigate('/admin');
+                                                                } else {
+                                                                    // Satıcı değil → ödeme seçeneklerini göster
+                                                                    navigate('/payment');  // Yeni sayfa
+                                                                }
+                                                            }}
+                                                            icon="🏪"
+                                                            label="Mağazam"
+                                                            colors={colors}
+                                                        />
                                                         <MenuItem onClick={() => navigate('/favorites')} icon="❤️" label="Favorilerim" colors={colors} />
                                                         <MenuItem onClick={() => navigate('/orders')} icon="📦" label="Siparişlerim" colors={colors} />
                                                         <div style={{ height: 1, background: colors.border, margin: '10px 0' }} />
@@ -585,7 +590,19 @@ const Header: React.FC<HeaderProps> = ({ colors, isDarkMode, onToggleDarkMode })
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                     <MobileMenuItem onClick={() => { navigate('/shop'); setIsMobileMenuOpen(false); }} icon="🛍️" label="Craftora Shop" colors={colors} />
-                                    <MobileMenuItem onClick={() => { navigate('/admin'); setIsMobileMenuOpen(false); }} icon="🏪" label="Mağazam" colors={colors} />
+                                    <MenuItem onClick={() => navigate('/shop')} icon="🛍️" label="Craftora Shop" colors={colors} />
+                                    <MenuItem
+                                        onClick={() => {
+                                            if (isLoggedIn && currentUser?.role === 'seller') {
+                                                navigate('/admin');
+                                            } else {
+                                                navigate('/payment'); 
+                                            }
+                                        }}
+                                        icon="🏪"
+                                        label="Mağazam"
+                                        colors={colors}
+                                    />
                                     <MobileMenuItem onClick={() => { navigate('/favorites'); setIsMobileMenuOpen(false); }} icon="❤️" label="Favorilerim" colors={colors} />
                                     <MobileMenuItem onClick={() => { navigate('/orders'); setIsMobileMenuOpen(false); }} icon="📦" label="Siparişlerim" colors={colors} />
                                     <MobileMenuItem onClick={() => { navigate('/settings'); setIsMobileMenuOpen(false); }} icon="⚙️" label="Ayarlar" colors={colors} />

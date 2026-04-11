@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
 import * as XLSX from 'xlsx';
 
@@ -18,6 +18,16 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showMessageModal, setShowMessageModal] = useState(false);
     const [showMailModal, setShowMailModal] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const isMobile = windowWidth <= 768;
+    const isTablet = windowWidth > 768 && windowWidth <= 1024;
 
     // Craftora Medya verileri
     const craftoraData = {
@@ -107,46 +117,80 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
     // Excel İndir
     const downloadExcel = () => {
         const wb = XLSX.utils.book_new();
-
-        // En çok satan ürünler sayfası
         const productsWS = XLSX.utils.json_to_sheet(topProducts);
         XLSX.utils.book_append_sheet(wb, productsWS, "En Cok Satanlar");
-
-        // En çok kazandıran müşteriler sayfası
         const customersWS = XLSX.utils.json_to_sheet(topCustomers);
         XLSX.utils.book_append_sheet(wb, customersWS, "En Cok Kazandiranlar");
-
-        // Mesajlar sayfası
         const messagesWS = XLSX.utils.json_to_sheet(messages);
         XLSX.utils.book_append_sheet(wb, messagesWS, "Mesajlar");
-
         XLSX.writeFile(wb, "craftora_rapor.xlsx");
     };
 
+    // Mobil kart bileşeni
+    const MetricCard = ({ title, value, subtitle, color, icon }: any) => (
+        <div style={{
+            backgroundColor: colors.surface,
+            borderRadius: 16,
+            padding: isMobile ? 16 : 20,
+            border: `1px solid ${colors.border}`,
+            flex: 1
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    backgroundColor: `${color}15`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <span style={{ fontSize: 20 }}>{icon}</span>
+                </div>
+                <div>
+                    <div style={{ fontSize: 11, color: colors.textSecondary }}>{title}</div>
+                    <div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 'bold', color: colors.text }}>{value}</div>
+                </div>
+            </div>
+            {subtitle && <div style={{ fontSize: 11, color: colors.textSecondary }}>{subtitle}</div>}
+        </div>
+    );
+
     return (
-        <div id="report-content" style={{ minHeight: '100%' }}>
+        <div id="report-content" style={{ minHeight: '100%', paddingBottom: 24 }}>
+            {/* Scrollbar styles */}
+            <style>{`
+                ::-webkit-scrollbar { width: 8px; height: 8px; }
+                ::-webkit-scrollbar-track { background: ${colors.bg}; border-radius: 10px; }
+                ::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 10px; border: 2px solid ${colors.bg}; }
+                ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
+                * { scrollbar-width: thin; scrollbar-color: #0ea5e9 ${colors.bg}; }
+            `}</style>
+
             {/* Header - Tarih Seçici ve İhracat */}
             <div style={{
                 display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
                 justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 24
+                alignItems: isMobile ? 'stretch' : 'center',
+                marginBottom: 24,
+                gap: isMobile ? 16 : 0
             }}>
-                <h1 style={{ fontSize: 28, fontWeight: 600, color: colors.text, margin: 0 }}>
+                <h1 style={{ fontSize: isMobile ? 24 : 28, fontWeight: 600, color: colors.text, margin: 0 }}>
                     Rapor Merkezi
                 </h1>
-                <div style={{ display: 'flex', gap: 12 }}>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     {/* Tarih Seçici */}
                     <div style={{ position: 'relative' }}>
                         <button
                             onClick={() => setShowDatePicker(!showDatePicker)}
                             style={{
-                                padding: '8px 20px',
+                                padding: isMobile ? '8px 16px' : '8px 20px',
                                 backgroundColor: colors.surface,
                                 border: `1px solid ${colors.border}`,
                                 borderRadius: 30,
                                 color: colors.text,
-                                fontSize: 14,
+                                fontSize: 13,
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -171,7 +215,7 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                                 borderRadius: 12,
                                 padding: '8px',
                                 zIndex: 10,
-                                minWidth: 160
+                                minWidth: 140
                             }}>
                                 {[
                                     { value: 'today', label: 'Bugün' },
@@ -204,526 +248,488 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                     <button
                         onClick={downloadPDF}
                         style={{
-                            padding: '8px 20px',
+                            padding: isMobile ? '8px 16px' : '8px 20px',
                             backgroundColor: '#ef4444',
                             border: 'none',
                             borderRadius: 30,
                             color: 'white',
-                            fontSize: 14,
+                            fontSize: 13,
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 8
+                            gap: 6
                         }}
                     >
                         <span className="material-icons-round" style={{ fontSize: 18 }}>picture_as_pdf</span>
-                        PDF İndir
+                        {!isMobile && 'PDF İndir'}
                     </button>
                     <button
                         onClick={downloadExcel}
                         style={{
-                            padding: '8px 20px',
+                            padding: isMobile ? '8px 16px' : '8px 20px',
                             backgroundColor: '#10b981',
                             border: 'none',
                             borderRadius: 30,
                             color: 'white',
-                            fontSize: 14,
+                            fontSize: 13,
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 8
+                            gap: 6
                         }}
                     >
                         <span className="material-icons-round" style={{ fontSize: 18 }}>table_chart</span>
-                        Excel İndir
+                        {!isMobile && 'Excel İndir'}
                     </button>
                 </div>
             </div>
 
-            {/* 4'lü Kartlar */}
-            {/* 4'lü Kartlar */}
+            {/* Craftora Medya Kartı - Full genişlik */}
+            {/* Craftora Medya Kartı - YENİ TASARIM */}
+<div style={{
+    backgroundColor: colors.surface,
+    borderRadius: 24,
+    padding: 0,
+    border: `1px solid ${colors.border}`,
+    marginBottom: 24,
+    overflow: 'hidden',
+    position: 'relative'
+}}>
+    {/* Gradient Header */}
+    <div style={{
+        background: craftoraStatus === 'acik' 
+            ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+            : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+        padding: isMobile ? '16px 20px' : '20px 24px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 12
+    }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+                width: 48,
+                height: 48,
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                borderRadius: 16,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24
+            }}>
+                🎬
+            </div>
+            <div>
+                <h3 style={{ fontSize: isMobile ? 18 : 20, fontWeight: 700, color: 'white', margin: 0 }}>
+                    Craftora Medya
+                </h3>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 4 }}>
+                    {craftoraStatus === 'acik' ? 'Yayında - Aktif' : 'Yayın durduruldu'}
+                </div>
+            </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+            <button
+                onClick={() => setCraftoraStatus('acik')}
+                style={{
+                    padding: '8px 20px',
+                    backgroundColor: craftoraStatus === 'acik' ? 'white' : 'rgba(255,255,255,0.2)',
+                    border: 'none',
+                    borderRadius: 30,
+                    color: craftoraStatus === 'acik' ? '#059669' : 'white',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    transition: 'all 0.2s ease'
+                }}
+            >
+                <span>🟢</span> AÇIK
+            </button>
+            <button
+                onClick={() => setCraftoraStatus('kapali')}
+                style={{
+                    padding: '8px 20px',
+                    backgroundColor: craftoraStatus === 'kapali' ? 'white' : 'rgba(255,255,255,0.2)',
+                    border: 'none',
+                    borderRadius: 30,
+                    color: craftoraStatus === 'kapali' ? '#dc2626' : 'white',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    transition: 'all 0.2s ease'
+                }}
+            >
+                <span>🔴</span> KAPALI
+            </button>
+        </div>
+    </div>
+
+    {craftoraStatus === 'acik' ? (
+        <>
+            {/* Ana Metrikler - Büyük ve Dikkat Çekici */}
+            <div style={{
+                padding: isMobile ? 20 : 24,
+                background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.bg} 100%)`
+            }}>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                    gap: isMobile ? 12 : 20,
+                    marginBottom: 24
+                }}>
+                    {/* Reels İzlenme */}
+                    <div style={{
+                        background: colors.surface,
+                        borderRadius: 20,
+                        padding: isMobile ? 16 : 20,
+                        textAlign: 'center',
+                        border: `1px solid ${colors.border}`,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                        transition: 'transform 0.2s ease',
+                        cursor: 'pointer'
+                    }}>
+                        <div style={{ fontSize: 32, marginBottom: 8 }}>📱</div>
+                        <div style={{ fontSize: 24, fontWeight: 'bold', color: '#0ea5e9', marginBottom: 4 }}>
+                            {(data.reelsIzlenme / 1000).toFixed(1)}K
+                        </div>
+                        <div style={{ fontSize: 12, color: colors.textSecondary }}>Reels İzlenme</div>
+                        <div style={{ fontSize: 11, color: '#10b981', marginTop: 6 }}>↑ %12</div>
+                    </div>
+
+                    {/* Beğeni */}
+                    <div style={{
+                        background: colors.surface,
+                        borderRadius: 20,
+                        padding: isMobile ? 16 : 20,
+                        textAlign: 'center',
+                        border: `1px solid ${colors.border}`,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                    }}>
+                        <div style={{ fontSize: 32, marginBottom: 8 }}>❤️</div>
+                        <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f43f5e', marginBottom: 4 }}>
+                            {(data.reelsBegeni / 1000).toFixed(1)}K
+                        </div>
+                        <div style={{ fontSize: 12, color: colors.textSecondary }}>Beğeni</div>
+                        <div style={{ fontSize: 11, color: '#10b981', marginTop: 6 }}>↑ %8</div>
+                    </div>
+
+                    {/* Sepete Ekleme */}
+                    <div style={{
+                        background: colors.surface,
+                        borderRadius: 20,
+                        padding: isMobile ? 16 : 20,
+                        textAlign: 'center',
+                        border: `1px solid ${colors.border}`,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                    }}>
+                        <div style={{ fontSize: 32, marginBottom: 8 }}>🛒</div>
+                        <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f59e0b', marginBottom: 4 }}>
+                            {(data.reelsSepet / 1000).toFixed(1)}K
+                        </div>
+                        <div style={{ fontSize: 12, color: colors.textSecondary }}>Sepete Ekleme</div>
+                        <div style={{ fontSize: 11, color: '#f59e0b', marginTop: 6 }}>↑ %5</div>
+                    </div>
+
+                    {/* Satın Alma */}
+                    <div style={{
+                        background: colors.surface,
+                        borderRadius: 20,
+                        padding: isMobile ? 16 : 20,
+                        textAlign: 'center',
+                        border: `1px solid ${colors.border}`,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                    }}>
+                        <div style={{ fontSize: 32, marginBottom: 8 }}>💰</div>
+                        <div style={{ fontSize: 24, fontWeight: 'bold', color: '#10b981', marginBottom: 4 }}>
+                            {data.reelsSatis}
+                        </div>
+                        <div style={{ fontSize: 12, color: colors.textSecondary }}>Satın Alma</div>
+                        <div style={{ fontSize: 11, color: '#10b981', marginTop: 6 }}>Dönüşüm %2.1</div>
+                    </div>
+                </div>
+
+                {/* İkincil Metrikler */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+                    gap: 16
+                }}>
+                    {/* Canlı Ziyaretçi */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: isMobile ? 16 : 20,
+                        background: colors.surface,
+                        borderRadius: 16,
+                        border: `1px solid ${colors.border}`
+                    }}>
+                        <div>
+                            <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Canlı Ziyaretçi</div>
+                            <div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 'bold', color: '#10b981' }}>
+                                {data.canliZiyaretci}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#10b981', marginTop: 4 }}>Aktif şu an</div>
+                        </div>
+                        <div style={{ fontSize: 40, opacity: 0.8 }}>👥</div>
+                    </div>
+
+                    {/* Bugün Giren */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: isMobile ? 16 : 20,
+                        background: colors.surface,
+                        borderRadius: 16,
+                        border: `1px solid ${colors.border}`
+                    }}>
+                        <div>
+                            <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Bugün Giren</div>
+                            <div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 'bold', color: '#0ea5e9' }}>
+                                {data.bugunGiren}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#0ea5e9', marginTop: 4 }}>Toplam ziyaret</div>
+                        </div>
+                        <div style={{ fontSize: 40, opacity: 0.8 }}>📊</div>
+                    </div>
+
+                    {/* Yeni Ziyaretçi */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: isMobile ? 16 : 20,
+                        background: colors.surface,
+                        borderRadius: 16,
+                        border: `1px solid ${colors.border}`
+                    }}>
+                        <div>
+                            <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Yeni Ziyaretçi</div>
+                            <div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 'bold', color: '#a855f7' }}>
+                                {data.yeniZiyaretci}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#a855f7', marginTop: 4 }}>İlk kez gelen</div>
+                        </div>
+                        <div style={{ fontSize: 40, opacity: 0.8 }}>✨</div>
+                    </div>
+                </div>
+
+                {/* Progress Bar - Dönüşüm */}
+                <div style={{
+                    marginTop: 24,
+                    padding: isMobile ? 16 : 20,
+                    background: colors.surface,
+                    borderRadius: 16,
+                    border: `1px solid ${colors.border}`
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <span style={{ fontSize: 13, color: colors.textSecondary }}>Dönüşüm Oranı</span>
+                        <span style={{ fontSize: 14, fontWeight: 'bold', color: '#10b981' }}>2.1%</span>
+                    </div>
+                    <div style={{ width: '100%', height: 8, backgroundColor: colors.bg, borderRadius: 4 }}>
+                        <div style={{ width: '21%', height: 8, background: 'linear-gradient(90deg, #10b981, #34d399)', borderRadius: 4 }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                        <span style={{ fontSize: 11, color: colors.textSecondary }}>Sepet → Satın Alma</span>
+                        <span style={{ fontSize: 11, color: colors.textSecondary }}>Hedef: %5</span>
+                    </div>
+                </div>
+            </div>
+        </>
+    ) : (
+        /* KAPALI DURUM - DAHA ŞIK TASARIM */
+        <div style={{
+            padding: isMobile ? 32 : 48,
+            textAlign: 'center',
+            background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.surface} 100%)`
+        }}>
+            <div style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                background: 'rgba(239,68,68,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 20px'
+            }}>
+                <span style={{ fontSize: 48 }}>🔴</span>
+            </div>
+            <div style={{ fontSize: isMobile ? 18 : 20, fontWeight: 700, color: colors.text, marginBottom: 8 }}>
+                Craftora Medya Kapalı
+            </div>
+            <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 24, maxWidth: 300, margin: '0 auto 24px' }}>
+                Şu anda yayın yapılmıyor. Yayını başlatmak için AÇIK butonuna tıklayın.
+            </div>
+            <button
+                onClick={() => setCraftoraStatus('acik')}
+                style={{
+                    padding: '12px 28px',
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    border: 'none',
+                    borderRadius: 40,
+                    color: 'white',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    transition: 'transform 0.2s ease',
+                    boxShadow: '0 4px 14px rgba(16,185,129,0.3)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+                <span>🟢</span>
+                Craftora Medya'yı Başlat
+            </button>
+        </div>
+    )}
+</div>
+
+            {/* Aktivite ve Performans Gridi */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateColumns: isMobile ? '1fr' : (isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'),
                 gap: 20,
                 marginBottom: 24
             }}>
-                {/* Craftora Medya Durumu */}
-                <div style={{
-                    backgroundColor: colors.surface,
-                    borderRadius: 20,
-                    padding: 24,
-                    border: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%'
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: 0 }}>🎬 Craftora Medya</h3>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                            <button
-                                onClick={() => setCraftoraStatus('acik')}
-                                style={{
-                                    padding: '4px 12px',
-                                    backgroundColor: craftoraStatus === 'acik' ? '#10b981' : 'transparent',
-                                    border: `1px solid ${craftoraStatus === 'acik' ? '#10b981' : colors.border}`,
-                                    borderRadius: 20,
-                                    color: craftoraStatus === 'acik' ? 'white' : colors.textSecondary,
-                                    fontSize: 12,
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                🟢 AÇIK
-                            </button>
-                            <button
-                                onClick={() => setCraftoraStatus('kapali')}
-                                style={{
-                                    padding: '4px 12px',
-                                    backgroundColor: craftoraStatus === 'kapali' ? '#ef4444' : 'transparent',
-                                    border: `1px solid ${craftoraStatus === 'kapali' ? '#ef4444' : colors.border}`,
-                                    borderRadius: 20,
-                                    color: craftoraStatus === 'kapali' ? 'white' : colors.textSecondary,
-                                    fontSize: 12,
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                🔴 KAPALI
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Craftora Medya İçeriği */}
-                    {craftoraStatus === 'acik' ? (
-                        <div style={{ flex: 1 }}>
-                            {/* Canlı İstatistikler */}
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
-                                gap: 12,
-                                marginBottom: 16
-                            }}>
-                                <div style={{
-                                    backgroundColor: 'rgba(16,185,129,0.1)',
-                                    borderRadius: 12,
-                                    padding: '12px',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Canlı İzlenme</div>
-                                    <div style={{ fontSize: 20, fontWeight: 'bold', color: '#10b981' }}>1.2K</div>
-                                </div>
-                                <div style={{
-                                    backgroundColor: 'rgba(14,165,233,0.1)',
-                                    borderRadius: 12,
-                                    padding: '12px',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Bugünkü Etkileşim</div>
-                                    <div style={{ fontSize: 20, fontWeight: 'bold', color: '#0ea5e9' }}>3.4K</div>
-                                </div>
-                            </div>
-
-                            {/* Reels Performansı */}
-                            <div style={{ marginBottom: 16 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                    <span style={{ fontSize: 13, color: colors.textSecondary }}>Reels İzlenme (Son 7 gün)</span>
-                                    <span style={{ fontSize: 13, fontWeight: 'bold', color: colors.text }}>45.2K</span>
-                                </div>
-                                <div style={{ width: '100%', height: 6, backgroundColor: colors.bg, borderRadius: 3 }}>
-                                    <div style={{ width: '78%', height: 6, backgroundColor: '#0ea5e9', borderRadius: 3 }} />
-                                </div>
-                            </div>
-
-                            {/* Metrikler */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                                <div>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary }}>Beğeni</div>
-                                    <div style={{ fontSize: 15, fontWeight: 'bold', color: '#f43f5e' }}>12.4K</div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary }}>Sepete Ekleme</div>
-                                    <div style={{ fontSize: 15, fontWeight: 'bold', color: '#f59e0b' }}>3.2K</div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary }}>Satın Alma</div>
-                                    <div style={{ fontSize: 15, fontWeight: 'bold', color: '#10b981' }}>891</div>
-                                </div>
-                            </div>
-
-                            {/* Dönüşüm Oranı */}
-                            <div style={{
-                                padding: '12px',
-                                backgroundColor: colors.bg,
-                                borderRadius: 12,
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginBottom: 16
-                            }}>
-                                <span style={{ fontSize: 13, color: colors.textSecondary }}>Dönüşüm Oranı</span>
-                                <span style={{ fontSize: 16, fontWeight: 'bold', color: '#10b981' }}>2.1%</span>
-                            </div>
-                        </div>
-                    ) : (
-                        <div style={{ flex: 1 }}>
-                            {/* Kapalı Uyarısı */}
-                            <div style={{
-                                padding: '16px',
-                                backgroundColor: 'rgba(244,67,54,0.1)',
-                                borderRadius: 12,
-                                color: '#ef4444',
-                                fontSize: 13,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
-                                marginBottom: 16
-                            }}>
-                                <span className="material-icons-round" style={{ fontSize: 20 }}>warning</span>
-                                <div>
-                                    <strong>Craftora Medya kapalı!</strong><br />
-                                    Açmak için yukarıdaki 🟢 AÇIK butonuna tıklayın.
-                                </div>
-                            </div>
-
-                            {/* Kapalıyken Gösterilecek Bilgiler */}
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
-                                gap: 12,
-                                opacity: 0.5,
-                                marginBottom: 16
-                            }}>
-                                <div style={{
-                                    backgroundColor: colors.bg,
-                                    borderRadius: 12,
-                                    padding: '12px'
-                                }}>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Son Açık Kalma</div>
-                                    <div style={{ fontSize: 14, fontWeight: 'bold', color: colors.text }}>2 gün önce</div>
-                                </div>
-                                <div style={{
-                                    backgroundColor: colors.bg,
-                                    borderRadius: 12,
-                                    padding: '12px'
-                                }}>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Toplam İzlenme</div>
-                                    <div style={{ fontSize: 14, fontWeight: 'bold', color: colors.text }}>124.5K</div>
-                                </div>
-                            </div>
-
-                            {/* Açma Butonu */}
-                            <button
-                                onClick={() => setCraftoraStatus('acik')}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    backgroundColor: '#10b981',
-                                    border: 'none',
-                                    borderRadius: 12,
-                                    color: 'white',
-                                    fontSize: 14,
-                                    fontWeight: 500,
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: 8,
-                                    marginBottom: 16
-                                }}
-                            >
-                                <span className="material-icons-round" style={{ fontSize: 18 }}>power_settings_new</span>
-                                Craftora Medya'yı Aç
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Detayları Gör Butonu - Her durumda gösterilir */}
-                    <button
-                        onClick={() => alert('Craftora Medya Detayları')}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            backgroundColor: 'transparent',
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: 12,
-                            color: colors.text,
-                            fontSize: 13,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 8,
-                            marginTop: 'auto'
-                        }}
-                    >
-                        <span className="material-icons-round" style={{ fontSize: 16 }}>visibility</span>
-                        Detayları Gör
-                    </button>
-                </div>
-
                 {/* Canlı Aktivite */}
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
-                    border: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%'
+                    padding: isMobile ? 20 : 24,
+                    border: `1px solid ${colors.border}`
                 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 16px 0' }}>👥 Canlı Aktivite</h3>
-
-                    {/* Ana Metrikler */}
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, marginBottom: 20 }}>👥 Canlı Aktivite</h3>
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr 1fr 1fr',
-                        gap: 8,
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: 12,
                         marginBottom: 20
                     }}>
                         <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 20, fontWeight: 'bold', color: '#10b981' }}>{data.canliZiyaretci}</div>
+                            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#10b981' }}>{data.canliZiyaretci}</div>
                             <div style={{ fontSize: 11, color: colors.textSecondary }}>Şu Anda</div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 20, fontWeight: 'bold', color: colors.text }}>{data.bugunGiren}</div>
+                            <div style={{ fontSize: 24, fontWeight: 'bold', color: colors.text }}>{data.bugunGiren}</div>
                             <div style={{ fontSize: 11, color: colors.textSecondary }}>Bugün</div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 20, fontWeight: 'bold', color: '#0ea5e9' }}>{data.yeniZiyaretci}</div>
+                            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#0ea5e9' }}>{data.yeniZiyaretci}</div>
                             <div style={{ fontSize: 11, color: colors.textSecondary }}>Yeni</div>
                         </div>
                     </div>
-
-                    {/* Anlık Hareketler */}
-                    <div style={{ marginBottom: 20 }}>
+                    <div>
                         <div style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 12 }}>Anlık Hareketler</div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-                                <span style={{ color: '#10b981' }}>⬆️</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                                <span>⬆️</span>
                                 <span style={{ color: colors.text }}>Ali sepete ekledi</span>
-                                <span style={{ color: colors.textSecondary, marginLeft: 'auto' }}>2dk</span>
+                                <span style={{ color: colors.textSecondary, marginLeft: 'auto', fontSize: 11 }}>2dk</span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-                                <span style={{ color: '#0ea5e9' }}>👀</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                                <span>👀</span>
                                 <span style={{ color: colors.text }}>Ayşe inceliyor</span>
-                                <span style={{ color: colors.textSecondary, marginLeft: 'auto' }}>3dk</span>
+                                <span style={{ color: colors.textSecondary, marginLeft: 'auto', fontSize: 11 }}>3dk</span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-                                <span style={{ color: '#f59e0b' }}>💬</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                                <span>💬</span>
                                 <span style={{ color: colors.text }}>Mehmet sordu</span>
-                                <span style={{ color: colors.textSecondary, marginLeft: 'auto' }}>5dk</span>
+                                <span style={{ color: colors.textSecondary, marginLeft: 'auto', fontSize: 11 }}>5dk</span>
                             </div>
                         </div>
                     </div>
-
-                    {/* Ziyaretçi Grafiği (Mini) */}
-                    <div style={{ marginBottom: 20 }}>
-                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 40 }}>
-                            {[45, 62, 38, 55, 72, 58, 63].map((height, i) => (
-                                <div
-                                    key={i}
-                                    style={{
-                                        flex: 1,
-                                        height: height * 0.5,
-                                        backgroundColor: i === 3 ? '#10b981' : colors.border,
-                                        borderRadius: '2px 2px 0 0'
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Detayları Gör Butonu */}
-                    <button
-                        onClick={() => alert('Canlı Aktivite Detayları')}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            backgroundColor: 'transparent',
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: 12,
-                            color: colors.text,
-                            fontSize: 13,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 8,
-                            marginTop: 'auto'
-                        }}
-                    >
-                        <span className="material-icons-round" style={{ fontSize: 16 }}>visibility</span>
-                        Detayları Gör
-                    </button>
-                </div>
-
-                {/* Reels Performans */}
-                <div style={{
-                    backgroundColor: colors.surface,
-                    borderRadius: 20,
-                    padding: 24,
-                    border: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%'
-                }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 16px 0' }}>📱 Reels Performans</h3>
-
-                    {craftoraStatus === 'acik' ? (
-                        <>
-                            {/* Ana Metrikler */}
-                            <div style={{ marginBottom: 20 }}>
-                                <div style={{ fontSize: 28, fontWeight: 'bold', color: colors.text, marginBottom: 4 }}>45.2K</div>
-                                <div style={{ fontSize: 12, color: colors.textSecondary }}>Toplam İzlenme</div>
-                            </div>
-
-                            {/* Metrik Grid */}
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
-                                gap: 12,
-                                marginBottom: 20
-                            }}>
-                                <div>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary }}>Beğeni</div>
-                                    <div style={{ fontSize: 16, fontWeight: 'bold', color: '#f43f5e' }}>12.4K</div>
-                                    <div style={{ fontSize: 10, color: colors.textSecondary }}>%27</div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: 11, color: colors.textSecondary }}>Sepete Ekleme</div>
-                                    <div style={{ fontSize: 16, fontWeight: 'bold', color: '#f59e0b' }}>3.2K</div>
-                                    <div style={{ fontSize: 10, color: colors.textSecondary }}>%7</div>
-                                </div>
-                            </div>
-
-                            {/* Dönüşüm */}
-                            <div style={{
-                                padding: '12px',
-                                backgroundColor: colors.bg,
-                                borderRadius: 12,
-                                marginBottom: 20
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ fontSize: 12, color: colors.textSecondary }}>Satın Alma</span>
-                                    <span style={{ fontSize: 14, fontWeight: 'bold', color: '#10b981' }}>891</span>
-                                </div>
-                                <div style={{ fontSize: 11, color: colors.textSecondary }}>Dönüşüm: %2</div>
-                            </div>
-                        </>
-                    ) : (
-                        <div style={{
-                            flex: 1,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: colors.textSecondary,
-                            fontSize: 13,
-                            marginBottom: 20
-                        }}>
-                            Craftora Medya kapalıyken veri gösterilmiyor
-                        </div>
-                    )}
-
-                    {/* Detayları Gör Butonu */}
-                    <button
-                        onClick={() => alert('Reels Performans Detayları')}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            backgroundColor: 'transparent',
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: 12,
-                            color: colors.text,
-                            fontSize: 13,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 8,
-                            marginTop: 'auto'
-                        }}
-                    >
-                        <span className="material-icons-round" style={{ fontSize: 16 }}>visibility</span>
-                        Detayları Gör
-                    </button>
                 </div>
 
                 {/* Başarı Metrikleri */}
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
-                    border: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%'
+                    padding: isMobile ? 20 : 24,
+                    border: `1px solid ${colors.border}`
                 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 16px 0' }}>📊 Başarı Metrikleri</h3>
-
-                    {/* Metrikler */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, marginBottom: 20 }}>📊 Başarı Metrikleri</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                         <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Sepet Dönüşüm</span>
-                                <span style={{ fontSize: 13, fontWeight: 'bold', color: '#10b981' }}>3.2%</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                <span style={{ fontSize: 13, color: colors.textSecondary }}>Sepet Dönüşüm</span>
+                                <span style={{ fontSize: 14, fontWeight: 'bold', color: '#10b981' }}>3.2%</span>
                             </div>
-                            <div style={{ width: '100%', height: 4, backgroundColor: colors.bg, borderRadius: 2 }}>
-                                <div style={{ width: '32%', height: 4, backgroundColor: '#10b981', borderRadius: 2 }} />
+                            <div style={{ width: '100%', height: 6, backgroundColor: colors.bg, borderRadius: 3 }}>
+                                <div style={{ width: '32%', height: 6, backgroundColor: '#10b981', borderRadius: 3 }} />
                             </div>
-                            <div style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>↑0.5%</div>
                         </div>
-
                         <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>İzlenme/Satın Alma</span>
-                                <span style={{ fontSize: 13, fontWeight: 'bold', color: '#f43f5e' }}>2.1%</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                <span style={{ fontSize: 13, color: colors.textSecondary }}>İzlenme/Satın Alma</span>
+                                <span style={{ fontSize: 14, fontWeight: 'bold', color: '#f43f5e' }}>2.1%</span>
                             </div>
-                            <div style={{ width: '100%', height: 4, backgroundColor: colors.bg, borderRadius: 2 }}>
-                                <div style={{ width: '21%', height: 4, backgroundColor: '#f43f5e', borderRadius: 2 }} />
+                            <div style={{ width: '100%', height: 6, backgroundColor: colors.bg, borderRadius: 3 }}>
+                                <div style={{ width: '21%', height: 6, backgroundColor: '#f43f5e', borderRadius: 3 }} />
                             </div>
-                            <div style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>↓0.3%</div>
                         </div>
-
                         <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Tıklama Oranı (CTR)</span>
-                                <span style={{ fontSize: 13, fontWeight: 'bold', color: '#0ea5e9' }}>4.8%</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                <span style={{ fontSize: 13, color: colors.textSecondary }}>Tıklama Oranı (CTR)</span>
+                                <span style={{ fontSize: 14, fontWeight: 'bold', color: '#0ea5e9' }}>4.8%</span>
                             </div>
-                            <div style={{ width: '100%', height: 4, backgroundColor: colors.bg, borderRadius: 2 }}>
-                                <div style={{ width: '48%', height: 4, backgroundColor: '#0ea5e9', borderRadius: 2 }} />
+                            <div style={{ width: '100%', height: 6, backgroundColor: colors.bg, borderRadius: 3 }}>
+                                <div style={{ width: '48%', height: 6, backgroundColor: '#0ea5e9', borderRadius: 3 }} />
                             </div>
-                            <div style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>↑1.2%</div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Detayları Gör Butonu */}
-                    <button
-                        onClick={() => alert('Başarı Metrikleri Detayları')}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            backgroundColor: 'transparent',
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: 12,
-                            color: colors.text,
-                            fontSize: 13,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 8,
-                            marginTop: 'auto'
-                        }}
-                    >
-                        <span className="material-icons-round" style={{ fontSize: 16 }}>visibility</span>
-                        Detayları Gör
-                    </button>
+                {/* Performans Trendleri */}
+                <div style={{
+                    backgroundColor: colors.surface,
+                    borderRadius: 20,
+                    padding: isMobile ? 20 : 24,
+                    border: `1px solid ${colors.border}`
+                }}>
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, marginBottom: 20 }}>📈 Son 7 Gün</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Gelir</span>
+                                <span style={{ fontSize: 14, fontWeight: 'bold', color: '#0ea5e9' }}>$12,450</span>
+                            </div>
+                            <div style={{ height: 40, display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+                                {[45, 62, 38, 55, 72, 58, 63].map((height, i) => (
+                                    <div key={i} style={{ flex: 1, height: height * 0.6, backgroundColor: '#0ea5e9', borderRadius: '4px 4px 0 0', opacity: 0.8 }} />
+                                ))}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Sipariş</span>
+                                <span style={{ fontSize: 14, fontWeight: 'bold', color: '#f59e0b' }}>1,482</span>
+                            </div>
+                            <div style={{ height: 40, display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+                                {[38, 42, 35, 48, 52, 45, 49].map((height, i) => (
+                                    <div key={i} style={{ flex: 1, height: height * 0.6, backgroundColor: '#f59e0b', borderRadius: '4px 4px 0 0', opacity: 0.8 }} />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Müşteri Mesajları ve Mail Kutusu */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: 20,
                 marginBottom: 24
             }}>
@@ -731,11 +737,11 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
+                    padding: isMobile ? 20 : 24,
                     border: `1px solid ${colors.border}`
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: 0 }}>💬 Müşteri Mesajları</h3>
+                        <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, margin: 0 }}>💬 Müşteri Mesajları</h3>
                         <button
                             onClick={() => setShowMessageModal(true)}
                             style={{
@@ -748,11 +754,11 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                                 cursor: 'pointer'
                             }}
                         >
-                            Tüm Mesajları Gör →
+                            Tümü →
                         </button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        {messages.slice(0, 3).map(msg => (
+                        {messages.slice(0, isMobile ? 2 : 3).map(msg => (
                             <div key={msg.id} style={{ display: 'flex', gap: 12 }}>
                                 <div style={{
                                     width: 40,
@@ -769,12 +775,12 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                                     {msg.avatar}
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap', gap: 4 }}>
                                         <span style={{ fontSize: 14, fontWeight: 500, color: colors.text }}>{msg.name}</span>
                                         <span style={{ fontSize: 11, color: colors.textSecondary }}>{msg.time}</span>
                                     </div>
                                     <p style={{ fontSize: 13, color: colors.textSecondary, margin: 0 }}>{msg.message}</p>
-                                    <span style={{ fontSize: 10, color: colors.textSecondary }}>{msg.platform}</span>
+                                    <span style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4, display: 'block' }}>{msg.platform}</span>
                                 </div>
                             </div>
                         ))}
@@ -785,11 +791,11 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
+                    padding: isMobile ? 20 : 24,
                     border: `1px solid ${colors.border}`
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: 0 }}>📧 Mail Kutusu</h3>
+                        <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, margin: 0 }}>📧 Mail Kutusu</h3>
                         <button
                             onClick={() => setShowMailModal(true)}
                             style={{
@@ -802,11 +808,11 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                                 cursor: 'pointer'
                             }}
                         >
-                            Tüm Mailleri Gör →
+                            Tümü →
                         </button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        {mails.slice(0, 3).map(mail => (
+                        {mails.slice(0, isMobile ? 2 : 3).map(mail => (
                             <div key={mail.id} style={{ display: 'flex', gap: 12 }}>
                                 <div style={{
                                     width: 40,
@@ -822,8 +828,8 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                                     📧
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                        <span style={{ fontSize: 14, fontWeight: 500, color: colors.text }}>{mail.from}</span>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap', gap: 4 }}>
+                                        <span style={{ fontSize: 13, fontWeight: 500, color: colors.text }}>{mail.from}</span>
                                         <span style={{ fontSize: 11, color: colors.textSecondary }}>{mail.time}</span>
                                     </div>
                                     <p style={{ fontSize: 13, fontWeight: 500, color: colors.text, margin: '0 0 4px 0' }}>{mail.subject}</p>
@@ -835,235 +841,89 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                 </div>
             </div>
 
-            {/* Grafikler ve Kategori Dağılımı */}
+            {/* Kategori ve Ödeme */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: '2fr 1fr',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: 20,
                 marginBottom: 24
             }}>
-                {/* Grafikler */}
+                {/* Kategori Dağılımı */}
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
+                    padding: isMobile ? 20 : 24,
                     border: `1px solid ${colors.border}`
                 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 20px 0' }}>📈 Performans Trendleri</h3>
-
-                    {/* Gelir Grafiği */}
-                    <div style={{ marginBottom: 28 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 13, color: colors.textSecondary }}>Gelir (Günlük)</span>
-                                <span style={{ fontSize: 11, color: colors.textSecondary }}>son 14 gün</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 13, fontWeight: 'bold', color: '#0ea5e9' }}>$12,450</span>
-                                <span style={{ fontSize: 11, color: '#10b981' }}>↑15.3%</span>
-                            </div>
-                        </div>
-                        <div style={{ height: 70, display: 'flex', alignItems: 'flex-end', gap: 3 }}>
-                            {[45, 62, 38, 55, 72, 58, 63, 41, 67, 53, 49, 71, 58, 44].map((height, i) => (
-                                <div
-                                    key={i}
-                                    style={{
-                                        flex: 1,
-                                        height: height,
-                                        background: 'linear-gradient(180deg, #0ea5e9 0%, #38bdf8 100%)',
-                                        borderRadius: '6px 6px 0 0',
-                                        opacity: 0.9,
-                                        transition: 'all 0.2s ease',
-                                        cursor: 'pointer'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.9'}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Sipariş Trendi */}
-                    <div style={{ marginBottom: 28 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 13, color: colors.textSecondary }}>Sipariş (Günlük)</span>
-                                <span style={{ fontSize: 11, color: colors.textSecondary }}>son 14 gün</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 13, fontWeight: 'bold', color: '#f59e0b' }}>1,482</span>
-                                <span style={{ fontSize: 11, color: '#10b981' }}>↑8.2%</span>
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, marginBottom: 20 }}>🥧 Kategori Dağılımı</h3>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        alignItems: 'center',
+                        gap: 24
+                    }}>
+                        <div style={{ position: 'relative', width: 160, height: 160, flexShrink: 0 }}>
+                            <svg viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)', width: '100%', height: '100%' }}>
+                                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#0ea5e9" strokeWidth="12" strokeDasharray={`${45 * 2.51} 251`} />
+                                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#10b981" strokeWidth="12" strokeDasharray={`${30 * 2.51} 251`} strokeDashoffset={`-${45 * 2.51}`} />
+                                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#a855f7" strokeWidth="12" strokeDasharray={`${25 * 2.51} 251`} strokeDashoffset={`-${(45 + 30) * 2.51}`} />
+                            </svg>
+                            <div style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                textAlign: 'center'
+                            }}>
+                                <div style={{ fontSize: 28, fontWeight: 'bold', color: colors.text }}>1.5K</div>
+                                <div style={{ fontSize: 10, color: colors.textSecondary }}>ÜRÜN</div>
                             </div>
                         </div>
-                        <div style={{ height: 60, display: 'flex', alignItems: 'flex-end', gap: 3 }}>
-                            {[38, 42, 35, 48, 52, 45, 49, 41, 53, 47, 44, 51, 48, 46].map((height, i) => (
-                                <div
-                                    key={i}
-                                    style={{
-                                        flex: 1,
-                                        height: height,
-                                        background: 'linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%)',
-                                        borderRadius: '6px 6px 0 0',
-                                        opacity: 0.9,
-                                        transition: 'all 0.2s ease',
-                                        cursor: 'pointer'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.9'}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Ziyaretçi Trendi - YENİ */}
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 13, color: colors.textSecondary }}>Ziyaretçi (Günlük)</span>
-                                <span style={{ fontSize: 11, color: colors.textSecondary }}>son 14 gün</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 13, fontWeight: 'bold', color: '#a855f7' }}>3,245</span>
-                                <span style={{ fontSize: 11, color: '#10b981' }}>↑12.3%</span>
-                            </div>
-                        </div>
-                        <div style={{ height: 70, display: 'flex', alignItems: 'flex-end', gap: 3 }}>
-                            {[52, 48, 63, 58, 71, 65, 59, 62, 68, 55, 61, 57, 64, 70].map((height, i) => (
-                                <div
-                                    key={i}
-                                    style={{
-                                        flex: 1,
-                                        height: height,
-                                        background: 'linear-gradient(180deg, #a855f7 0%, #c084fc 100%)',
-                                        borderRadius: '6px 6px 0 0',
-                                        opacity: 0.9,
-                                        transition: 'all 0.2s ease',
-                                        cursor: 'pointer'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.9'}
-                                />
+                        <div style={{ flex: 1 }}>
+                            {categoryDistribution.map(cat => (
+                                <div key={cat.name} style={{ marginBottom: 12 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <div style={{ width: 10, height: 10, backgroundColor: cat.color, borderRadius: 3 }} />
+                                            <span style={{ fontSize: 13, color: colors.textSecondary }}>{cat.name}</span>
+                                        </div>
+                                        <span style={{ fontSize: 13, fontWeight: 'bold', color: colors.text }}>{cat.percentage}%</span>
+                                    </div>
+                                    <div style={{ width: '100%', height: 4, backgroundColor: colors.bg, borderRadius: 2 }}>
+                                        <div style={{ width: `${cat.percentage}%`, height: 4, backgroundColor: cat.color, borderRadius: 2 }} />
+                                    </div>
+                                </div>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                {/* Kategori Dağılımı ve Ödeme Yöntemleri */}
+                {/* Ödeme Yöntemleri */}
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
+                    padding: isMobile ? 20 : 24,
                     border: `1px solid ${colors.border}`
                 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 16px 0' }}>🥧 Kategori Dağılımı</h3>
-
-                    {/* Pie Chart */}
-                    <div style={{
-                        position: 'relative',
-                        width: 180,  // 150'den 180'e çıktı
-                        height: 180, // 150'den 180'e çıktı
-                        margin: '0 auto 24px'
-                    }}>
-                        <svg viewBox="0 0 100 100" style={{
-                            transform: 'rotate(-90deg)',
-                            width: '100%',
-                            height: '100%'
-                        }}>
-                            <circle
-                                cx="50"
-                                cy="50"
-                                r="40"
-                                fill="transparent"
-                                stroke="#0ea5e9"
-                                strokeWidth="12"
-                                strokeDasharray={`${45 * 2.51} 251`}
-                                strokeDashoffset="0"
-                            />
-                            <circle
-                                cx="50"
-                                cy="50"
-                                r="40"
-                                fill="transparent"
-                                stroke="#10b981"
-                                strokeWidth="12"
-                                strokeDasharray={`${30 * 2.51} 251`}
-                                strokeDashoffset={`-${45 * 2.51}`}
-                            />
-                            <circle
-                                cx="50"
-                                cy="50"
-                                r="40"
-                                fill="transparent"
-                                stroke="#a855f7"
-                                strokeWidth="12"
-                                strokeDasharray={`${25 * 2.51} 251`}
-                                strokeDashoffset={`-${(45 + 30) * 2.51}`}
-                            />
-                        </svg>
-
-                        {/* Yuvarlağın İçindeki Sayı - BÜYÜTÜLDÜ */}
-                        <div style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            textAlign: 'center',
-                            width: '100%',
-                            padding: '0 5px'
-                        }}>
-                            <div style={{
-                                fontSize: 36, // 28'den 36'ya çıktı
-                                fontWeight: 'bold',
-                                color: colors.text,
-                                lineHeight: 1.2,
-                                marginBottom: 8 // 0'dan 8'e çıktı
-                            }}>
-                                1,482
-                            </div>
-                            <div style={{
-                                fontSize: 12, // 10'dan 12'ye çıktı
-                                color: colors.textSecondary,
-                                letterSpacing: 1, // 0.5'ten 1'e çıktı
-                                fontWeight: 500
-                            }}>
-                                TOPLAM ÜRÜN
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Kategori Listesi */}
-                    <div style={{ marginBottom: 24 }}>
-                        {categoryDistribution.map(cat => (
-                            <div key={cat.name} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <div style={{ width: 10, height: 10, backgroundColor: cat.color, borderRadius: 3 }} />
-                                    <span style={{ fontSize: 13, color: colors.textSecondary }}>{cat.name}</span>
-                                </div>
-                                <span style={{ fontSize: 13, fontWeight: 'bold', color: colors.text }}>{cat.percentage}%</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Ödeme Yöntemleri */}
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 16px 0' }}>💳 Ödeme Yöntemleri</h3>
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, marginBottom: 20 }}>💳 Ödeme Yöntemleri</h3>
                     {paymentMethods.map(method => (
-                        <div key={method.name} style={{ marginBottom: 12 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>{method.name}</span>
-                                <span style={{ fontSize: 12, fontWeight: 'bold', color: colors.text }}>{method.percentage}%</span>
+                        <div key={method.name} style={{ marginBottom: 16 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                <span style={{ fontSize: 13, color: colors.textSecondary }}>{method.name}</span>
+                                <span style={{ fontSize: 13, fontWeight: 'bold', color: colors.text }}>{method.percentage}%</span>
                             </div>
-                            <div style={{ width: '100%', height: 4, backgroundColor: colors.bg, borderRadius: 2 }}>
-                                <div style={{ width: `${method.percentage}%`, height: 4, backgroundColor: method.color, borderRadius: 2 }} />
+                            <div style={{ width: '100%', height: 6, backgroundColor: colors.bg, borderRadius: 3 }}>
+                                <div style={{ width: `${method.percentage}%`, height: 6, backgroundColor: method.color, borderRadius: 3 }} />
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* En Çok Satanlar ve Kazandıran Müşteriler */}
+            {/* En Çok Satanlar ve Kazandıran Müşteriler - Tablolar mobil için kartlara dönüştü */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: 20,
                 marginBottom: 24
             }}>
@@ -1071,176 +931,159 @@ const ReportsPage = ({ colors }: ReportsPageProps) => {
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
+                    padding: isMobile ? 20 : 24,
                     border: `1px solid ${colors.border}`
                 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 16px 0' }}>🏆 En Çok Satan Ürünler</h3>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ fontSize: 11, color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>
-                                <th style={{ padding: '8px 0', textAlign: 'left' }}>Ürün</th>
-                                <th style={{ padding: '8px 0', textAlign: 'left' }}>Kategori</th>
-                                <th style={{ padding: '8px 0', textAlign: 'right' }}>Satış</th>
-                                <th style={{ padding: '8px 0', textAlign: 'right' }}>Gelir</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topProducts.map(product => (
-                                <tr key={product.name} style={{ borderBottom: `1px solid ${colors.border}` }}>
-                                    <td style={{ padding: '12px 0', fontSize: 13, color: colors.text }}>{product.name}</td>
-                                    <td style={{ padding: '12px 0', fontSize: 12, color: colors.textSecondary }}>{product.category}</td>
-                                    <td style={{ padding: '12px 0', fontSize: 13, color: colors.text, textAlign: 'right' }}>{product.sales}</td>
-                                    <td style={{ padding: '12px 0', fontSize: 13, fontWeight: 'bold', color: '#10b981', textAlign: 'right' }}>${product.revenue.toLocaleString()}</td>
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, marginBottom: 16 }}>🏆 En Çok Satan Ürünler</h3>
+                    {isMobile ? (
+                        topProducts.map(product => (
+                            <div key={product.name} style={{
+                                padding: '12px 0',
+                                borderBottom: `1px solid ${colors.border}`,
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <div>
+                                    <div style={{ fontSize: 14, fontWeight: 500, color: colors.text }}>{product.name}</div>
+                                    <div style={{ fontSize: 11, color: colors.textSecondary }}>{product.category}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: 14, fontWeight: 'bold', color: '#10b981' }}>${product.revenue.toLocaleString()}</div>
+                                    <div style={{ fontSize: 11, color: colors.textSecondary }}>{product.sales} satış</div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ fontSize: 11, color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>
+                                    <th style={{ padding: '8px 0', textAlign: 'left' }}>Ürün</th>
+                                    <th style={{ padding: '8px 0', textAlign: 'left' }}>Kategori</th>
+                                    <th style={{ padding: '8px 0', textAlign: 'right' }}>Satış</th>
+                                    <th style={{ padding: '8px 0', textAlign: 'right' }}>Gelir</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {topProducts.map(product => (
+                                    <tr key={product.name} style={{ borderBottom: `1px solid ${colors.border}` }}>
+                                        <td style={{ padding: '12px 0', fontSize: 13, color: colors.text }}>{product.name}</td>
+                                        <td style={{ padding: '12px 0', fontSize: 12, color: colors.textSecondary }}>{product.category}</td>
+                                        <td style={{ padding: '12px 0', fontSize: 13, color: colors.text, textAlign: 'right' }}>{product.sales}</td>
+                                        <td style={{ padding: '12px 0', fontSize: 13, fontWeight: 'bold', color: '#10b981', textAlign: 'right' }}>${product.revenue.toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
 
                 {/* En Çok Kazandıran Müşteriler */}
                 <div style={{
                     backgroundColor: colors.surface,
                     borderRadius: 20,
-                    padding: 24,
+                    padding: isMobile ? 20 : 24,
                     border: `1px solid ${colors.border}`
                 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: '0 0 16px 0' }}>👑 En Çok Kazandıran Müşteriler</h3>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ fontSize: 11, color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>
-                                <th style={{ padding: '8px 0', textAlign: 'left' }}>Müşteri</th>
-                                <th style={{ padding: '8px 0', textAlign: 'left' }}>Tip</th>
-                                <th style={{ padding: '8px 0', textAlign: 'right' }}>Sipariş</th>
-                                <th style={{ padding: '8px 0', textAlign: 'right' }}>Harcama</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topCustomers.map(customer => (
-                                <tr key={customer.email} style={{ borderBottom: `1px solid ${colors.border}` }}>
-                                    <td style={{ padding: '12px 0' }}>
-                                        <div style={{ fontSize: 13, color: colors.text }}>{customer.name}</div>
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, marginBottom: 16 }}>👑 En Çok Kazandıran Müşteriler</h3>
+                    {isMobile ? (
+                        topCustomers.map(customer => (
+                            <div key={customer.email} style={{
+                                padding: '12px 0',
+                                borderBottom: `1px solid ${colors.border}`
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                                    <div>
+                                        <div style={{ fontSize: 14, fontWeight: 500, color: colors.text }}>{customer.name}</div>
                                         <div style={{ fontSize: 11, color: colors.textSecondary }}>{customer.email}</div>
-                                    </td>
-                                    <td style={{ padding: '12px 0' }}>
-                                        <span style={{
-                                            padding: '2px 8px',
-                                            backgroundColor: customer.type === 'VIP' ? 'rgba(168,85,247,0.1)' : 'rgba(14,165,233,0.1)',
-                                            color: customer.type === 'VIP' ? '#a855f7' : '#0ea5e9',
-                                            fontSize: 11,
-                                            borderRadius: 20
-                                        }}>
-                                            {customer.type}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '12px 0', fontSize: 13, color: colors.text, textAlign: 'right' }}>{customer.orders}</td>
-                                    <td style={{ padding: '12px 0', fontSize: 13, fontWeight: 'bold', color: '#a855f7', textAlign: 'right' }}>${customer.spent.toLocaleString()}</td>
+                                    </div>
+                                    <span style={{
+                                        padding: '2px 8px',
+                                        backgroundColor: customer.type === 'VIP' ? 'rgba(168,85,247,0.1)' : 'rgba(14,165,233,0.1)',
+                                        color: customer.type === 'VIP' ? '#a855f7' : '#0ea5e9',
+                                        fontSize: 10,
+                                        borderRadius: 20
+                                    }}>
+                                        {customer.type}
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                                    <span style={{ fontSize: 12, color: colors.textSecondary }}>{customer.orders} sipariş</span>
+                                    <span style={{ fontSize: 14, fontWeight: 'bold', color: '#a855f7' }}>${customer.spent.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ fontSize: 11, color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>
+                                    <th style={{ padding: '8px 0', textAlign: 'left' }}>Müşteri</th>
+                                    <th style={{ padding: '8px 0', textAlign: 'left' }}>Tip</th>
+                                    <th style={{ padding: '8px 0', textAlign: 'right' }}>Sipariş</th>
+                                    <th style={{ padding: '8px 0', textAlign: 'right' }}>Harcama</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {topCustomers.map(customer => (
+                                    <tr key={customer.email} style={{ borderBottom: `1px solid ${colors.border}` }}>
+                                        <td style={{ padding: '12px 0' }}>
+                                            <div style={{ fontSize: 13, color: colors.text }}>{customer.name}</div>
+                                            <div style={{ fontSize: 11, color: colors.textSecondary }}>{customer.email}</div>
+                                        </td>
+                                        <td style={{ padding: '12px 0' }}>
+                                            <span style={{
+                                                padding: '2px 8px',
+                                                backgroundColor: customer.type === 'VIP' ? 'rgba(168,85,247,0.1)' : 'rgba(14,165,233,0.1)',
+                                                color: customer.type === 'VIP' ? '#a855f7' : '#0ea5e9',
+                                                fontSize: 11,
+                                                borderRadius: 20
+                                            }}>
+                                                {customer.type}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '12px 0', fontSize: 13, color: colors.text, textAlign: 'right' }}>{customer.orders}</td>
+                                        <td style={{ padding: '12px 0', fontSize: 13, fontWeight: 'bold', color: '#a855f7', textAlign: 'right' }}>${customer.spent.toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             </div>
 
-            {/* Özet ve İhracat */}
+            {/* Özet */}
             <div style={{
                 backgroundColor: colors.surface,
                 borderRadius: 20,
-                padding: 24,
+                padding: isMobile ? 20 : 24,
                 border: `1px solid ${colors.border}`
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, margin: 0 }}>📋 Günlük/Haftalık/Aylık Özet</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+                    <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: colors.text, margin: 0 }}>📋 Dönem Özeti</h3>
                     <div style={{ display: 'flex', gap: 8 }}>
-                        <button
-                            onClick={downloadPDF}
-                            style={{
-                                padding: '8px 20px',
-                                backgroundColor: '#ef4444',
-                                border: 'none',
-                                borderRadius: 30,
-                                color: 'white',
-                                fontSize: 13,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8
-                            }}
-                        >
-                            <span className="material-icons-round" style={{ fontSize: 18 }}>picture_as_pdf</span>
-                            PDF İndir
-                        </button>
-                        <button
-                            onClick={downloadExcel}
-                            style={{
-                                padding: '8px 20px',
-                                backgroundColor: '#10b981',
-                                border: 'none',
-                                borderRadius: 30,
-                                color: 'white',
-                                fontSize: 13,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8
-                            }}
-                        >
-                            <span className="material-icons-round" style={{ fontSize: 18 }}>table_chart</span>
-                            Excel İndir
-                        </button>
+                        <button onClick={downloadPDF} style={{ padding: '8px 16px', backgroundColor: '#ef4444', border: 'none', borderRadius: 30, color: 'white', fontSize: 12, cursor: 'pointer' }}>PDF</button>
+                        <button onClick={downloadExcel} style={{ padding: '8px 16px', backgroundColor: '#10b981', border: 'none', borderRadius: 30, color: 'white', fontSize: 12, cursor: 'pointer' }}>Excel</button>
                     </div>
                 </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-                    <div>
-                        <h4 style={{ fontSize: 14, fontWeight: 500, color: colors.text, margin: '0 0 12px 0' }}>Günlük Özet</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Ziyaretçi:</span>
-                                <span style={{ fontSize: 12, color: colors.text }}>1,245</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Sipariş:</span>
-                                <span style={{ fontSize: 12, color: colors.text }}>45</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Gelir:</span>
-                                <span style={{ fontSize: 12, fontWeight: 'bold', color: '#10b981' }}>$12,450</span>
-                            </div>
-                        </div>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+                    gap: isMobile ? 16 : 20
+                }}>
+                    <div style={{ backgroundColor: colors.bg, borderRadius: 16, padding: 16 }}>
+                        <div style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>Günlük</div>
+                        <div style={{ fontSize: 20, fontWeight: 'bold', color: colors.text }}>$12,450</div>
+                        <div style={{ fontSize: 11, color: colors.textSecondary }}>45 sipariş</div>
                     </div>
-                    <div>
-                        <h4 style={{ fontSize: 14, fontWeight: 500, color: colors.text, margin: '0 0 12px 0' }}>Haftalık Özet</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Ziyaretçi:</span>
-                                <span style={{ fontSize: 12, color: colors.text }}>8,942</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Sipariş:</span>
-                                <span style={{ fontSize: 12, color: colors.text }}>312</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Gelir:</span>
-                                <span style={{ fontSize: 12, fontWeight: 'bold', color: '#10b981' }}>$89,450</span>
-                            </div>
-                        </div>
+                    <div style={{ backgroundColor: colors.bg, borderRadius: 16, padding: 16 }}>
+                        <div style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>Haftalık</div>
+                        <div style={{ fontSize: 20, fontWeight: 'bold', color: colors.text }}>$89,450</div>
+                        <div style={{ fontSize: 11, color: colors.textSecondary }}>312 sipariş</div>
                     </div>
-                    <div>
-                        <h4 style={{ fontSize: 14, fontWeight: 500, color: colors.text, margin: '0 0 12px 0' }}>Aylık Özet</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Ziyaretçi:</span>
-                                <span style={{ fontSize: 12, color: colors.text }}>32,450</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Sipariş:</span>
-                                <span style={{ fontSize: 12, color: colors.text }}>1,482</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: 12, color: colors.textSecondary }}>Gelir:</span>
-                                <span style={{ fontSize: 12, fontWeight: 'bold', color: '#10b981' }}>$348,900</span>
-                            </div>
-                        </div>
+                    <div style={{ backgroundColor: colors.bg, borderRadius: 16, padding: 16 }}>
+                        <div style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>Aylık</div>
+                        <div style={{ fontSize: 20, fontWeight: 'bold', color: colors.text }}>$348,900</div>
+                        <div style={{ fontSize: 11, color: colors.textSecondary }}>1,482 sipariş</div>
                     </div>
                 </div>
             </div>

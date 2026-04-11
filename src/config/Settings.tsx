@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaInstagram, FaFacebook, FaTiktok, FaPinterest } from 'react-icons/fa';
 import { useMyShops, useShopSettings, useUpdateShopSettings } from '../server/FastAPI/shop.hooks';
-import { useCurrentUser } from '../server/FastAPI/user.hooks';
+import { useCurrentUser, useUserSessions  } from '../server/FastAPI/user.hooks';
 import {
   useSendNewOrderNotification,
   useSendNewSubscriberNotification,
@@ -793,151 +793,273 @@ const InvoiceSettings = ({ colors }: SettingsPageProps) => {
   );
 };
 
+
+
 // 5. HESAP GÜVENLİĞİ (Google/Apple bağlantısı, oturumlar)
 const SecuritySettings = ({ colors }: SettingsPageProps) => {
   const { data: userData, isLoading: userLoading } = useCurrentUser();
-  
+  const { data: sessions, isLoading: sessionsLoading } = useUserSessions();
+
+  // Giriş geçmişi - varsa göster, yoksa boş
+  const loginHistory = sessions?.map(session => ({
+    date: new Date(session.created_at).toLocaleString('tr-TR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }),
+    device: session.user_agent ? (
+      session.user_agent.includes('Windows') ? '💻 Windows PC' :
+      session.user_agent.includes('Mac') ? '🍎 Mac' :
+      session.user_agent.includes('iPhone') ? '📱 iPhone' :
+      session.user_agent.includes('iPad') ? '📱 iPad' :
+      session.user_agent.includes('Android') ? '📱 Android' : '🖥️ Bilinmeyen Cihaz'
+    ) : '🖥️ Bilinmeyen Cihaz',
+    ip: session.ip_address || '📍 Bilinmiyor',
+    location: (session.ip_address === '127.0.0.1' || session.ip_address === 'localhost') ? '🏠 İstanbul, TR' : '🌍 Bilinmiyor',
+    status: session.is_revoked ? '❌ İptal Edildi' : '✅ Aktif',
+    expires_at: new Date(session.expires_at).toLocaleString('tr-TR')
+  })) || [];
+
+  const securityTips = [];
+
+  // Güvenlik önerileri
+  if (userData?.auth_provider === 'email') {
+    securityTips.push({
+      text: '🔐 Şifrenizi düzenli olarak değiştirmelisiniz',
+      action: 'Şifre Değiştir',
+      urgent: false
+    });
+  }
+
+  // Oturum sayısı kontrolü
+  if (sessions && sessions.length > 3) {
+    securityTips.push({
+      text: `⚠️ ${sessions.length} farklı cihazdan aktif oturumunuz var. Güvenli olmayan oturumları sonlandırın.`,
+      action: 'Oturumları Yönet',
+      urgent: true
+    });
+  }
+
+  // Hiç giriş geçmişi yoksa
+  if (sessions && sessions.length === 0) {
+    securityTips.push({
+      text: '📌 Henüz hiç giriş kaydınız bulunmuyor. Giriş yaptığınızda burada görünecektir.',
+      action: '',
+      urgent: false
+    });
+  }
+
   const connectedAccount = {
     type: userData?.auth_provider || 'email',
     email: userData?.email || '',
     name: userData?.full_name || userData?.email?.split('@')[0] || 'Kullanıcı',
-    avatar: userData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.full_name || 'Kullanıcı')}&background=e07c5c&color=fff&size=80`
+    avatar: userData?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.full_name || 'Kullanıcı')}&background=e07c5c&color=fff&size=80`
   };
 
-  // Giriş Geçmişi - Son 5 giriş
-  const loginHistory = [
-    { date: 'Bugün 10:30', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
-    { date: 'Dün 22:15', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
-    { date: '2 gün önce', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
-    { date: '5 gün önce', location: 'İstanbul, TR', device: 'Firefox on Windows', ip: '192.168.1.2' },
-    { date: '1 hafta önce', location: 'İstanbul, TR', device: 'Chrome on Windows', ip: '192.168.1.1' },
-  ];
-
-  // Güvenlik Önerileri
-  const securityTips = [
-    { text: 'Şifrenizi değiştirmeyeli 90 gün oldu', action: 'Şifre Değiştir', urgent: true },
-    { text: 'İki faktörlü kimlik doğrulama aktif değil', action: 'Aktif Et', urgent: false },
-    { text: 'Hesabınıza bağlı uygulama yok', action: 'Uygulama Ekle', urgent: false },
-  ];
-
-  if (userLoading) {
-    return <div style={{ padding: 20, color: colors.text }}>Yükleniyor...</div>;
+  if (userLoading || sessionsLoading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center', color: colors.textSecondary }}>
+        <span className="material-icons-round" style={{ fontSize: 40, marginBottom: 16 }}>hourglass_empty</span>
+        <div>Yükleniyor...</div>
+      </div>
+    );
   }
 
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 600, color: colors.text, marginBottom: 24 }}>Hesap Güvenliği</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: colors.text, marginBottom: 24 }}>🔒 Hesap Güvenliği</h2>
 
-      {/* Bağlı Hesap Bilgisi */}
-      <div style={{ marginBottom: 32, padding: 20, backgroundColor: colors.bg, borderRadius: 20, border: `1px solid ${colors.border}` }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+      {/* ===== BAĞLI HESAP KARTI ===== */}
+      <div style={{ marginBottom: 32, padding: 24, backgroundColor: colors.bg, borderRadius: 24, border: `1px solid ${colors.border}` }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span className="material-icons-round" style={{ color: colors.primary }}>link</span>
           Bağlı Hesap
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
           <div style={{
-            width: 64,
-            height: 64,
-            borderRadius: 32,
+            width: 72,
+            height: 72,
+            borderRadius: 36,
             backgroundImage: `url(${connectedAccount.avatar})`,
             backgroundSize: 'cover',
-            backgroundColor: colors.surface
+            backgroundPosition: 'center',
+            backgroundColor: colors.surface,
+            border: `3px solid ${colors.primary}`
           }} />
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: colors.text }}>{connectedAccount.name}</div>
-            <div style={{ fontSize: 13, color: colors.textSecondary }}>{connectedAccount.email}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 18, fontWeight: 600, color: colors.text, marginBottom: 4 }}>{connectedAccount.name}</div>
+            <div style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 8 }}>{connectedAccount.email}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <span style={{
-                display: 'inline-block',
-                padding: '2px 8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 12px',
                 backgroundColor: connectedAccount.type === 'google' ? '#ea4335' : (connectedAccount.type === 'apple' ? '#000' : colors.primary),
                 color: 'white',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 600,
-                borderRadius: 20
+                borderRadius: 30
               }}>
+                <span className="material-icons-round" style={{ fontSize: 14 }}>
+                  {connectedAccount.type === 'google' ? 'public' : (connectedAccount.type === 'apple' ? 'apple' : 'email')}
+                </span>
                 {connectedAccount.type === 'google' ? 'Google ile Bağlı' : (connectedAccount.type === 'apple' ? 'Apple ile Bağlı' : 'E-posta ile')}
               </span>
+              {userData?.is_verified && (
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '4px 10px',
+                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                  color: '#10b981',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  borderRadius: 30
+                }}>
+                  <span className="material-icons-round" style={{ fontSize: 12 }}>verified</span>
+                  Doğrulanmış Hesap
+                </span>
+              )}
             </div>
           </div>
-          <button style={{ marginLeft: 'auto', padding: '8px 16px', backgroundColor: 'transparent', border: `1px solid ${colors.border}`, borderRadius: 30, color: colors.textSecondary, fontSize: 12, cursor: 'pointer' }}>
+          <button style={{
+            padding: '10px 20px',
+            backgroundColor: 'transparent',
+            border: `1px solid ${colors.border}`,
+            borderRadius: 30,
+            color: colors.textSecondary,
+            fontSize: 13,
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.surface}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
             Hesabı Değiştir
           </button>
         </div>
       </div>
 
-      {/* Güvenlik Önerileri */}
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="material-icons-round" style={{ color: colors.primary }}>tips_and_updates</span>
-          Güvenlik Önerileri
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {securityTips.map((tip, idx) => (
-            <div key={idx} style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '14px 16px',
-              backgroundColor: tip.urgent ? 'rgba(239, 68, 68, 0.1)' : colors.bg,
-              borderRadius: 16,
-              border: `1px solid ${tip.urgent ? '#ef4444' : colors.border}`
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span className="material-icons-round" style={{ color: tip.urgent ? '#ef4444' : colors.primary }}>
-                  {tip.urgent ? 'warning' : 'info'}
-                </span>
-                <span style={{ fontSize: 14, color: colors.text }}>{tip.text}</span>
-              </div>
-              <button style={{
-                padding: '6px 16px',
-                backgroundColor: tip.urgent ? '#ef4444' : 'transparent',
-                border: tip.urgent ? 'none' : `1px solid ${colors.border}`,
-                borderRadius: 30,
-                color: tip.urgent ? 'white' : colors.textSecondary,
-                fontSize: 12,
-                cursor: 'pointer'
+      {/* ===== GÜVENLİK ÖNERİLERİ ===== */}
+      {securityTips.length > 0 && (
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="material-icons-round" style={{ color: colors.primary }}>tips_and_updates</span>
+            Güvenlik Önerileri
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {securityTips.map((tip, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '16px 20px',
+                backgroundColor: tip.urgent ? 'rgba(239, 68, 68, 0.08)' : colors.bg,
+                borderRadius: 20,
+                border: `1px solid ${tip.urgent ? '#ef4444' : colors.border}`
               }}>
-                {tip.action}
-              </button>
-            </div>
-          ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <span className="material-icons-round" style={{ color: tip.urgent ? '#ef4444' : colors.primary, fontSize: 22 }}>
+                    {tip.urgent ? 'warning' : 'info'}
+                  </span>
+                  <span style={{ fontSize: 14, color: colors.text }}>{tip.text}</span>
+                </div>
+                {tip.action && (
+                  <button style={{
+                    padding: '8px 20px',
+                    backgroundColor: tip.urgent ? '#ef4444' : 'transparent',
+                    border: tip.urgent ? 'none' : `1px solid ${colors.border}`,
+                    borderRadius: 30,
+                    color: tip.urgent ? 'white' : colors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}>
+                    {tip.action}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Giriş Geçmişi */}
+      {/* ===== GİRİŞ GEÇMİŞİ ===== */}
       <div>
         <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span className="material-icons-round" style={{ color: colors.primary }}>history</span>
           Giriş Geçmişi
+          <span style={{
+            fontSize: 11,
+            backgroundColor: colors.surface,
+            padding: '2px 8px',
+            borderRadius: 20,
+            color: colors.textSecondary
+          }}>
+            {loginHistory.length} kayıt
+          </span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {loginHistory.map((item, idx) => (
-            <div key={idx} style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '12px 16px',
-              backgroundColor: colors.bg,
-              borderRadius: 12,
-              border: `1px solid ${colors.border}`,
-              flexWrap: 'wrap',
-              gap: 8
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span className="material-icons-round" style={{ color: colors.textSecondary }}>computer</span>
-                <div>
-                  <div style={{ fontSize: 13, color: colors.text }}>{item.device}</div>
-                  <div style={{ fontSize: 11, color: colors.textSecondary }}>{item.location} • {item.ip}</div>
+
+        {loginHistory.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: 48,
+            backgroundColor: colors.bg,
+            borderRadius: 20,
+            border: `1px solid ${colors.border}`
+          }}>
+            <span className="material-icons-round" style={{ fontSize: 48, color: colors.textSecondary, marginBottom: 12 }}>devices_other</span>
+            <div style={{ fontSize: 14, color: colors.textSecondary }}>Henüz giriş kaydınız bulunmuyor</div>
+            <div style={{ fontSize: 12, color: colors.textMuted || colors.textSecondary, marginTop: 4 }}>Giriş yaptığınızda burada görünecektir</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {loginHistory.map((item, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '16px 20px',
+                backgroundColor: colors.bg,
+                borderRadius: 16,
+                border: `1px solid ${colors.border}`,
+                flexWrap: 'wrap',
+                gap: 12,
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: colors.surface,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span className="material-icons-round" style={{ fontSize: 22, color: colors.textSecondary }}>computer</span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: colors.text, marginBottom: 4 }}>{item.device}</div>
+                    <div style={{ fontSize: 12, color: colors.textSecondary, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span>📍 {item.location}</span>
+                      <span>•</span>
+                      <span>🌐 {item.ip}</span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 13, color: colors.text, fontWeight: 500 }}>{item.date}</div>
+                  <div style={{ fontSize: 11, color: colors.textSecondary }}>{item.status}</div>
                 </div>
               </div>
-              <div style={{ fontSize: 12, color: colors.textSecondary }}>
-                🕐 {item.date}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
